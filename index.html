@@ -589,6 +589,45 @@
       background: #ffffff;
     }
 
+    .workflow-bridge {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .workflow-bridge strong,
+    .workflow-bridge span {
+      display: block;
+    }
+
+    .workflow-bridge strong {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .workflow-bridge span {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .workflow-bridge .chip {
+      justify-self: end;
+      background: var(--ink);
+    }
+
+    .workflow-bridge.connected .chip {
+      background: var(--green);
+    }
+
     .log-row {
       display: grid;
       grid-template-columns: 34px minmax(0, 1fr);
@@ -914,6 +953,13 @@
           <button class="button primary" id="copy-artifact" type="button">Copy active draft</button>
           <button class="button subtle" id="reset-workflow" type="button">Reset workflow</button>
         </div>
+        <div class="workflow-bridge" id="workflow-bridge" aria-label="Workflow integration status">
+          <div>
+            <strong id="workflow-mode">Local draft mode</strong>
+            <span id="workflow-endpoint">Add a workflow endpoint when external systems are ready.</span>
+          </div>
+          <span class="chip" id="workflow-status">No external calls</span>
+        </div>
         <div class="activity-log" id="activity-log" aria-live="polite" aria-label="Activity log"></div>
       </div>
     </section>
@@ -933,7 +979,7 @@
       </div>
     </section>
 
-    <p class="footer-note">This page is a training surface. Buttons create local drafts only. Use a hosted HTTPS version as a space website tab when you are ready to place it in the collaboration space.</p>
+    <p class="footer-note">This page is a training surface. Without a workflow endpoint, buttons create local drafts only. With an approved endpoint, each button posts a structured workflow event and updates this page with the returned links or summaries.</p>
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -955,6 +1001,77 @@
     const preview = document.querySelector("#artifact-preview");
     const log = document.querySelector("#activity-log");
     const toast = document.querySelector("#toast");
+    const workflowBridge = document.querySelector("#workflow-bridge");
+    const workflowMode = document.querySelector("#workflow-mode");
+    const workflowEndpointLabel = document.querySelector("#workflow-endpoint");
+    const workflowStatus = document.querySelector("#workflow-status");
+
+    const workflowActions = {
+      intake: {
+        label: "Intake",
+        phase: "intake",
+        artifact: "thread",
+        system: "command-center",
+        requestedOutputs: ["response-thread", "incident-record"]
+      },
+      thread: {
+        label: "Response thread",
+        phase: "triage",
+        artifact: "thread",
+        system: "workspace-thread",
+        requestedOutputs: ["coordination-update"]
+      },
+      jira: {
+        label: "Jira task",
+        phase: "draft",
+        artifact: "jira",
+        system: "jira",
+        requestedOutputs: ["issue-url", "engineering-task"]
+      },
+      confluence: {
+        label: "Notes page",
+        phase: "draft",
+        artifact: "notes",
+        system: "confluence",
+        requestedOutputs: ["page-url", "decision-log"]
+      },
+      miro: {
+        label: "Response board",
+        phase: "draft",
+        artifact: "board",
+        system: "miro",
+        requestedOutputs: ["board-url", "lane-map"]
+      },
+      approval: {
+        label: "Approval email",
+        phase: "approval",
+        artifact: "email",
+        system: "outlook",
+        requestedOutputs: ["draft-email-url", "approval-request"]
+      },
+      closeout: {
+        label: "AI incident recap",
+        phase: "closeout",
+        artifact: "recap",
+        system: "ai-agent",
+        requestedOutputs: ["recap", "follow-up-actions"]
+      }
+    };
+
+    const workflowStorageKey = "practiceIncidentWorkflowEndpoint";
+    const endpointParam = new URLSearchParams(window.location.search).get("endpoint");
+    if (endpointParam) {
+      if (endpointParam === "local" || endpointParam === "off") {
+        localStorage.removeItem(workflowStorageKey);
+      } else {
+        localStorage.setItem(workflowStorageKey, endpointParam);
+      }
+    }
+
+    const workflow = {
+      endpoint: getValidWorkflowEndpoint(endpointParam || localStorage.getItem(workflowStorageKey) || ""),
+      lastStatus: "No external calls"
+    };
 
     const state = {
       activeArtifact: "thread",
@@ -982,6 +1099,33 @@
         facts: data.get("facts").trim(),
         unknowns: data.get("unknowns").trim()
       };
+    }
+
+    function getValidWorkflowEndpoint(value) {
+      if (!value) return "";
+      try {
+        const url = new URL(value);
+        const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
+        if (url.protocol === "https:" || (url.protocol === "http:" && localHosts.has(url.hostname))) {
+          return url.toString();
+        }
+      } catch (error) {
+        return "";
+      }
+      return "";
+    }
+
+    function updateWorkflowBridge() {
+      const endpoint = workflow.endpoint;
+      workflowBridge.classList.toggle("connected", Boolean(endpoint));
+      workflowMode.textContent = endpoint ? "Connected workflow mode" : "Local draft mode";
+      workflowStatus.textContent = workflow.lastStatus;
+      if (!endpoint) {
+        workflowEndpointLabel.textContent = "Add ?endpoint=https://your-workflow-url to connect external systems.";
+        return;
+      }
+      const url = new URL(endpoint);
+      workflowEndpointLabel.textContent = `Events post to ${url.host}.`;
     }
 
     function updateMetrics() {
@@ -1139,12 +1283,18 @@ Recommended follow-ups:
     function addLog(message) {
       state.log.unshift(message);
       state.log = state.log.slice(0, 8);
-      log.innerHTML = state.log.map((entry, index) => `
-        <div class="log-row">
-          <span class="log-time">${String(index + 1).padStart(2, "0")}</span>
-          <span class="log-text">${entry}</span>
-        </div>
-      `).join("");
+      log.replaceChildren(...state.log.map((entry, index) => {
+        const row = document.createElement("div");
+        const time = document.createElement("span");
+        const text = document.createElement("span");
+        row.className = "log-row";
+        time.className = "log-time";
+        text.className = "log-text";
+        time.textContent = String(index + 1).padStart(2, "0");
+        text.textContent = entry;
+        row.append(time, text);
+        return row;
+      }));
     }
 
     function setPhase(phase, label) {
@@ -1161,7 +1311,98 @@ Recommended follow-ups:
       updateMetrics();
     }
 
-    function runAction(action) {
+    function makeWorkflowPayload(action, outputs) {
+      const data = getData();
+      const actionConfig = workflowActions[action] || workflowActions.intake;
+      return {
+        type: "incident.workflow.action",
+        version: "2026-04-30",
+        action,
+        actionLabel: actionConfig.label,
+        targetSystem: actionConfig.system,
+        requestedOutputs: actionConfig.requestedOutputs,
+        idempotencyKey: `${data.id || "unassigned"}:${action}`,
+        incident: {
+          id: data.id,
+          title: data.title,
+          severity: data.severity,
+          owner: data.owner,
+          audience: data.audience,
+          nextUpdate: data.deadline,
+          knownFacts: data.facts,
+          openQuestions: data.unknowns
+        },
+        artifacts: outputs,
+        page: {
+          origin: window.location.origin,
+          path: window.location.pathname
+        }
+      };
+    }
+
+    function applyWorkflowResult(action, result = {}) {
+      const actionConfig = workflowActions[action] || workflowActions.intake;
+      const artifact = actionConfig.artifact || state.activeArtifact;
+      if (result.outputs && typeof result.outputs === "object") {
+        state.outputs = { ...state.outputs, ...result.outputs };
+      }
+
+      const links = Object.entries(result.artifacts || result.urls || {})
+        .filter(([, value]) => typeof value === "string" && value.trim())
+        .map(([key, value]) => `${key}: ${value}`);
+
+      if (links.length) {
+        state.outputs[artifact] = `${state.outputs[artifact] || ""}\n\nWorkflow result:\n${links.join("\n")}`;
+        setArtifact(artifact);
+      }
+
+      if (Array.isArray(result.messages)) {
+        result.messages.slice(0, 3).forEach((message) => addLog(String(message)));
+      }
+    }
+
+    async function sendWorkflowEvent(action, outputs) {
+      const actionConfig = workflowActions[action] || workflowActions.intake;
+      const payload = makeWorkflowPayload(action, outputs);
+
+      if (!workflow.endpoint) {
+        workflow.lastStatus = "Local event ready";
+        updateWorkflowBridge();
+        addLog(`${actionConfig.label} event prepared for future workflow endpoint.`);
+        return { mode: "local", payload };
+      }
+
+      workflow.lastStatus = "Sending event";
+      updateWorkflowBridge();
+
+      try {
+        const response = await fetch(workflow.endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || result.ok === false) {
+          throw new Error(result.error || `Workflow endpoint returned ${response.status}`);
+        }
+        workflow.lastStatus = "Endpoint accepted";
+        updateWorkflowBridge();
+        applyWorkflowResult(action, result);
+        addLog(`${actionConfig.label} workflow accepted by endpoint.`);
+        return result;
+      } catch (error) {
+        workflow.lastStatus = "Endpoint failed";
+        updateWorkflowBridge();
+        addLog(`${actionConfig.label} stayed local because endpoint failed: ${error.message}`);
+        showToast("Endpoint failed; draft kept local");
+        return { mode: "error", error: error.message, payload };
+      }
+    }
+
+    async function runAction(action) {
       const outputs = makeOutputs();
       state.outputs = { ...state.outputs, ...outputs };
       document.querySelectorAll("[data-action]").forEach((button) => {
@@ -1211,6 +1452,7 @@ Recommended follow-ups:
       }
 
       showToast("Workflow updated");
+      await sendWorkflowEvent(action, state.outputs);
     }
 
     function resetWorkflow() {
@@ -1227,6 +1469,7 @@ Recommended follow-ups:
       log.innerHTML = "";
       setArtifact("thread");
       updateMetrics();
+      updateWorkflowBridge();
       showToast("Workflow reset");
     }
 
@@ -1276,6 +1519,7 @@ Recommended follow-ups:
     state.outputs = makeOutputs();
     setArtifact("thread");
     updateMetrics();
+    updateWorkflowBridge();
   </script>
 </body>
 </html>
