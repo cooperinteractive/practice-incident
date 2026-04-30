@@ -292,7 +292,7 @@
 
     .workbench {
       display: grid;
-      grid-template-columns: minmax(420px, 0.58fr) minmax(0, 1fr);
+      grid-template-columns: minmax(600px, 0.78fr) minmax(0, 1fr);
       gap: 16px;
       align-items: start;
       margin-top: 14px;
@@ -380,6 +380,35 @@
       font-size: 11px;
       font-weight: 750;
       line-height: 1.35;
+    }
+
+    .due-card {
+      display: grid;
+      gap: 7px;
+      margin-top: 8px;
+      padding: 10px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .due-card span,
+    .due-card strong {
+      display: block;
+    }
+
+    .due-card span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .due-card strong {
+      margin-top: 2px;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.3;
+      font-weight: 850;
     }
 
     input:focus,
@@ -757,9 +786,15 @@
               <input id="audience" name="audience" value="Internal team and reviewers">
             </div>
             <div class="field">
-              <label for="deadline">Next update</label>
+              <label for="deadline">Update cadence</label>
               <input id="deadline" name="deadline" value="30 minutes">
-              <div class="field-hint" id="next-update-preview">30 minutes after intake is submitted</div>
+              <div class="field-hint">Use relative timing, like 15 minutes, 30 minutes, or 1 hour.</div>
+              <div class="due-card" aria-live="polite">
+                <span>Next update due</span>
+                <strong id="next-update-preview">Calculated when intake is submitted</strong>
+                <span>Submitted at</span>
+                <strong id="submitted-at-preview">Not submitted yet</strong>
+              </div>
             </div>
           </div>
           <div class="field">
@@ -861,6 +896,7 @@
     const toast = document.querySelector("#toast");
     const githubTrigger = document.querySelector("#github-trigger");
     const nextUpdatePreview = document.querySelector("#next-update-preview");
+    const submittedAtPreview = document.querySelector("#submitted-at-preview");
     const simulationLabel = "SIMULATION";
     const artifactActions = {
       asana: "asana",
@@ -1025,16 +1061,39 @@
         const date = new Date(state.intakeSubmittedAt.getTime() + offsetMs);
         return {
           raw,
+          cadence: raw,
+          submittedAt: state.intakeSubmittedAt,
+          submittedLabel: formatDateTime(state.intakeSubmittedAt),
           at: date,
           iso: date.toISOString(),
-          label: `${formatDateTime(date)} (${raw} from intake)`
+          dueLabel: formatDateTime(date),
+          label: `${formatDateTime(date)} (${raw} from intake)`,
+          summary: `Submitted ${formatDateTime(state.intakeSubmittedAt)}. Next update due ${formatDateTime(date)}.`
+        };
+      }
+      if (state.intakeSubmittedAt) {
+        return {
+          raw,
+          cadence: raw,
+          submittedAt: state.intakeSubmittedAt,
+          submittedLabel: formatDateTime(state.intakeSubmittedAt),
+          at: null,
+          iso: "",
+          dueLabel: raw,
+          label: raw,
+          summary: `Submitted ${formatDateTime(state.intakeSubmittedAt)}. Next update timing entered manually: ${raw}.`
         };
       }
       return {
         raw,
+        cadence: raw,
+        submittedAt: null,
+        submittedLabel: "Not submitted yet",
         at: null,
         iso: "",
-        label: offsetMs ? `${raw} after intake is submitted` : raw
+        dueLabel: "Calculated when intake is submitted",
+        label: offsetMs ? `${raw} after intake is submitted` : raw,
+        summary: offsetMs ? `Next update will be due ${raw} after intake is submitted.` : `Next update timing entered manually: ${raw}.`
       };
     }
 
@@ -1060,7 +1119,9 @@
       setChip("#chip-intake", intakeChip);
       setChip("#chip-tier", tierChip, tierTone);
       setChip("#chip-approval", approvalChip, approvalTone);
-      nextUpdatePreview.textContent = getNextUpdateInfo(data).label;
+      const timing = getNextUpdateInfo(data);
+      nextUpdatePreview.textContent = timing.dueLabel;
+      submittedAtPreview.textContent = timing.submittedLabel;
     }
 
     function makeOutputs() {
@@ -1072,7 +1133,9 @@
 Task: [${simulationLabel}] ${data.id} - Coordinate ${data.title}
 Project: Incident Command
 Owner: ${data.owner}
-Due: ${timing.label}
+Submitted at: ${timing.submittedLabel}
+Next update due: ${timing.dueLabel}
+Cadence: ${timing.cadence}
 
 Checklist:
 - Confirm owner for engineering validation.
@@ -1095,7 +1158,9 @@ ${data.unknowns}`,
 Owner: ${data.owner}
 Severity: ${data.severity}
 Audience: ${data.audience}
-Next update: ${timing.label}
+Submitted at: ${timing.submittedLabel}
+Next update due: ${timing.dueLabel}
+Cadence: ${timing.cadence}
 
 Simulation note:
 This is a training exercise. Do not send externally as a live incident update.
@@ -1147,7 +1212,9 @@ ${data.unknowns}
 
 Decision log:
 - Owner: ${data.owner}
-- First update: ${timing.label}
+- Intake submitted: ${timing.submittedLabel}
+- First update due: ${timing.dueLabel}
+- Update cadence: ${timing.cadence}
 - Approval rule: external language remains draft-only until reviewer approval.
 
 Sections:
@@ -1159,6 +1226,12 @@ Sections:
 - Process improvements`,
 
         board: `${simulationLabel} Miro board update
+
+Next update due:
+${timing.dueLabel}
+
+Update cadence:
+${timing.cadence}
 
 Create four lanes:
 1. Facts
@@ -1201,7 +1274,9 @@ Requested decision:
 Approve, revise, or hold. External language remains draft-only until approval is explicit.
 
 Owner: ${data.owner}
-Deadline: ${timing.label}`,
+Submitted at: ${timing.submittedLabel}
+Next update due: ${timing.dueLabel}
+Update cadence: ${timing.cadence}`,
 
         recap: `${simulationLabel} AI incident recap
 
@@ -1213,6 +1288,8 @@ A possible workspace exposure was reported. The response team captured known fac
 
 Timeline:
 - Intake captured by ${data.owner}.
+- Intake submitted: ${timing.submittedLabel}.
+- Next update due: ${timing.dueLabel} (${timing.cadence} cadence).
 - Engineering validation task drafted.
 - Notes page drafted for decisions and evidence.
 - Response board mapped with facts, roles, deliverables, and closeout lanes.
@@ -1294,9 +1371,11 @@ Recommended follow-ups:
           severity: data.severity,
           owner: data.owner,
           audience: data.audience,
-          nextUpdate: timing.label,
+          nextUpdate: timing.dueLabel,
+          nextUpdateSummary: timing.summary,
           nextUpdateRaw: timing.raw,
           nextUpdateAt: timing.iso,
+          submittedAt: timing.submittedAt ? timing.submittedAt.toISOString() : "",
           simulation: true,
           knownFacts: data.facts,
           openQuestions: data.unknowns
