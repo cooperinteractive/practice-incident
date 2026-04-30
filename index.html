@@ -1345,6 +1345,9 @@ Recommended follow-ups:
       const artifact = actionConfig.artifact || state.activeArtifact;
       if (result.outputs && typeof result.outputs === "object") {
         state.outputs = { ...state.outputs, ...result.outputs };
+        if (Object.prototype.hasOwnProperty.call(result.outputs, artifact)) {
+          setArtifact(artifact);
+        }
       }
 
       const links = Object.entries(result.artifacts || result.urls || {})
