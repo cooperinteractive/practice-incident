@@ -124,7 +124,8 @@
 
     .button:focus-visible,
     .action-card:focus-visible,
-    .artifact-tab:focus-visible {
+    .artifact-tab:focus-visible,
+    .deliverable-run:focus-visible {
       outline: 3px solid rgba(10, 96, 255, 0.45);
       outline-offset: 3px;
     }
@@ -554,6 +555,207 @@
       font-weight: 850;
     }
 
+    .deliverable-tracker {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--cyan);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .deliverable-tracker.all-complete {
+      border-top-color: var(--green);
+      background: #f4fbf7;
+    }
+
+    .tracker-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .tracker-head h3 {
+      margin: 2px 0 4px;
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.15;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .tracker-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      font-weight: 650;
+    }
+
+    .deliverable-tracker.all-complete .tracker-head p {
+      color: var(--green);
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+    }
+
+    .tracker-kicker {
+      display: block;
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .tracker-badge {
+      flex: 0 0 auto;
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 9px;
+      border-radius: 7px;
+      color: #ffffff;
+      background: var(--ink);
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .deliverable-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .deliverable-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 76px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--blue);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+
+    .deliverable-item.waiting {
+      border-left-color: #9aa8b8;
+    }
+
+    .deliverable-item.late {
+      border-left-color: var(--red);
+      background: #fff6f7;
+    }
+
+    .deliverable-item.done {
+      border-left-color: var(--green);
+      background: #f4fbf7;
+    }
+
+    .deliverable-copy {
+      min-width: 0;
+    }
+
+    .deliverable-copy strong,
+    .deliverable-copy span {
+      display: block;
+    }
+
+    .deliverable-copy strong {
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .deliverable-copy span {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 650;
+    }
+
+    .deliverable-time {
+      margin-top: 5px;
+      color: var(--blue);
+      font-size: 11px;
+      line-height: 1.35;
+      font-weight: 850;
+    }
+
+    .deliverable-item.done .deliverable-copy strong,
+    .deliverable-item.done .deliverable-copy span,
+    .deliverable-item.done .deliverable-time {
+      color: var(--green);
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+    }
+
+    .deliverable-state {
+      display: inline-flex;
+      min-width: 66px;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 8px;
+      border-radius: 999px;
+      color: var(--ink);
+      background: #eef3f8;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 900;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .deliverable-actions {
+      display: grid;
+      justify-items: end;
+      gap: 7px;
+    }
+
+    .deliverable-item.open .deliverable-state {
+      color: #ffffff;
+      background: var(--blue);
+    }
+
+    .deliverable-item.late .deliverable-state {
+      color: #ffffff;
+      background: var(--red);
+    }
+
+    .deliverable-item.done .deliverable-state {
+      color: #ffffff;
+      background: var(--green);
+    }
+
+    .deliverable-run {
+      width: 42px;
+      min-height: 32px;
+      border: 0;
+      border-radius: 7px;
+      color: #ffffff;
+      background: var(--ink);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .deliverable-run:hover {
+      background: var(--blue);
+    }
+
+    .deliverable-run:disabled {
+      cursor: default;
+      color: #ffffff;
+      background: var(--green);
+    }
+
     .artifact-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -688,7 +890,8 @@
 
       .two-col,
       .action-grid,
-      .phase-board {
+      .phase-board,
+      .deliverable-list {
         grid-template-columns: 1fr;
       }
 
@@ -856,6 +1059,18 @@
           <div class="phase" data-phase="closeout"><span>Closeout</span><strong id="phase-closeout">Waiting</strong></div>
         </div>
 
+        <section class="deliverable-tracker" id="deliverable-tracker" aria-label="Deliverable time tracker">
+          <div class="tracker-head">
+            <div>
+              <span class="tracker-kicker">Tier-based timing</span>
+              <h3>Deliverable tracker</h3>
+              <p id="tracker-summary">Submit intake to start the deliverable clock.</p>
+            </div>
+            <span class="tracker-badge" id="tracker-tier">Tier 2 coordination</span>
+          </div>
+          <div class="deliverable-list" id="deliverable-list" aria-live="polite"></div>
+        </section>
+
         <div class="artifact-tabs" role="tablist" aria-label="Generated draft tabs">
           <button class="artifact-tab active" type="button" role="tab" aria-selected="true" data-artifact="asana">Asana</button>
           <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="jira">Jira</button>
@@ -898,6 +1113,10 @@
     const nextUpdatePreview = document.querySelector("#next-update-preview");
     const submittedAtPreview = document.querySelector("#submitted-at-preview");
     const simulationLabel = "SIMULATION";
+    const deliverableTracker = document.querySelector("#deliverable-tracker");
+    const deliverableList = document.querySelector("#deliverable-list");
+    const trackerSummary = document.querySelector("#tracker-summary");
+    const trackerTier = document.querySelector("#tracker-tier");
     const artifactActions = {
       asana: "asana",
       jira: "jira",
@@ -959,6 +1178,76 @@
       }
     };
 
+    const tierProfiles = {
+      tier1: {
+        label: "Tier 1 monitor",
+        minutes: { asana: 20, jira: 45, notes: 60, board: 75, email: 90, recap: 180 }
+      },
+      tier2: {
+        label: "Tier 2 coordination",
+        minutes: { asana: 10, jira: 20, notes: 30, board: 40, email: 45, recap: 90 }
+      },
+      tier3: {
+        label: "Tier 3 leadership",
+        minutes: { asana: 5, jira: 15, notes: 20, board: 30, email: 30, recap: 60 }
+      },
+      tier4: {
+        label: "Tier 4 external",
+        minutes: { asana: 5, jira: 10, notes: 15, board: 20, email: 20, recap: 45 }
+      }
+    };
+
+    const deliverableDefinitions = [
+      {
+        id: "asana",
+        action: "asana",
+        label: "Asana task",
+        system: "Asana",
+        owner: "Response lead",
+        detail: "Task, owner, and response checklist"
+      },
+      {
+        id: "jira",
+        action: "jira",
+        label: "Jira validation",
+        system: "Jira",
+        owner: "Engineering",
+        detail: "Scope review and evidence criteria"
+      },
+      {
+        id: "notes",
+        action: "confluence",
+        label: "Confluence notes",
+        system: "Confluence",
+        owner: "Scribe",
+        detail: "Decision log and incident record"
+      },
+      {
+        id: "board",
+        action: "miro",
+        label: "Miro board brief",
+        system: "Miro",
+        owner: "Facilitator",
+        detail: "Scenario lanes and visual map"
+      },
+      {
+        id: "email",
+        action: "approval",
+        label: "Approval email",
+        system: "Outlook",
+        owner: "Reviewer",
+        detail: "Approval request and holding language"
+      },
+      {
+        id: "recap",
+        action: "closeout",
+        label: "AI recap",
+        system: "AI recap",
+        owner: "Response lead",
+        detail: "Final recap and follow-up actions"
+      }
+    ];
+
     const workflowStorageKey = "practiceIncidentWorkflowEndpoint";
     const pageParams = new URLSearchParams(window.location.search);
     const endpointParam = pageParams.get("endpoint");
@@ -992,7 +1281,8 @@
       complete: new Set(),
       outputs: {},
       log: [],
-      intakeSubmittedAt: null
+      intakeSubmittedAt: null,
+      deliverablesDone: new Map()
     };
 
     function showToast(message) {
@@ -1097,6 +1387,121 @@
       };
     }
 
+    function getTierKey(severity) {
+      const text = String(severity || "").toLowerCase();
+      if (text.includes("tier 4")) return "tier4";
+      if (text.includes("tier 3")) return "tier3";
+      if (text.includes("tier 1")) return "tier1";
+      return "tier2";
+    }
+
+    function getTierProfile(data) {
+      const key = getTierKey(data.severity);
+      return { key, ...tierProfiles[key] };
+    }
+
+    function formatMinutes(minutes) {
+      if (minutes < 60) return `${minutes} min`;
+      const hours = Math.floor(minutes / 60);
+      const remainder = minutes % 60;
+      if (!remainder) return `${hours} hr`;
+      return `${hours} hr ${remainder} min`;
+    }
+
+    function getDeliverableSchedule(data = getData()) {
+      const profile = getTierProfile(data);
+      const now = new Date();
+      return deliverableDefinitions.map((definition) => {
+        const minutes = profile.minutes[definition.id] || 30;
+        const dueAt = state.intakeSubmittedAt ? new Date(state.intakeSubmittedAt.getTime() + minutes * 60 * 1000) : null;
+        const doneAt = state.deliverablesDone.get(definition.id) || null;
+        const status = doneAt ? "done" : !dueAt ? "waiting" : now > dueAt ? "late" : "open";
+        const statusLabel = doneAt ? `Done ${formatDateTime(doneAt)}` : dueAt ? status === "late" ? "Late" : "Open" : "Waiting";
+        const dueLabel = dueAt ? formatDateTime(dueAt) : `+${formatMinutes(minutes)} after intake`;
+        return {
+          ...definition,
+          minutes,
+          dueAt,
+          doneAt,
+          dueLabel,
+          status,
+          statusLabel
+        };
+      });
+    }
+
+    function makeScheduleText(data = getData()) {
+      const profile = getTierProfile(data);
+      const rows = getDeliverableSchedule(data).map((item) => {
+        const finished = item.doneAt ? `; completed ${formatDateTime(item.doneAt)}` : "";
+        return `- ${item.label} (${item.system}, ${item.owner}): due ${item.dueLabel}${finished}`;
+      });
+      return `Deliverable tracker (${profile.label}):\n${rows.join("\n")}`;
+    }
+
+    function markDeliverableDone(action) {
+      const item = deliverableDefinitions.find((definition) => definition.action === action);
+      if (!item || state.deliverablesDone.has(item.id)) return;
+      state.deliverablesDone.set(item.id, new Date());
+    }
+
+    function renderDeliverableTracker() {
+      if (!deliverableList) return;
+      const data = getData();
+      const profile = getTierProfile(data);
+      const schedule = getDeliverableSchedule(data);
+      const completeCount = schedule.filter((item) => item.doneAt).length;
+      const allComplete = completeCount === schedule.length;
+      const nextOpen = schedule.find((item) => !item.doneAt);
+
+      trackerTier.textContent = profile.label;
+      deliverableTracker.classList.toggle("all-complete", allComplete);
+      if (!state.intakeSubmittedAt) {
+        trackerSummary.textContent = `${profile.label} is ready. Submit intake to calculate exact due times.`;
+      } else if (allComplete) {
+        trackerSummary.textContent = `All ${schedule.length} deliverables are complete for this simulation.`;
+      } else {
+        trackerSummary.textContent = `${completeCount}/${schedule.length} complete. Next expected: ${nextOpen.label} by ${nextOpen.dueLabel}.`;
+      }
+
+      const rows = schedule.map((item) => {
+        const row = document.createElement("div");
+        const copy = document.createElement("div");
+        const title = document.createElement("strong");
+        const meta = document.createElement("span");
+        const time = document.createElement("div");
+        const side = document.createElement("div");
+        const stateLabel = document.createElement("span");
+        const button = document.createElement("button");
+
+        row.className = `deliverable-item ${item.status}`;
+        row.dataset.deliverable = item.id;
+        copy.className = "deliverable-copy";
+        title.textContent = item.label;
+        meta.textContent = `${item.system} - ${item.detail}`;
+        time.className = "deliverable-time";
+        time.textContent = item.doneAt ? `Due ${item.dueLabel} - done ${formatDateTime(item.doneAt)}` : `Due ${item.dueLabel}`;
+        side.className = "deliverable-actions";
+        stateLabel.className = "deliverable-state";
+        stateLabel.textContent = item.statusLabel === "Late" ? "Late" : item.doneAt ? "Done" : state.intakeSubmittedAt ? "Open" : "Wait";
+        button.className = "deliverable-run";
+        button.type = "button";
+        button.textContent = state.intakeSubmittedAt ? "Run" : "Start";
+        button.setAttribute("aria-label", `Run ${item.label}`);
+        if (!item.doneAt) {
+          button.addEventListener("click", () => runAction(item.action));
+        }
+
+        copy.append(title, meta, time);
+        side.append(stateLabel);
+        if (!item.doneAt) side.append(button);
+        row.append(copy, side);
+        return row;
+      });
+
+      deliverableList.replaceChildren(...rows);
+    }
+
     function setChip(selector, text, tone = "") {
       const chip = document.querySelector(selector);
       chip.textContent = text;
@@ -1122,11 +1527,15 @@
       const timing = getNextUpdateInfo(data);
       nextUpdatePreview.textContent = timing.dueLabel;
       submittedAtPreview.textContent = timing.submittedLabel;
+      renderDeliverableTracker();
     }
 
     function makeOutputs() {
       const data = getData();
       const timing = getNextUpdateInfo(data);
+      const profile = getTierProfile(data);
+      const scheduleText = makeScheduleText(data);
+      const brandStyle = "Brand style: header #07182d, primary action #0a60ff, timing lane #00a8d6, approval accent #ad5900, blockers #c73545.";
       return {
         asana: `${simulationLabel} Asana task draft
 
@@ -1136,6 +1545,7 @@ Owner: ${data.owner}
 Submitted at: ${timing.submittedLabel}
 Next update due: ${timing.dueLabel}
 Cadence: ${timing.cadence}
+Tier timing: ${profile.label}
 
 Checklist:
 - Confirm owner for engineering validation.
@@ -1146,6 +1556,8 @@ Checklist:
 
 Simulation note:
 This is a training exercise. Do not treat this as a live incident record.
+
+${scheduleText}
 
 Context:
 ${data.facts}
@@ -1161,6 +1573,7 @@ Audience: ${data.audience}
 Submitted at: ${timing.submittedLabel}
 Next update due: ${timing.dueLabel}
 Cadence: ${timing.cadence}
+Tier timing: ${profile.label}
 
 Simulation note:
 This is a training exercise. Do not send externally as a live incident update.
@@ -1170,6 +1583,8 @@ ${data.facts}
 
 Open questions:
 ${data.unknowns}
+
+${scheduleText}
 
 Next action:
 Route engineering validation, capture notes, and keep external language draft-only until approval is explicit.`,
@@ -1186,6 +1601,8 @@ Training artifact only. Do not classify as a live production incident.
 
 Description:
 ${data.facts}
+
+${scheduleText}
 
 Acceptance criteria:
 - Identify which documents were visible.
@@ -1204,6 +1621,8 @@ Document the scenario, decisions, approvals, and lessons learned.
 Simulation note:
 Training artifact only. No real customer, employee, or production data should be added.
 
+${brandStyle}
+
 Known facts:
 ${data.facts}
 
@@ -1215,7 +1634,10 @@ Decision log:
 - Intake submitted: ${timing.submittedLabel}
 - First update due: ${timing.dueLabel}
 - Update cadence: ${timing.cadence}
+- Tier timing: ${profile.label}
 - Approval rule: external language remains draft-only until reviewer approval.
+
+${scheduleText}
 
 Sections:
 - Timeline
@@ -1227,11 +1649,16 @@ Sections:
 
         board: `${simulationLabel} Miro board update
 
+${brandStyle}
+
 Next update due:
 ${timing.dueLabel}
 
 Update cadence:
 ${timing.cadence}
+
+Tier timing:
+${profile.label}
 
 Create four lanes:
 1. Facts
@@ -1250,6 +1677,9 @@ Create four lanes:
    - Recap
    - Lessons learned
    - Follow-up tasks
+
+Add a timing lane:
+${scheduleText}
 
 Simulation note:
 Training board only. Keep real incident details out of this draft.`,
@@ -1276,7 +1706,10 @@ Approve, revise, or hold. External language remains draft-only until approval is
 Owner: ${data.owner}
 Submitted at: ${timing.submittedLabel}
 Next update due: ${timing.dueLabel}
-Update cadence: ${timing.cadence}`,
+Update cadence: ${timing.cadence}
+Tier timing: ${profile.label}
+
+${scheduleText}`,
 
         recap: `${simulationLabel} AI incident recap
 
@@ -1290,10 +1723,13 @@ Timeline:
 - Intake captured by ${data.owner}.
 - Intake submitted: ${timing.submittedLabel}.
 - Next update due: ${timing.dueLabel} (${timing.cadence} cadence).
+- Tier timing: ${profile.label}.
 - Engineering validation task drafted.
 - Notes page drafted for decisions and evidence.
 - Response board mapped with facts, roles, deliverables, and closeout lanes.
 - Approval email drafted for reviewer decision.
+
+${scheduleText}
 
 Known facts:
 ${data.facts}
@@ -1357,6 +1793,18 @@ Recommended follow-ups:
       const data = getData();
       const timing = getNextUpdateInfo(data);
       const actionConfig = workflowActions[action] || workflowActions.intake;
+      const profile = getTierProfile(data);
+      const deliverables = getDeliverableSchedule(data).map((item) => ({
+        id: item.id,
+        label: item.label,
+        system: item.system,
+        owner: item.owner,
+        dueInMinutes: item.minutes,
+        dueAt: item.dueAt ? item.dueAt.toISOString() : "",
+        doneAt: item.doneAt ? item.doneAt.toISOString() : "",
+        status: item.status,
+        simulation: true
+      }));
       return {
         type: "incident.workflow.action",
         version: "2026-04-30",
@@ -1379,6 +1827,11 @@ Recommended follow-ups:
           simulation: true,
           knownFacts: data.facts,
           openQuestions: data.unknowns
+        },
+        timing: {
+          tier: profile.label,
+          tierKey: profile.key,
+          deliverables
         },
         artifacts: outputs,
         page: {
@@ -1521,6 +1974,10 @@ Generated draft stays in the Webex training page. This issue is only a short sim
       if (action === "intake" || !state.intakeSubmittedAt) {
         state.intakeSubmittedAt = new Date();
       }
+      if (state.intakeSubmittedAt) {
+        state.complete.add("intake");
+      }
+      markDeliverableDone(action);
       const outputs = makeOutputs();
       state.outputs = { ...state.outputs, ...outputs };
       document.querySelectorAll("[data-action]").forEach((button) => {
@@ -1569,6 +2026,7 @@ Generated draft stays in the Webex training page. This issue is only a short sim
         addLog("AI incident recap generated.");
       }
 
+      renderDeliverableTracker();
       showToast("Workflow updated");
       await sendWorkflowEvent(action, state.outputs);
     }
@@ -1577,6 +2035,7 @@ Generated draft stays in the Webex training page. This issue is only a short sim
       state.activeArtifact = "asana";
       state.complete = new Set();
       state.intakeSubmittedAt = null;
+      state.deliverablesDone = new Map();
       state.outputs = makeOutputs();
       state.log = [];
       phaseOrder.forEach((phase) => {
