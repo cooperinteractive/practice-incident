@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Incident Command Center</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2307182d'/%3E%3Crect x='12' y='12' width='17' height='17' rx='3' fill='white'/%3E%3Crect x='35' y='12' width='17' height='17' rx='3' fill='%2300a8d6'/%3E%3Crect x='12' y='35' width='17' height='17' rx='3' fill='%23e97800'/%3E%3Crect x='35' y='35' width='17' height='17' rx='3' fill='%23635bff'/%3E%3C/svg%3E">
   <style>
     :root {
       --ink: #07182d;
@@ -16,7 +17,7 @@
       --blue: #0a60ff;
       --cyan: #00a8d6;
       --green: #16834f;
-      --orange: #e97800;
+      --orange: #ad5900;
       --red: #c73545;
       --violet: #635bff;
       --shadow: 0 18px 48px rgba(7, 24, 45, 0.13);
@@ -26,6 +27,10 @@
 
     * {
       box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
     }
 
     html {
@@ -143,6 +148,14 @@
       box-shadow: inset 0 0 0 1px var(--line);
     }
 
+    .nav a:focus-visible,
+    .button:focus-visible,
+    .action-card:focus-visible,
+    .artifact-tab:focus-visible {
+      outline: 3px solid rgba(10, 96, 255, 0.45);
+      outline-offset: 3px;
+    }
+
     .hero {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 310px;
@@ -152,7 +165,8 @@
       color: #ffffff;
       background:
         radial-gradient(circle at 82% 15%, rgba(0, 168, 214, 0.34), transparent 30%),
-        linear-gradient(135deg, #07182d, #10263f 68%, #17324f);
+        linear-gradient(135deg, #07182d, #10263f 68%, #17324f),
+        #07182d;
       border-radius: var(--radius);
       border-bottom: 4px solid var(--cyan);
       box-shadow: var(--shadow);
@@ -403,8 +417,9 @@
     }
 
     .action-card {
+      position: relative;
       width: 100%;
-      min-height: 66px;
+      min-height: 72px;
       display: grid;
       grid-template-columns: 36px minmax(0, 1fr);
       align-items: center;
@@ -441,6 +456,32 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.32;
+    }
+
+    .action-mode {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      min-height: 19px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 7px;
+      color: #2c3d51;
+      background: #eef3f8;
+      font-size: 10px;
+      font-weight: 850;
+      line-height: 1;
+    }
+
+    .action-mode.live {
+      color: #ffffff;
+      background: var(--green);
+    }
+
+    .action-mode.preview {
+      color: #ffffff;
+      background: var(--violet);
     }
 
     .action-icon {
@@ -766,31 +807,37 @@
 
       <div class="panel">
         <h2>Workflow actions</h2>
-        <p class="panel-copy">Each button completes a step locally and generates the next draft. Real posting or ticket creation stays off until you approve it.</p>
+        <p class="panel-copy">Live buttons open existing records. Draft and preview buttons generate safe copy without sending or posting.</p>
         <div class="action-grid" aria-label="Workflow actions">
           <button class="action-card" type="button" data-action="asana">
+            <span class="action-mode preview">Preview</span>
             <span class="action-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h10M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Asana task</strong><small>Creates the action list.</small></span>
+            <span><strong>Asana task</strong><small>Stages task copy.</small></span>
           </button>
           <button class="action-card" type="button" data-action="jira">
+            <span class="action-mode live">Live</span>
             <span class="action-icon violet" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="2"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Jira issue</strong><small>Builds validation work.</small></span>
+            <span><strong>Jira issue</strong><small>Opens validation work.</small></span>
           </button>
           <button class="action-card" type="button" data-action="confluence">
+            <span class="action-mode live">Live</span>
             <span class="action-icon cyan" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v16H7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 8h4M10 12h4M10 16h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Confluence notes</strong><small>Creates the record.</small></span>
+            <span><strong>Confluence notes</strong><small>Opens recap record.</small></span>
           </button>
           <button class="action-card" type="button" data-action="miro">
+            <span class="action-mode">Draft</span>
             <span class="action-icon orange" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 5h14v14H5z" stroke="currentColor" stroke-width="2"/><path d="M8 9h8M8 13h5M8 17h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Miro board</strong><small>Maps lanes and decisions.</small></span>
+            <span><strong>Miro board</strong><small>Builds board brief.</small></span>
           </button>
           <button class="action-card" type="button" data-action="approval">
+            <span class="action-mode">Draft</span>
             <span class="action-icon red" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3 4 7v6c0 4 3.2 6.7 8 8 4.8-1.3 8-4 8-8V7l-8-4Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Outlook email</strong><small>Prepares reviewer request.</small></span>
+            <span><strong>Outlook email</strong><small>Drafts reviewer request.</small></span>
           </button>
           <button class="action-card" type="button" data-action="closeout">
+            <span class="action-mode live">Live</span>
             <span class="action-icon dark" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12 10 17 20 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>AI recap</strong><small>Outputs summary and follow-ups.</small></span>
+            <span><strong>AI recap</strong><small>Opens recap page.</small></span>
           </button>
         </div>
 
@@ -803,14 +850,14 @@
         </div>
 
         <div class="artifact-tabs" role="tablist" aria-label="Generated draft tabs">
-          <button class="artifact-tab active" type="button" data-artifact="asana">Asana</button>
-          <button class="artifact-tab" type="button" data-artifact="jira">Jira</button>
-          <button class="artifact-tab" type="button" data-artifact="notes">Notes</button>
-          <button class="artifact-tab" type="button" data-artifact="board">Board</button>
-          <button class="artifact-tab" type="button" data-artifact="email">Email</button>
-          <button class="artifact-tab" type="button" data-artifact="recap">AI Recap</button>
+          <button class="artifact-tab active" type="button" role="tab" aria-selected="true" data-artifact="asana">Asana</button>
+          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="jira">Jira</button>
+          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="notes">Notes</button>
+          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="board">Board</button>
+          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="email">Email</button>
+          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="recap">AI Recap</button>
         </div>
-        <pre class="artifact-preview" id="artifact-preview" aria-live="polite"></pre>
+        <pre class="artifact-preview" id="artifact-preview" role="tabpanel" aria-live="polite"></pre>
         <div class="button-row" style="margin-top: 12px;">
           <button class="button primary" id="copy-artifact" type="button">Copy active draft</button>
           <a class="button subtle" id="github-trigger" href="#" target="_blank" rel="noopener" hidden>Open trigger</a>
@@ -901,7 +948,12 @@
       if (endpointParam === "local" || endpointParam === "off") {
         localStorage.removeItem(workflowStorageKey);
       } else {
-        localStorage.setItem(workflowStorageKey, endpointParam);
+        const validatedEndpoint = getValidWorkflowEndpoint(endpointParam);
+        if (validatedEndpoint) {
+          localStorage.setItem(workflowStorageKey, validatedEndpoint);
+        } else {
+          localStorage.removeItem(workflowStorageKey);
+        }
       }
     }
 
@@ -1122,7 +1174,9 @@ Recommended follow-ups:
       state.activeArtifact = name;
       state.outputs = { ...makeOutputs(), ...state.outputs };
       document.querySelectorAll("[data-artifact]").forEach((tab) => {
-        tab.classList.toggle("active", tab.dataset.artifact === name);
+        const isActive = tab.dataset.artifact === name;
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
       });
       preview.textContent = state.outputs[name] || "";
     }
@@ -1285,9 +1339,11 @@ ${JSON.stringify(payload, null, 2)}
         return result;
       } catch (error) {
         workflow.lastStatus = "Endpoint failed";
+        const triggerUrl = setGitHubTrigger(action, payload);
         addLog(`${actionConfig.label} stayed local because endpoint failed: ${error.message}`);
+        addLog(`${actionConfig.label} fallback trigger ready.`);
         showToast("Endpoint failed; draft kept local");
-        return { mode: "error", error: error.message, payload };
+        return { mode: "error", error: error.message, payload, triggerUrl };
       }
     }
 
