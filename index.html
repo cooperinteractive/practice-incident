@@ -47,9 +47,9 @@
     }
 
     .app {
-      width: min(1320px, calc(100% - 36px));
+      width: min(1240px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 18px 0 42px;
+      padding: 12px 0 26px;
     }
 
     .topbar {
@@ -62,8 +62,8 @@
     }
 
     .topbar-inner {
-      width: min(1320px, calc(100% - 36px));
-      min-height: 62px;
+      width: min(1240px, calc(100% - 28px));
+      min-height: 52px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -145,10 +145,10 @@
 
     .hero {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 360px;
-      gap: 24px;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 16px;
       align-items: stretch;
-      padding: 30px;
+      padding: 22px;
       color: #ffffff;
       background:
         radial-gradient(circle at 82% 15%, rgba(0, 168, 214, 0.34), transparent 30%),
@@ -162,18 +162,18 @@
       max-width: 780px;
       margin: 0;
       color: #ffffff;
-      font-size: clamp(36px, 5vw, 70px);
-      line-height: 0.96;
+      font-size: clamp(32px, 4.1vw, 56px);
+      line-height: 1;
       font-weight: 850;
       letter-spacing: 0;
     }
 
     .hero p {
       max-width: 720px;
-      margin: 16px 0 0;
+      margin: 12px 0 0;
       color: rgba(255, 255, 255, 0.78);
-      font-size: 17px;
-      line-height: 1.5;
+      font-size: 15px;
+      line-height: 1.4;
     }
 
     .hero-actions,
@@ -184,7 +184,7 @@
     }
 
     .hero-actions {
-      margin-top: 24px;
+      margin-top: 18px;
     }
 
     .button {
@@ -234,7 +234,7 @@
     }
 
     .status-panel {
-      padding: 18px;
+      padding: 14px;
       border-radius: var(--radius);
       color: var(--ink);
       background: rgba(255, 255, 255, 0.96);
@@ -242,8 +242,8 @@
     }
 
     .status-panel h2 {
-      margin: 0 0 14px;
-      font-size: 18px;
+      margin: 0 0 10px;
+      font-size: 16px;
       line-height: 1.2;
     }
 
@@ -257,15 +257,15 @@
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 10px;
       align-items: center;
-      min-height: 42px;
-      padding: 10px;
+      min-height: 38px;
+      padding: 8px;
       border-radius: 7px;
       border: 1px solid var(--line);
       background: #f8fafc;
     }
 
     .status-row span {
-      color: var(--muted);
+      color: #35465b;
       font-size: 12px;
       font-weight: 800;
     }
@@ -299,41 +299,8 @@
       background: var(--red);
     }
 
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin: 16px 0;
-    }
-
-    .metric {
-      min-height: 96px;
-      padding: 16px;
-      border-radius: var(--radius);
-      border: 1px solid var(--line);
-      background: var(--surface);
-      box-shadow: 0 10px 26px rgba(7, 24, 45, 0.06);
-    }
-
-    .metric-label {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 850;
-    }
-
-    .metric-value {
-      margin-top: 9px;
-      color: var(--ink);
-      font-size: 25px;
-      line-height: 1;
-      font-weight: 850;
-    }
-
-    .metric-note {
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
+    .status-row .chip {
+      color: #ffffff;
     }
 
     .workbench {
@@ -341,11 +308,11 @@
       grid-template-columns: minmax(300px, 0.42fr) minmax(0, 1fr);
       gap: 16px;
       align-items: start;
-      margin-top: 16px;
+      margin-top: 14px;
     }
 
     .panel {
-      padding: 18px;
+      padding: 16px;
       border-radius: var(--radius);
       border: 1px solid var(--line);
       background: var(--surface);
@@ -360,7 +327,7 @@
     }
 
     .panel h2 {
-      font-size: clamp(24px, 3vw, 34px);
+      font-size: clamp(22px, 2.4vw, 30px);
       line-height: 1.05;
       font-weight: 850;
     }
@@ -381,7 +348,7 @@
     .form-grid {
       display: grid;
       gap: 12px;
-      margin-top: 16px;
+      margin-top: 12px;
     }
 
     .two-col {
@@ -432,14 +399,14 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
-      margin-top: 16px;
+      margin-top: 12px;
     }
 
     .action-card {
       width: 100%;
-      min-height: 76px;
+      min-height: 66px;
       display: grid;
-      grid-template-columns: 40px minmax(0, 1fr);
+      grid-template-columns: 36px minmax(0, 1fr);
       align-items: center;
       gap: 12px;
       border: 1px solid var(--line);
@@ -477,8 +444,8 @@
     }
 
     .action-icon {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       display: grid;
       place-items: center;
       border-radius: 8px;
@@ -501,8 +468,8 @@
     }
 
     .phase {
-      min-height: 68px;
-      padding: 11px;
+      min-height: 54px;
+      padding: 9px;
       border-radius: 8px;
       border: 1px solid var(--line);
       background: #f8fafc;
@@ -530,7 +497,7 @@
     }
 
     .phase strong {
-      margin-top: 8px;
+      margin-top: 5px;
       color: var(--ink);
       font-size: 13px;
       line-height: 1.25;
@@ -564,7 +531,7 @@
     }
 
     .artifact-preview {
-      min-height: 330px;
+      min-height: 245px;
       margin: 0;
       padding: 16px;
       border-radius: 8px;
@@ -580,52 +547,13 @@
     .activity-log {
       display: grid;
       gap: 8px;
-      max-height: 160px;
+      max-height: 118px;
       overflow: auto;
       margin-top: 12px;
       padding: 10px;
       border-radius: 8px;
       border: 1px solid var(--line);
       background: #ffffff;
-    }
-
-    .workflow-bridge {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
-      align-items: center;
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: #f8fafc;
-    }
-
-    .workflow-bridge strong,
-    .workflow-bridge span {
-      display: block;
-    }
-
-    .workflow-bridge strong {
-      color: var(--ink);
-      font-size: 13px;
-      font-weight: 850;
-    }
-
-    .workflow-bridge span {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .workflow-bridge .chip {
-      justify-self: end;
-      background: var(--ink);
-    }
-
-    .workflow-bridge.connected .chip {
-      background: var(--green);
     }
 
     .log-row {
@@ -647,41 +575,6 @@
       color: var(--ink-2);
       font-size: 13px;
       line-height: 1.35;
-    }
-
-    .link-strip {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .link-card {
-      padding: 14px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: var(--surface);
-    }
-
-    .link-card strong {
-      display: block;
-      color: var(--ink);
-      font-size: 14px;
-    }
-
-    .link-card span {
-      display: block;
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .footer-note {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
     }
 
     .toast {
@@ -712,11 +605,6 @@
       .hero,
       .workbench {
         grid-template-columns: 1fr;
-      }
-
-      .metrics,
-      .link-strip {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .phase-board {
@@ -753,11 +641,9 @@
         font-size: 16px;
       }
 
-      .metrics,
       .two-col,
       .action-grid,
-      .phase-board,
-      .link-strip {
+      .phase-board {
         grid-template-columns: 1fr;
       }
 
@@ -784,7 +670,6 @@
       <nav class="nav" aria-label="Page sections">
         <a class="active" href="#command">Command</a>
         <a href="#workflow">Workflow</a>
-        <a href="#systems">Systems</a>
       </nav>
     </div>
   </header>
@@ -822,29 +707,6 @@
           </div>
         </div>
       </aside>
-    </section>
-
-    <section class="metrics" aria-label="Incident summary metrics">
-      <div class="metric">
-        <div class="metric-label">Owner</div>
-        <div class="metric-value" id="metric-owner">Response lead</div>
-        <div class="metric-note">Owns next update and routing.</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Next Update</div>
-        <div class="metric-value" id="metric-update">30 min</div>
-        <div class="metric-note">Visible in the response thread.</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Workflow</div>
-        <div class="metric-value" id="metric-workflow">Open</div>
-        <div class="metric-note">Local workflow state only.</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Outputs</div>
-        <div class="metric-value" id="metric-outputs">0</div>
-        <div class="metric-note">Drafts generated in this page.</div>
-      </div>
     </section>
 
     <section class="workbench" id="workflow">
@@ -906,29 +768,29 @@
         <h2>Workflow actions</h2>
         <p class="panel-copy">Each button completes a step locally and generates the next draft. Real posting or ticket creation stays off until you approve it.</p>
         <div class="action-grid" aria-label="Workflow actions">
-          <button class="action-card" type="button" data-action="thread">
+          <button class="action-card" type="button" data-action="asana">
             <span class="action-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h10M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Draft response thread</strong><small>Creates the coordination update.</small></span>
+            <span><strong>Asana task</strong><small>Creates the action list.</small></span>
           </button>
           <button class="action-card" type="button" data-action="jira">
             <span class="action-icon violet" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="2"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Draft Jira task</strong><small>Builds engineering validation work.</small></span>
+            <span><strong>Jira issue</strong><small>Builds validation work.</small></span>
           </button>
           <button class="action-card" type="button" data-action="confluence">
             <span class="action-icon cyan" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v16H7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 8h4M10 12h4M10 16h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Draft notes page</strong><small>Creates the working incident record.</small></span>
+            <span><strong>Confluence notes</strong><small>Creates the record.</small></span>
           </button>
           <button class="action-card" type="button" data-action="miro">
             <span class="action-icon orange" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 5h14v14H5z" stroke="currentColor" stroke-width="2"/><path d="M8 9h8M8 13h5M8 17h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Map response board</strong><small>Defines lanes and decision cards.</small></span>
+            <span><strong>Miro board</strong><small>Maps lanes and decisions.</small></span>
           </button>
           <button class="action-card" type="button" data-action="approval">
             <span class="action-icon red" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3 4 7v6c0 4 3.2 6.7 8 8 4.8-1.3 8-4 8-8V7l-8-4Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Draft approval email</strong><small>Prepares reviewer request.</small></span>
+            <span><strong>Outlook email</strong><small>Prepares reviewer request.</small></span>
           </button>
           <button class="action-card" type="button" data-action="closeout">
             <span class="action-icon dark" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12 10 17 20 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>AI incident recap</strong><small>Outputs final summary and follow-ups.</small></span>
+            <span><strong>AI recap</strong><small>Outputs summary and follow-ups.</small></span>
           </button>
         </div>
 
@@ -941,7 +803,7 @@
         </div>
 
         <div class="artifact-tabs" role="tablist" aria-label="Generated draft tabs">
-          <button class="artifact-tab active" type="button" data-artifact="thread">Thread</button>
+          <button class="artifact-tab active" type="button" data-artifact="asana">Asana</button>
           <button class="artifact-tab" type="button" data-artifact="jira">Jira</button>
           <button class="artifact-tab" type="button" data-artifact="notes">Notes</button>
           <button class="artifact-tab" type="button" data-artifact="board">Board</button>
@@ -951,36 +813,12 @@
         <pre class="artifact-preview" id="artifact-preview" aria-live="polite"></pre>
         <div class="button-row" style="margin-top: 12px;">
           <button class="button primary" id="copy-artifact" type="button">Copy active draft</button>
-          <a class="button subtle" id="github-trigger" href="#" target="_blank" rel="noopener" hidden>Open GitHub trigger</a>
+          <a class="button subtle" id="github-trigger" href="#" target="_blank" rel="noopener" hidden>Open trigger</a>
           <button class="button subtle" id="reset-workflow" type="button">Reset workflow</button>
-        </div>
-        <div class="workflow-bridge" id="workflow-bridge" aria-label="Workflow integration status">
-          <div>
-            <strong id="workflow-mode">GitHub trigger mode</strong>
-            <span id="workflow-endpoint">Buttons prepare GitHub issue triggers for approved automation.</span>
-          </div>
-          <span class="chip" id="workflow-status">No external calls</span>
         </div>
         <div class="activity-log" id="activity-log" aria-live="polite" aria-label="Activity log"></div>
       </div>
     </section>
-
-    <section class="link-strip" id="systems" aria-label="Connected systems">
-      <div class="link-card">
-        <strong>Jira</strong>
-        <span>Engineering validation, evidence, owner, and acceptance criteria.</span>
-      </div>
-      <div class="link-card">
-        <strong>Confluence</strong>
-        <span>Working notes, decision log, recap, and reusable improvements.</span>
-      </div>
-      <div class="link-card">
-        <strong>Miro</strong>
-        <span>Visual response map with facts, roles, deliverables, and closeout lanes.</span>
-      </div>
-    </section>
-
-    <p class="footer-note">This page is a training surface. Buttons generate local drafts and GitHub issue triggers by default. With an approved endpoint, each button posts a structured workflow event and updates this page with returned links or summaries.</p>
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1002,50 +840,46 @@
     const preview = document.querySelector("#artifact-preview");
     const log = document.querySelector("#activity-log");
     const toast = document.querySelector("#toast");
-    const workflowBridge = document.querySelector("#workflow-bridge");
-    const workflowMode = document.querySelector("#workflow-mode");
-    const workflowEndpointLabel = document.querySelector("#workflow-endpoint");
-    const workflowStatus = document.querySelector("#workflow-status");
     const githubTrigger = document.querySelector("#github-trigger");
 
     const workflowActions = {
       intake: {
         label: "Intake",
         phase: "intake",
-        artifact: "thread",
+        artifact: "asana",
         system: "command-center",
-        requestedOutputs: ["response-thread", "incident-record"]
+        requestedOutputs: ["asana-task", "incident-record"]
       },
-      thread: {
-        label: "Response thread",
+      asana: {
+        label: "Asana task",
         phase: "triage",
-        artifact: "thread",
-        system: "workspace-thread",
-        requestedOutputs: ["coordination-update"]
+        artifact: "asana",
+        system: "asana",
+        requestedOutputs: ["task-url", "action-list"]
       },
       jira: {
-        label: "Jira task",
+        label: "Jira issue",
         phase: "draft",
         artifact: "jira",
         system: "jira",
         requestedOutputs: ["issue-url", "engineering-task"]
       },
       confluence: {
-        label: "Notes page",
+        label: "Confluence notes",
         phase: "draft",
         artifact: "notes",
         system: "confluence",
         requestedOutputs: ["page-url", "decision-log"]
       },
       miro: {
-        label: "Response board",
+        label: "Miro board",
         phase: "draft",
         artifact: "board",
         system: "miro",
         requestedOutputs: ["board-url", "lane-map"]
       },
       approval: {
-        label: "Approval email",
+        label: "Outlook email",
         phase: "approval",
         artifact: "email",
         system: "outlook",
@@ -1078,7 +912,7 @@
     };
 
     const state = {
-      activeArtifact: "thread",
+      activeArtifact: "asana",
       complete: new Set(),
       outputs: {},
       log: []
@@ -1119,33 +953,36 @@
       return "";
     }
 
-    function updateWorkflowBridge() {
-      const endpoint = workflow.endpoint;
-      workflowBridge.classList.toggle("connected", Boolean(endpoint));
-      workflowMode.textContent = endpoint ? "Connected workflow mode" : "GitHub trigger mode";
-      workflowStatus.textContent = workflow.lastStatus;
-      if (!endpoint) {
-        workflowEndpointLabel.textContent = "Buttons prepare GitHub issue triggers for approved automation.";
-        return;
-      }
-      const url = new URL(endpoint);
-      workflowEndpointLabel.textContent = `Events post to ${url.host}.`;
-    }
-
     function updateMetrics() {
       const data = getData();
       document.querySelector("#metric-id").textContent = data.id || "Unassigned";
       document.querySelector("#metric-tier").textContent = (data.severity || "Tier").split(" - ")[0];
-      document.querySelector("#metric-owner").textContent = data.owner || "Unassigned";
-      document.querySelector("#metric-update").textContent = data.deadline || "TBD";
-      document.querySelector("#metric-outputs").textContent = Object.values(state.outputs).filter(Boolean).length;
-      document.querySelector("#metric-workflow").textContent = state.complete.has("closeout") ? "Closed" : "Open";
       document.querySelector("#metric-approval").textContent = state.complete.has("approval") ? "Pending" : state.complete.has("closeout") ? "Closed" : "Draft";
     }
 
     function makeOutputs() {
       const data = getData();
       return {
+        asana: `Asana task draft
+
+Task: ${data.id} - Coordinate ${data.title}
+Project: Incident Command
+Owner: ${data.owner}
+Due: ${data.deadline}
+
+Checklist:
+- Confirm owner for engineering validation.
+- Open Jira issue for scope review.
+- Draft Confluence incident notes.
+- Prepare Outlook approval email.
+- Hold external language until approval is explicit.
+
+Context:
+${data.facts}
+
+Open questions:
+${data.unknowns}`,
+
         thread: `[Declare] ${data.id} - ${data.title}
 
 Owner: ${data.owner}
@@ -1162,7 +999,7 @@ ${data.unknowns}
 Next action:
 Route engineering validation, capture notes, and keep external language draft-only until approval is explicit.`,
 
-        jira: `Jira task draft
+        jira: `Jira issue draft
 
 Summary: ${data.id} - Validate scope for ${data.title}
 Issue type: Task
@@ -1356,7 +1193,7 @@ Next update: ${payload.incident.nextUpdate}
 
 ## Generated draft
 
-${payload.artifacts[workflowActions[payload.action]?.artifact || "thread"] || "No draft generated."}
+${payload.artifacts[workflowActions[payload.action]?.artifact || "asana"] || "No draft generated."}
 
 ## Workflow payload
 
@@ -1409,15 +1246,13 @@ ${JSON.stringify(payload, null, 2)}
 
       if (!workflow.endpoint) {
         const triggerUrl = setGitHubTrigger(action, payload);
-        workflow.lastStatus = "GitHub trigger ready";
-        updateWorkflowBridge();
-        addLog(`${actionConfig.label} GitHub issue trigger ready.`);
+        workflow.lastStatus = "Trigger ready";
+        addLog(`${actionConfig.label} trigger ready.`);
         return { mode: "github", payload, triggerUrl };
       }
 
       githubTrigger.hidden = true;
       workflow.lastStatus = "Sending event";
-      updateWorkflowBridge();
 
       try {
         const response = await fetch(workflow.endpoint, {
@@ -1433,13 +1268,11 @@ ${JSON.stringify(payload, null, 2)}
           throw new Error(result.error || `Workflow endpoint returned ${response.status}`);
         }
         workflow.lastStatus = "Endpoint accepted";
-        updateWorkflowBridge();
         applyWorkflowResult(action, result);
         addLog(`${actionConfig.label} workflow accepted by endpoint.`);
         return result;
       } catch (error) {
         workflow.lastStatus = "Endpoint failed";
-        updateWorkflowBridge();
         addLog(`${actionConfig.label} stayed local because endpoint failed: ${error.message}`);
         showToast("Endpoint failed; draft kept local");
         return { mode: "error", error: error.message, payload };
@@ -1455,14 +1288,14 @@ ${JSON.stringify(payload, null, 2)}
 
       if (action === "intake") {
         setPhase("intake", "Captured");
-        setArtifact("thread");
-        addLog("Intake submitted locally and response thread draft generated.");
+        setArtifact("asana");
+        addLog("Intake submitted and Asana action list drafted.");
       }
 
-      if (action === "thread") {
-        setPhase("triage", "Thread ready");
-        setArtifact("thread");
-        addLog("Response thread draft completed.");
+      if (action === "asana") {
+        setPhase("triage", "Asana ready");
+        setArtifact("asana");
+        addLog("Asana task draft completed.");
       }
 
       if (action === "jira") {
@@ -1500,7 +1333,7 @@ ${JSON.stringify(payload, null, 2)}
     }
 
     function resetWorkflow() {
-      state.activeArtifact = "thread";
+      state.activeArtifact = "asana";
       state.complete = new Set();
       state.outputs = makeOutputs();
       state.log = [];
@@ -1513,9 +1346,8 @@ ${JSON.stringify(payload, null, 2)}
       githubTrigger.hidden = true;
       githubTrigger.href = "#";
       log.innerHTML = "";
-      setArtifact("thread");
+      setArtifact("asana");
       updateMetrics();
-      updateWorkflowBridge();
       showToast("Workflow reset");
     }
 
@@ -1563,9 +1395,8 @@ ${JSON.stringify(payload, null, 2)}
     });
 
     state.outputs = makeOutputs();
-    setArtifact("thread");
+    setArtifact("asana");
     updateMetrics();
-    updateWorkflowBridge();
   </script>
 </body>
 </html>
