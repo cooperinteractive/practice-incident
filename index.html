@@ -1039,19 +1039,19 @@
         <p class="panel-copy">Buttons generate drafts, open simulation records, and hold sends.</p>
         <div class="action-grid" aria-label="Workflow actions">
           <button class="action-card" type="button" data-action="asana">
-            <span class="action-mode preview">Preview</span>
+            <span class="action-mode preview">Generate</span>
             <span class="action-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h10M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Asana task</strong><small>Creates task draft.</small></span>
+            <span><strong>Asana task</strong><small>Generates task card.</small></span>
           </button>
           <button class="action-card" type="button" data-action="jira">
-            <span class="action-mode live">Live</span>
+            <span class="action-mode">Draft</span>
             <span class="action-icon violet" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="2"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Jira issue</strong><small>Opens validation work.</small></span>
+            <span><strong>Jira issue</strong><small>Builds validation draft.</small></span>
           </button>
           <button class="action-card" type="button" data-action="confluence">
-            <span class="action-mode live">Live</span>
+            <span class="action-mode">Draft</span>
             <span class="action-icon cyan" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v16H7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 8h4M10 12h4M10 16h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Confluence notes</strong><small>Opens recap record.</small></span>
+            <span><strong>Confluence notes</strong><small>Builds notes draft.</small></span>
           </button>
           <button class="action-card" type="button" data-action="miro">
             <span class="action-mode">Draft</span>
@@ -1064,9 +1064,9 @@
             <span><strong>Outlook email</strong><small>Drafts reviewer request.</small></span>
           </button>
           <button class="action-card" type="button" data-action="closeout">
-            <span class="action-mode live">Live</span>
+            <span class="action-mode preview">Generate</span>
             <span class="action-icon dark" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12 10 17 20 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>AI recap</strong><small>Opens recap page.</small></span>
+            <span><strong>AI recap</strong><small>Writes recap draft.</small></span>
           </button>
         </div>
 
@@ -1089,7 +1089,7 @@
         <pre class="artifact-preview" id="artifact-preview" role="tabpanel" aria-live="polite"></pre>
         <div class="button-row" style="margin-top: 12px;">
           <button class="button primary" id="copy-artifact" type="button">Copy current draft</button>
-          <a class="button subtle" id="github-trigger" href="#" target="_blank" rel="noopener" hidden>Open trigger</a>
+          <a class="button subtle" id="github-trigger" href="#" target="_blank" rel="noopener" hidden>Open workflow result</a>
           <button class="button subtle" id="reset-workflow" type="button">Reset workflow</button>
         </div>
         <div class="activity-log" id="activity-log" aria-live="polite" aria-label="Activity log"></div>
@@ -1273,14 +1273,7 @@
 
     const workflow = {
       endpoint: getValidWorkflowEndpoint(endpointParam || localStorage.getItem(workflowStorageKey) || ""),
-      githubIssueBase: "https://github.com/cooperinteractive/practice-incident/issues/new",
       lastStatus: "No external calls"
-    };
-
-    const liveArtifacts = {
-      jira: "https://cooperinteractive.atlassian.net/browse/KAN-1",
-      confluence: "https://cooperinteractive.atlassian.net/wiki/spaces/PM/pages/589825/IR-2026-0429+Incident+Recap+-+Vendor+Workspace+Exposure+Review",
-      closeout: "https://cooperinteractive.atlassian.net/wiki/spaces/PM/pages/589825/IR-2026-0429+Incident+Recap+-+Vendor+Workspace+Exposure+Review"
     };
 
     const state = {
@@ -1560,6 +1553,8 @@
 Task: [${simulationLabel}] ${data.id} - Coordinate ${data.title}
 Project: Incident Command
 Owner: ${data.owner}
+Generated record: ASANA-SIM-${data.id || "UNASSIGNED"}
+Status: Staged in this Webex training page
 Submitted at: ${timing.submittedLabel}
 Next update due: ${timing.dueLabel}
 Cadence: ${timing.cadence}
@@ -1567,8 +1562,8 @@ Tier timing: ${profile.label}
 
 Checklist:
 - Confirm owner for engineering validation.
-- Open Jira issue for scope review.
-- Draft Confluence incident notes.
+- Generate Jira scope review draft.
+- Generate Confluence incident notes draft.
 - Prepare Outlook approval email.
 - Hold external language until approval is explicit.
 
@@ -1859,51 +1854,9 @@ Recommended follow-ups:
       };
     }
 
-    function makeGitHubIssueUrl(payload) {
-      const title = `[${simulationLabel}] [${payload.incident.id || "Incident"}] ${payload.actionLabel}`;
-      const body = `## Workflow trigger
-
-Simulation: yes
-Action: ${payload.actionLabel}
-Target system: ${payload.targetSystem}
-Incident: ${payload.incident.id} - ${payload.incident.title}
-Owner: ${payload.incident.owner}
-Next update: ${payload.incident.nextUpdate}
-
-Generated draft stays in the Webex training page. This issue is only a short simulation trigger so the URL does not carry incident details.
-`;
-      const url = new URL(workflow.githubIssueBase);
-      url.searchParams.set("title", title);
-      url.searchParams.set("body", body);
-      return url.toString();
-    }
-
-    function makeOutlookComposeUrl(payload) {
-      const url = new URL("https://outlook.office.com/mail/deeplink/compose");
-      url.searchParams.set("to", "cooper.media.group@gmail.com");
-      url.searchParams.set("subject", `[${simulationLabel}] [Approval needed] ${payload.incident.id} - holding statement`);
-      return url.toString();
-    }
-
     function setGitHubTrigger(action, payload) {
-      const actionConfig = workflowActions[action] || workflowActions.intake;
       githubTrigger.dataset.action = action;
-      githubTrigger.dataset.mode = "open";
-      if (liveArtifacts[action]) {
-        githubTrigger.href = liveArtifacts[action];
-        githubTrigger.textContent = action === "closeout" ? "Open AI recap page" : `Open ${actionConfig.label}`;
-        githubTrigger.hidden = false;
-        return liveArtifacts[action];
-      }
-
-      if (action === "approval") {
-        const composeUrl = makeOutlookComposeUrl(payload);
-        githubTrigger.href = composeUrl;
-        githubTrigger.textContent = "Open Outlook compose";
-        githubTrigger.hidden = false;
-        return composeUrl;
-      }
-
+      githubTrigger.dataset.mode = "local";
       githubTrigger.href = "#";
       githubTrigger.textContent = "";
       githubTrigger.hidden = true;
@@ -1946,13 +1899,9 @@ Generated draft stays in the Webex training page. This issue is only a short sim
 
       if (!workflow.endpoint) {
         const triggerUrl = setGitHubTrigger(action, payload);
-        workflow.lastStatus = "Trigger ready";
-        if (liveArtifacts[action] || action === "approval") {
-          addLog(`${actionConfig.label} link ready.`);
-        } else {
-          addLog(`${actionConfig.label} draft ready; live ${actionConfig.system} endpoint not connected.`);
-        }
-        return { mode: "github", payload, triggerUrl };
+        workflow.lastStatus = "Local draft only";
+        addLog(`${actionConfig.label} generated in this page; approved ${actionConfig.system} endpoint not connected.`);
+        return { mode: "local", payload, triggerUrl };
       }
 
       githubTrigger.hidden = true;
@@ -2014,13 +1963,13 @@ Generated draft stays in the Webex training page. This issue is only a short sim
       if (action === "jira") {
         setPhase("draft", "Jira ready");
         setArtifact("jira");
-        addLog("Jira issue linked with acceptance criteria.");
+        addLog("Jira validation draft generated.");
       }
 
       if (action === "confluence") {
         setPhase("draft", "Notes ready");
         setArtifact("notes");
-        addLog("Confluence recap page linked.");
+        addLog("Confluence notes draft generated.");
       }
 
       if (action === "miro") {
