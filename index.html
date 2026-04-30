@@ -911,6 +911,12 @@
       lastStatus: "No external calls"
     };
 
+    const liveArtifacts = {
+      jira: "https://cooperinteractive.atlassian.net/browse/KAN-1",
+      confluence: "https://cooperinteractive.atlassian.net/wiki/spaces/PM/pages/589825/IR-2026-0429+Incident+Recap+-+Vendor+Workspace+Exposure+Review",
+      closeout: "https://cooperinteractive.atlassian.net/wiki/spaces/PM/pages/589825/IR-2026-0429+Incident+Recap+-+Vendor+Workspace+Exposure+Review"
+    };
+
     const state = {
       activeArtifact: "asana",
       complete: new Set(),
@@ -1209,6 +1215,12 @@ ${JSON.stringify(payload, null, 2)}
 
     function setGitHubTrigger(action, payload) {
       const actionConfig = workflowActions[action] || workflowActions.intake;
+      if (liveArtifacts[action]) {
+        githubTrigger.href = liveArtifacts[action];
+        githubTrigger.textContent = action === "closeout" ? "Open AI recap page" : `Open ${actionConfig.label}`;
+        githubTrigger.hidden = false;
+        return liveArtifacts[action];
+      }
       const triggerUrl = makeGitHubIssueUrl(payload);
       githubTrigger.href = triggerUrl;
       githubTrigger.textContent = `Open ${actionConfig.label} trigger`;
@@ -1247,7 +1259,7 @@ ${JSON.stringify(payload, null, 2)}
       if (!workflow.endpoint) {
         const triggerUrl = setGitHubTrigger(action, payload);
         workflow.lastStatus = "Trigger ready";
-        addLog(`${actionConfig.label} trigger ready.`);
+        addLog(liveArtifacts[action] ? `${actionConfig.label} link ready.` : `${actionConfig.label} trigger ready.`);
         return { mode: "github", payload, triggerUrl };
       }
 
@@ -1301,13 +1313,13 @@ ${JSON.stringify(payload, null, 2)}
       if (action === "jira") {
         setPhase("draft", "Jira ready");
         setArtifact("jira");
-        addLog("Jira task draft completed with acceptance criteria.");
+        addLog("Jira issue linked with acceptance criteria.");
       }
 
       if (action === "confluence") {
         setPhase("draft", "Notes ready");
         setArtifact("notes");
-        addLog("Notes page draft completed with decision log and sections.");
+        addLog("Confluence recap page linked.");
       }
 
       if (action === "miro") {
