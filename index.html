@@ -72,7 +72,7 @@
       margin: 0 auto;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 16px;
     }
 
@@ -122,33 +122,6 @@
       font-weight: 750;
     }
 
-    .nav {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-    }
-
-    .nav a {
-      min-height: 34px;
-      display: inline-flex;
-      align-items: center;
-      border-radius: 6px;
-      padding: 8px 10px;
-      color: var(--muted);
-      text-decoration: none;
-      white-space: nowrap;
-      font-size: 12px;
-      font-weight: 850;
-    }
-
-    .nav a:hover,
-    .nav a.active {
-      color: var(--ink);
-      background: var(--surface);
-      box-shadow: inset 0 0 0 1px var(--line);
-    }
-
-    .nav a:focus-visible,
     .button:focus-visible,
     .action-card:focus-visible,
     .artifact-tab:focus-visible {
@@ -319,7 +292,7 @@
 
     .workbench {
       display: grid;
-      grid-template-columns: minmax(300px, 0.42fr) minmax(0, 1fr);
+      grid-template-columns: minmax(420px, 0.58fr) minmax(0, 1fr);
       gap: 16px;
       align-items: start;
       margin-top: 14px;
@@ -397,9 +370,16 @@
     }
 
     textarea {
-      min-height: 96px;
+      min-height: 116px;
       resize: vertical;
       line-height: 1.45;
+    }
+
+    .field-hint {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      line-height: 1.35;
     }
 
     input:focus,
@@ -665,11 +645,6 @@
         padding: 12px 0;
       }
 
-      .nav {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
       .hero {
         padding: 22px;
       }
@@ -708,10 +683,6 @@
           <span class="brand-subtitle">Simulation training workspace</span>
         </span>
       </a>
-      <nav class="nav" aria-label="Page sections">
-        <a class="active" href="#command">Command</a>
-        <a href="#workflow">Workflow</a>
-      </nav>
     </div>
   </header>
 
@@ -736,15 +707,15 @@
         <div class="status-list">
           <div class="status-row">
             <span>Incident ID<strong id="metric-id">IR-2026-0429</strong></span>
-            <span class="chip">Ready</span>
+            <span class="chip" id="chip-intake">Ready</span>
           </div>
           <div class="status-row">
             <span>Tier<strong id="metric-tier">Tier 2</strong></span>
-            <span class="chip warn">Review</span>
+            <span class="chip warn" id="chip-tier">Review</span>
           </div>
           <div class="status-row">
             <span>Approval<strong id="metric-approval">Draft</strong></span>
-            <span class="chip pending">Hold</span>
+            <span class="chip pending" id="chip-approval">Hold</span>
           </div>
         </div>
       </aside>
@@ -788,6 +759,7 @@
             <div class="field">
               <label for="deadline">Next update</label>
               <input id="deadline" name="deadline" value="30 minutes">
+              <div class="field-hint" id="next-update-preview">30 minutes after intake is submitted</div>
             </div>
           </div>
           <div class="field">
@@ -888,6 +860,16 @@
     const log = document.querySelector("#activity-log");
     const toast = document.querySelector("#toast");
     const githubTrigger = document.querySelector("#github-trigger");
+    const nextUpdatePreview = document.querySelector("#next-update-preview");
+    const simulationLabel = "SIMULATION";
+    const artifactActions = {
+      asana: "asana",
+      jira: "jira",
+      notes: "confluence",
+      board: "miro",
+      email: "approval",
+      recap: "closeout"
+    };
 
     const workflowActions = {
       intake: {
@@ -973,7 +955,8 @@
       activeArtifact: "asana",
       complete: new Set(),
       outputs: {},
-      log: []
+      log: [],
+      intakeSubmittedAt: null
     };
 
     function showToast(message) {
@@ -1011,22 +994,85 @@
       return "";
     }
 
+    function parseRelativeDeadline(value) {
+      const text = String(value || "").trim().toLowerCase();
+      const match = text.match(/(\d+(?:\.\d+)?)\s*(minute|min|m|hour|hr|h|day|d)s?/);
+      if (!match) return null;
+      const amount = Number(match[1]);
+      const unit = match[2];
+      if (!Number.isFinite(amount)) return null;
+      if (["minute", "min", "m"].includes(unit)) return amount * 60 * 1000;
+      if (["hour", "hr", "h"].includes(unit)) return amount * 60 * 60 * 1000;
+      if (["day", "d"].includes(unit)) return amount * 24 * 60 * 60 * 1000;
+      return null;
+    }
+
+    function formatDateTime(date) {
+      return new Intl.DateTimeFormat(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        timeZoneName: "short"
+      }).format(date);
+    }
+
+    function getNextUpdateInfo(data) {
+      const raw = data.deadline || "30 minutes";
+      const offsetMs = parseRelativeDeadline(raw);
+      if (state.intakeSubmittedAt && offsetMs) {
+        const date = new Date(state.intakeSubmittedAt.getTime() + offsetMs);
+        return {
+          raw,
+          at: date,
+          iso: date.toISOString(),
+          label: `${formatDateTime(date)} (${raw} from intake)`
+        };
+      }
+      return {
+        raw,
+        at: null,
+        iso: "",
+        label: offsetMs ? `${raw} after intake is submitted` : raw
+      };
+    }
+
+    function setChip(selector, text, tone = "") {
+      const chip = document.querySelector(selector);
+      chip.textContent = text;
+      chip.className = `chip${tone ? ` ${tone}` : ""}`;
+    }
+
     function updateMetrics() {
       const data = getData();
+      const tier = (data.severity || "Tier").split(" - ")[0];
+      const severityText = data.severity || "";
+      const approvalState = state.complete.has("closeout") ? "Closed" : state.complete.has("approval") ? "Pending" : "Draft";
+      const intakeChip = state.complete.has("closeout") ? "Closed" : state.complete.has("intake") ? "Captured" : "Ready";
+      const tierChip = severityText.includes("Tier 4") ? "External" : severityText.includes("Tier 3") ? "Leadership" : severityText.includes("Tier 2") ? "Review" : "Monitor";
+      const tierTone = severityText.includes("Tier 4") ? "pending" : severityText.includes("Tier 2") || severityText.includes("Tier 3") ? "warn" : "";
+      const approvalChip = state.complete.has("closeout") ? "Closed" : state.complete.has("approval") ? "Review" : "Hold";
+      const approvalTone = state.complete.has("closeout") ? "" : state.complete.has("approval") ? "warn" : "pending";
       document.querySelector("#metric-id").textContent = data.id || "Unassigned";
-      document.querySelector("#metric-tier").textContent = (data.severity || "Tier").split(" - ")[0];
-      document.querySelector("#metric-approval").textContent = state.complete.has("approval") ? "Pending" : state.complete.has("closeout") ? "Closed" : "Draft";
+      document.querySelector("#metric-tier").textContent = tier;
+      document.querySelector("#metric-approval").textContent = approvalState;
+      setChip("#chip-intake", intakeChip);
+      setChip("#chip-tier", tierChip, tierTone);
+      setChip("#chip-approval", approvalChip, approvalTone);
+      nextUpdatePreview.textContent = getNextUpdateInfo(data).label;
     }
 
     function makeOutputs() {
       const data = getData();
+      const timing = getNextUpdateInfo(data);
       return {
-        asana: `Asana task draft
+        asana: `${simulationLabel} Asana task draft
 
-Task: ${data.id} - Coordinate ${data.title}
+Task: [${simulationLabel}] ${data.id} - Coordinate ${data.title}
 Project: Incident Command
 Owner: ${data.owner}
-Due: ${data.deadline}
+Due: ${timing.label}
 
 Checklist:
 - Confirm owner for engineering validation.
@@ -1035,18 +1081,24 @@ Checklist:
 - Prepare Outlook approval email.
 - Hold external language until approval is explicit.
 
+Simulation note:
+This is a training exercise. Do not treat this as a live incident record.
+
 Context:
 ${data.facts}
 
 Open questions:
 ${data.unknowns}`,
 
-        thread: `[Declare] ${data.id} - ${data.title}
+        thread: `[Simulation Declare] ${data.id} - ${data.title}
 
 Owner: ${data.owner}
 Severity: ${data.severity}
 Audience: ${data.audience}
-Next update: ${data.deadline}
+Next update: ${timing.label}
+
+Simulation note:
+This is a training exercise. Do not send externally as a live incident update.
 
 Known facts:
 ${data.facts}
@@ -1057,12 +1109,15 @@ ${data.unknowns}
 Next action:
 Route engineering validation, capture notes, and keep external language draft-only until approval is explicit.`,
 
-        jira: `Jira issue draft
+        jira: `${simulationLabel} Jira issue draft
 
-Summary: ${data.id} - Validate scope for ${data.title}
+Summary: [${simulationLabel}] ${data.id} - Validate scope for ${data.title}
 Issue type: Task
 Priority: ${data.severity.includes("Tier 4") ? "High" : "Medium"}
 Owner: Engineering validation lead
+
+Simulation note:
+Training artifact only. Do not classify as a live production incident.
 
 Description:
 ${data.facts}
@@ -1074,12 +1129,15 @@ Acceptance criteria:
 - Attach evidence or source links.
 - Add final engineering finding to the triage record.`,
 
-        notes: `Confluence notes draft
+        notes: `${simulationLabel} Confluence notes draft
 
-Title: ${data.id} Incident Record
+Title: [${simulationLabel}] ${data.id} Incident Record
 
 Purpose:
 Document the scenario, decisions, approvals, and lessons learned.
+
+Simulation note:
+Training artifact only. No real customer, employee, or production data should be added.
 
 Known facts:
 ${data.facts}
@@ -1089,7 +1147,7 @@ ${data.unknowns}
 
 Decision log:
 - Owner: ${data.owner}
-- First update: ${data.deadline}
+- First update: ${timing.label}
 - Approval rule: external language remains draft-only until reviewer approval.
 
 Sections:
@@ -1100,7 +1158,7 @@ Sections:
 - Follow-up tasks
 - Process improvements`,
 
-        board: `Miro board update
+        board: `${simulationLabel} Miro board update
 
 Create four lanes:
 1. Facts
@@ -1118,13 +1176,18 @@ Create four lanes:
 4. Closeout
    - Recap
    - Lessons learned
-   - Follow-up tasks`,
+   - Follow-up tasks
 
-        email: `Approval email draft
+Simulation note:
+Training board only. Keep real incident details out of this draft.`,
 
-Subject: [Approval needed] ${data.id} - holding statement
+        email: `${simulationLabel} approval email draft
+
+Subject: [${simulationLabel}] [Approval needed] ${data.id} - holding statement
 
 Hi team,
+
+This is a simulation training exercise.
 
 Please review the draft holding update for ${data.title}.
 
@@ -1138,9 +1201,9 @@ Requested decision:
 Approve, revise, or hold. External language remains draft-only until approval is explicit.
 
 Owner: ${data.owner}
-Deadline: ${data.deadline}`,
+Deadline: ${timing.label}`,
 
-        recap: `AI incident recap
+        recap: `${simulationLabel} AI incident recap
 
 Incident:
 ${data.id} - ${data.title}
@@ -1179,6 +1242,7 @@ Recommended follow-ups:
         tab.setAttribute("aria-selected", String(isActive));
       });
       preview.textContent = state.outputs[name] || "";
+      refreshWorkflowLinkForArtifact(name);
     }
 
     function addLog(message) {
@@ -1214,6 +1278,7 @@ Recommended follow-ups:
 
     function makeWorkflowPayload(action, outputs) {
       const data = getData();
+      const timing = getNextUpdateInfo(data);
       const actionConfig = workflowActions[action] || workflowActions.intake;
       return {
         type: "incident.workflow.action",
@@ -1229,7 +1294,10 @@ Recommended follow-ups:
           severity: data.severity,
           owner: data.owner,
           audience: data.audience,
-          nextUpdate: data.deadline,
+          nextUpdate: timing.label,
+          nextUpdateRaw: timing.raw,
+          nextUpdateAt: timing.iso,
+          simulation: true,
           knownFacts: data.facts,
           openQuestions: data.unknowns
         },
@@ -1242,24 +1310,17 @@ Recommended follow-ups:
     }
 
     function makeGitHubIssueUrl(payload) {
-      const title = `[${payload.incident.id || "Incident"}] ${payload.actionLabel}`;
+      const title = `[${simulationLabel}] [${payload.incident.id || "Incident"}] ${payload.actionLabel}`;
       const body = `## Workflow trigger
 
+Simulation: yes
 Action: ${payload.actionLabel}
 Target system: ${payload.targetSystem}
 Incident: ${payload.incident.id} - ${payload.incident.title}
 Owner: ${payload.incident.owner}
 Next update: ${payload.incident.nextUpdate}
 
-## Generated draft
-
-${payload.artifacts[workflowActions[payload.action]?.artifact || "asana"] || "No draft generated."}
-
-## Workflow payload
-
-\`\`\`json
-${JSON.stringify(payload, null, 2)}
-\`\`\`
+Generated draft stays in the Webex training page. This issue is only a short simulation trigger so the URL does not carry incident details.
 `;
       const url = new URL(workflow.githubIssueBase);
       url.searchParams.set("title", title);
@@ -1267,19 +1328,49 @@ ${JSON.stringify(payload, null, 2)}
       return url.toString();
     }
 
+    function makeOutlookComposeUrl(payload) {
+      const url = new URL("https://outlook.office.com/mail/deeplink/compose");
+      url.searchParams.set("to", "cooper.media.group@gmail.com");
+      url.searchParams.set("subject", `[${simulationLabel}] [Approval needed] ${payload.incident.id} - holding statement`);
+      return url.toString();
+    }
+
+    function copyLabelForAction(actionConfig) {
+      if (actionConfig.artifact === "board") return "Copy Miro board brief";
+      if (actionConfig.artifact === "asana") return "Copy Asana task draft";
+      return `Copy ${actionConfig.label} draft`;
+    }
+
     function setGitHubTrigger(action, payload) {
       const actionConfig = workflowActions[action] || workflowActions.intake;
+      githubTrigger.dataset.action = action;
+      githubTrigger.dataset.mode = "open";
       if (liveArtifacts[action]) {
         githubTrigger.href = liveArtifacts[action];
         githubTrigger.textContent = action === "closeout" ? "Open AI recap page" : `Open ${actionConfig.label}`;
         githubTrigger.hidden = false;
         return liveArtifacts[action];
       }
-      const triggerUrl = makeGitHubIssueUrl(payload);
-      githubTrigger.href = triggerUrl;
-      githubTrigger.textContent = `Open ${actionConfig.label} trigger`;
+
+      if (action === "approval") {
+        const composeUrl = makeOutlookComposeUrl(payload);
+        githubTrigger.href = composeUrl;
+        githubTrigger.textContent = "Open Outlook compose";
+        githubTrigger.hidden = false;
+        return composeUrl;
+      }
+
+      githubTrigger.href = "#";
+      githubTrigger.dataset.mode = "copy";
+      githubTrigger.textContent = copyLabelForAction(actionConfig);
       githubTrigger.hidden = false;
-      return triggerUrl;
+      return "#";
+    }
+
+    function refreshWorkflowLinkForArtifact(name) {
+      const action = artifactActions[name] || "intake";
+      const payload = makeWorkflowPayload(action, state.outputs);
+      setGitHubTrigger(action, payload);
     }
 
     function applyWorkflowResult(action, result = {}) {
@@ -1313,7 +1404,7 @@ ${JSON.stringify(payload, null, 2)}
       if (!workflow.endpoint) {
         const triggerUrl = setGitHubTrigger(action, payload);
         workflow.lastStatus = "Trigger ready";
-        addLog(liveArtifacts[action] ? `${actionConfig.label} link ready.` : `${actionConfig.label} trigger ready.`);
+        addLog(liveArtifacts[action] ? `${actionConfig.label} link ready.` : `${actionConfig.label} action ready.`);
         return { mode: "github", payload, triggerUrl };
       }
 
@@ -1341,13 +1432,16 @@ ${JSON.stringify(payload, null, 2)}
         workflow.lastStatus = "Endpoint failed";
         const triggerUrl = setGitHubTrigger(action, payload);
         addLog(`${actionConfig.label} stayed local because endpoint failed: ${error.message}`);
-        addLog(`${actionConfig.label} fallback trigger ready.`);
+        addLog(`${actionConfig.label} fallback action ready.`);
         showToast("Endpoint failed; draft kept local");
         return { mode: "error", error: error.message, payload, triggerUrl };
       }
     }
 
     async function runAction(action) {
+      if (action === "intake" || !state.intakeSubmittedAt) {
+        state.intakeSubmittedAt = new Date();
+      }
       const outputs = makeOutputs();
       state.outputs = { ...state.outputs, ...outputs };
       document.querySelectorAll("[data-action]").forEach((button) => {
@@ -1403,6 +1497,7 @@ ${JSON.stringify(payload, null, 2)}
     function resetWorkflow() {
       state.activeArtifact = "asana";
       state.complete = new Set();
+      state.intakeSubmittedAt = null;
       state.outputs = makeOutputs();
       state.log = [];
       phaseOrder.forEach((phase) => {
@@ -1440,6 +1535,12 @@ ${JSON.stringify(payload, null, 2)}
       }
     }
 
+    async function handleWorkflowLinkClick(event) {
+      if (githubTrigger.dataset.mode !== "copy") return;
+      event.preventDefault();
+      await copyActiveDraft();
+    }
+
     document.querySelector("#start-incident").addEventListener("click", () => {
       document.querySelector("#workflow").scrollIntoView({ behavior: "smooth", block: "start" });
       runAction("intake");
@@ -1454,6 +1555,7 @@ ${JSON.stringify(payload, null, 2)}
     });
 
     document.querySelector("#copy-artifact").addEventListener("click", copyActiveDraft);
+    githubTrigger.addEventListener("click", handleWorkflowLinkClick);
     document.querySelector("#reset-workflow").addEventListener("click", resetWorkflow);
     document.querySelector("#reset-intake").addEventListener("click", resetIntake);
     form.addEventListener("input", () => {
