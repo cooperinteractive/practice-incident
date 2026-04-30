@@ -821,6 +821,38 @@
       overflow: auto;
     }
 
+    .platform-launchpad {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .platform-link {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: #ffffff;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .platform-link:hover {
+      color: #ffffff;
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+
     .activity-log {
       display: grid;
       gap: 8px;
@@ -916,6 +948,7 @@
       .two-col,
       .action-grid,
       .phase-board,
+      .platform-launchpad,
       .deliverable-list {
         grid-template-columns: 1fr;
       }
@@ -1069,6 +1102,14 @@
             <span><strong>AI recap</strong><small>Writes recap draft.</small></span>
           </button>
         </div>
+        <div class="platform-launchpad" aria-label="Platform launchpad">
+          <a class="platform-link" href="https://app.asana.com/0/home" target="_blank" rel="noopener noreferrer">Open Asana</a>
+          <a class="platform-link" href="https://cooperinteractive.atlassian.net/jira/your-work" target="_blank" rel="noopener noreferrer">Open Jira</a>
+          <a class="platform-link" href="https://cooperinteractive.atlassian.net/wiki/home" target="_blank" rel="noopener noreferrer">Open Confluence</a>
+          <a class="platform-link" href="https://miro.com/app/dashboard/" target="_blank" rel="noopener noreferrer">Open Miro</a>
+          <a class="platform-link" href="https://outlook.office.com/mail/" target="_blank" rel="noopener noreferrer">Open Outlook</a>
+          <a class="platform-link" href="https://github.com/cooperinteractive/practice-incident" target="_blank" rel="noopener noreferrer">Open GitHub</a>
+        </div>
 
         <div class="phase-board" aria-label="Workflow phase board">
           <div class="phase active" data-phase="intake"><span>Intake</span><strong id="phase-intake">Ready</strong></div>
@@ -1183,6 +1224,43 @@
         system: "ai-agent",
         requestedOutputs: ["recap", "follow-up-actions"]
       }
+    };
+
+    const platformLinks = {
+      asana: {
+        label: "Open Asana",
+        url: "https://app.asana.com/0/home"
+      },
+      jira: {
+        label: "Open Jira",
+        url: "https://cooperinteractive.atlassian.net/jira/your-work"
+      },
+      confluence: {
+        label: "Open Confluence",
+        url: "https://cooperinteractive.atlassian.net/wiki/home"
+      },
+      miro: {
+        label: "Open Miro",
+        url: "https://miro.com/app/dashboard/"
+      },
+      outlook: {
+        label: "Open Outlook",
+        url: "https://outlook.office.com/mail/"
+      },
+      github: {
+        label: "Open GitHub",
+        url: "https://github.com/cooperinteractive/practice-incident"
+      }
+    };
+
+    const platformByAction = {
+      intake: "asana",
+      asana: "asana",
+      jira: "jira",
+      confluence: "confluence",
+      miro: "miro",
+      approval: "outlook",
+      closeout: "confluence"
     };
 
     const tierProfiles = {
@@ -1855,12 +1933,21 @@ Recommended follow-ups:
     }
 
     function setGitHubTrigger(action, payload) {
+      const platformKey = platformByAction[action] || "";
+      const platform = platformLinks[platformKey];
       githubTrigger.dataset.action = action;
-      githubTrigger.dataset.mode = "local";
-      githubTrigger.href = "#";
-      githubTrigger.textContent = "";
-      githubTrigger.hidden = true;
-      return "";
+      if (!platform) {
+        githubTrigger.dataset.mode = "local";
+        githubTrigger.href = "#";
+        githubTrigger.textContent = "";
+        githubTrigger.hidden = true;
+        return "";
+      }
+      githubTrigger.dataset.mode = "platform";
+      githubTrigger.href = platform.url;
+      githubTrigger.textContent = platform.label;
+      githubTrigger.hidden = false;
+      return platform.url;
     }
 
     function refreshWorkflowLinkForArtifact(name) {
