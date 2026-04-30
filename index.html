@@ -351,6 +351,7 @@
     }
 
     label {
+      align-self: start;
       color: var(--ink);
       font-size: 12px;
       font-weight: 850;
@@ -388,11 +389,15 @@
 
     .audience-field {
       align-self: stretch;
+      align-content: start;
+    }
+
+    .cadence-field {
+      align-self: stretch;
     }
 
     .audience-field textarea {
-      height: 100%;
-      min-height: 132px;
+      min-height: 150px;
       resize: vertical;
     }
 
@@ -996,7 +1001,7 @@
               <label for="audience">Affected audience</label>
               <textarea id="audience" name="audience" placeholder="Internal team and reviewers">Internal team and reviewers</textarea>
             </div>
-            <div class="field">
+            <div class="field cadence-field">
               <label for="deadline">Update cadence</label>
               <input id="deadline" name="deadline" value="30 minutes" placeholder="30 minutes">
               <div class="due-card" aria-live="polite">
@@ -1036,7 +1041,7 @@
           <button class="action-card" type="button" data-action="asana">
             <span class="action-mode preview">Preview</span>
             <span class="action-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h10M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Asana task</strong><small>Stages task copy.</small></span>
+            <span><strong>Asana task</strong><small>Creates task draft.</small></span>
           </button>
           <button class="action-card" type="button" data-action="jira">
             <span class="action-mode live">Live</span>
@@ -1083,7 +1088,7 @@
         </div>
         <pre class="artifact-preview" id="artifact-preview" role="tabpanel" aria-live="polite"></pre>
         <div class="button-row" style="margin-top: 12px;">
-          <button class="button primary" id="copy-artifact" type="button">Copy active draft</button>
+          <button class="button primary" id="copy-artifact" type="button">Copy current draft</button>
           <a class="button subtle" id="github-trigger" href="#" target="_blank" rel="noopener" hidden>Open trigger</a>
           <button class="button subtle" id="reset-workflow" type="button">Reset workflow</button>
         </div>
@@ -1880,12 +1885,6 @@ Generated draft stays in the Webex training page. This issue is only a short sim
       return url.toString();
     }
 
-    function copyLabelForAction(actionConfig) {
-      if (actionConfig.artifact === "board") return "Copy Miro board brief";
-      if (actionConfig.artifact === "asana") return "Copy Asana task draft";
-      return `Copy ${actionConfig.label} draft`;
-    }
-
     function setGitHubTrigger(action, payload) {
       const actionConfig = workflowActions[action] || workflowActions.intake;
       githubTrigger.dataset.action = action;
@@ -1906,10 +1905,9 @@ Generated draft stays in the Webex training page. This issue is only a short sim
       }
 
       githubTrigger.href = "#";
-      githubTrigger.dataset.mode = "copy";
-      githubTrigger.textContent = copyLabelForAction(actionConfig);
-      githubTrigger.hidden = false;
-      return "#";
+      githubTrigger.textContent = "";
+      githubTrigger.hidden = true;
+      return "";
     }
 
     function refreshWorkflowLinkForArtifact(name) {
@@ -1949,7 +1947,11 @@ Generated draft stays in the Webex training page. This issue is only a short sim
       if (!workflow.endpoint) {
         const triggerUrl = setGitHubTrigger(action, payload);
         workflow.lastStatus = "Trigger ready";
-        addLog(liveArtifacts[action] ? `${actionConfig.label} link ready.` : `${actionConfig.label} action ready.`);
+        if (liveArtifacts[action] || action === "approval") {
+          addLog(`${actionConfig.label} link ready.`);
+        } else {
+          addLog(`${actionConfig.label} draft ready; live ${actionConfig.system} endpoint not connected.`);
+        }
         return { mode: "github", payload, triggerUrl };
       }
 
@@ -2086,12 +2088,6 @@ Generated draft stays in the Webex training page. This issue is only a short sim
       }
     }
 
-    async function handleWorkflowLinkClick(event) {
-      if (githubTrigger.dataset.mode !== "copy") return;
-      event.preventDefault();
-      await copyActiveDraft();
-    }
-
     document.querySelector("#start-incident").addEventListener("click", () => {
       document.querySelector("#workflow").scrollIntoView({ behavior: "smooth", block: "start" });
       runAction("intake");
@@ -2106,7 +2102,6 @@ Generated draft stays in the Webex training page. This issue is only a short sim
     });
 
     document.querySelector("#copy-artifact").addEventListener("click", copyActiveDraft);
-    githubTrigger.addEventListener("click", handleWorkflowLinkClick);
     document.querySelector("#reset-workflow").addEventListener("click", resetWorkflow);
     document.querySelector("#reset-intake").addEventListener("click", resetIntake);
     form.addEventListener("input", () => {
