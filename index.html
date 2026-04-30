@@ -951,12 +951,13 @@
         <pre class="artifact-preview" id="artifact-preview" aria-live="polite"></pre>
         <div class="button-row" style="margin-top: 12px;">
           <button class="button primary" id="copy-artifact" type="button">Copy active draft</button>
+          <a class="button subtle" id="github-trigger" href="#" target="_blank" rel="noopener" hidden>Open GitHub trigger</a>
           <button class="button subtle" id="reset-workflow" type="button">Reset workflow</button>
         </div>
         <div class="workflow-bridge" id="workflow-bridge" aria-label="Workflow integration status">
           <div>
-            <strong id="workflow-mode">Local draft mode</strong>
-            <span id="workflow-endpoint">Add a workflow endpoint when external systems are ready.</span>
+            <strong id="workflow-mode">GitHub trigger mode</strong>
+            <span id="workflow-endpoint">Buttons prepare GitHub issue triggers for approved automation.</span>
           </div>
           <span class="chip" id="workflow-status">No external calls</span>
         </div>
@@ -979,7 +980,7 @@
       </div>
     </section>
 
-    <p class="footer-note">This page is a training surface. Without a workflow endpoint, buttons create local drafts only. With an approved endpoint, each button posts a structured workflow event and updates this page with the returned links or summaries.</p>
+    <p class="footer-note">This page is a training surface. Buttons generate local drafts and GitHub issue triggers by default. With an approved endpoint, each button posts a structured workflow event and updates this page with returned links or summaries.</p>
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1005,6 +1006,7 @@
     const workflowMode = document.querySelector("#workflow-mode");
     const workflowEndpointLabel = document.querySelector("#workflow-endpoint");
     const workflowStatus = document.querySelector("#workflow-status");
+    const githubTrigger = document.querySelector("#github-trigger");
 
     const workflowActions = {
       intake: {
@@ -1059,7 +1061,8 @@
     };
 
     const workflowStorageKey = "practiceIncidentWorkflowEndpoint";
-    const endpointParam = new URLSearchParams(window.location.search).get("endpoint");
+    const pageParams = new URLSearchParams(window.location.search);
+    const endpointParam = pageParams.get("endpoint");
     if (endpointParam) {
       if (endpointParam === "local" || endpointParam === "off") {
         localStorage.removeItem(workflowStorageKey);
@@ -1070,6 +1073,7 @@
 
     const workflow = {
       endpoint: getValidWorkflowEndpoint(endpointParam || localStorage.getItem(workflowStorageKey) || ""),
+      githubIssueBase: "https://github.com/cooperinteractive/practice-incident/issues/new",
       lastStatus: "No external calls"
     };
 
@@ -1118,10 +1122,10 @@
     function updateWorkflowBridge() {
       const endpoint = workflow.endpoint;
       workflowBridge.classList.toggle("connected", Boolean(endpoint));
-      workflowMode.textContent = endpoint ? "Connected workflow mode" : "Local draft mode";
+      workflowMode.textContent = endpoint ? "Connected workflow mode" : "GitHub trigger mode";
       workflowStatus.textContent = workflow.lastStatus;
       if (!endpoint) {
-        workflowEndpointLabel.textContent = "Add ?endpoint=https://your-workflow-url to connect external systems.";
+        workflowEndpointLabel.textContent = "Buttons prepare GitHub issue triggers for approved automation.";
         return;
       }
       const url = new URL(endpoint);
@@ -1340,6 +1344,41 @@ Recommended follow-ups:
       };
     }
 
+    function makeGitHubIssueUrl(payload) {
+      const title = `[${payload.incident.id || "Incident"}] ${payload.actionLabel}`;
+      const body = `## Workflow trigger
+
+Action: ${payload.actionLabel}
+Target system: ${payload.targetSystem}
+Incident: ${payload.incident.id} - ${payload.incident.title}
+Owner: ${payload.incident.owner}
+Next update: ${payload.incident.nextUpdate}
+
+## Generated draft
+
+${payload.artifacts[workflowActions[payload.action]?.artifact || "thread"] || "No draft generated."}
+
+## Workflow payload
+
+\`\`\`json
+${JSON.stringify(payload, null, 2)}
+\`\`\`
+`;
+      const url = new URL(workflow.githubIssueBase);
+      url.searchParams.set("title", title);
+      url.searchParams.set("body", body);
+      return url.toString();
+    }
+
+    function setGitHubTrigger(action, payload) {
+      const actionConfig = workflowActions[action] || workflowActions.intake;
+      const triggerUrl = makeGitHubIssueUrl(payload);
+      githubTrigger.href = triggerUrl;
+      githubTrigger.textContent = `Open ${actionConfig.label} trigger`;
+      githubTrigger.hidden = false;
+      return triggerUrl;
+    }
+
     function applyWorkflowResult(action, result = {}) {
       const actionConfig = workflowActions[action] || workflowActions.intake;
       const artifact = actionConfig.artifact || state.activeArtifact;
@@ -1369,12 +1408,14 @@ Recommended follow-ups:
       const payload = makeWorkflowPayload(action, outputs);
 
       if (!workflow.endpoint) {
-        workflow.lastStatus = "Local event ready";
+        const triggerUrl = setGitHubTrigger(action, payload);
+        workflow.lastStatus = "GitHub trigger ready";
         updateWorkflowBridge();
-        addLog(`${actionConfig.label} event prepared for future workflow endpoint.`);
-        return { mode: "local", payload };
+        addLog(`${actionConfig.label} GitHub issue trigger ready.`);
+        return { mode: "github", payload, triggerUrl };
       }
 
+      githubTrigger.hidden = true;
       workflow.lastStatus = "Sending event";
       updateWorkflowBridge();
 
@@ -1469,6 +1510,8 @@ Recommended follow-ups:
       });
       document.querySelector('[data-phase="intake"]').classList.add("active");
       document.querySelectorAll("[data-action]").forEach((button) => button.classList.remove("active"));
+      githubTrigger.hidden = true;
+      githubTrigger.href = "#";
       log.innerHTML = "";
       setArtifact("thread");
       updateMetrics();

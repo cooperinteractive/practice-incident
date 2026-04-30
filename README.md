@@ -11,7 +11,9 @@ The page runs entirely in the browser by default. Buttons generate local workflo
 - Approval email
 - AI incident recap
 
-No external systems are modified unless the page is opened with an approved workflow endpoint:
+Without an endpoint, each workflow button prepares a prefilled GitHub Issue trigger for the selected action. This keeps the Webex/GitHub Pages version useful without putting credentials in the browser.
+
+External systems are modified only if the page is opened with an approved workflow endpoint:
 
 ```text
 https://cooperinteractive.github.io/practice-incident/?endpoint=https://your-workflow-url
