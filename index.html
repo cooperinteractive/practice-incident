@@ -370,10 +370,30 @@
       outline: none;
     }
 
+    input::placeholder,
+    textarea::placeholder {
+      color: #7a8da3;
+      opacity: 1;
+    }
+
     textarea {
       min-height: 116px;
       resize: vertical;
       line-height: 1.45;
+    }
+
+    .audience-row {
+      align-items: stretch;
+    }
+
+    .audience-field {
+      align-self: stretch;
+    }
+
+    .audience-field textarea {
+      height: 100%;
+      min-height: 132px;
+      resize: vertical;
     }
 
     .field-hint {
@@ -906,18 +926,6 @@
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="#command" aria-label="Incident Command Center">
-        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-        <span>
-          <span class="brand-title">Incident Command Center</span>
-          <span class="brand-subtitle">Simulation training workspace</span>
-        </span>
-      </a>
-    </div>
-  </header>
-
   <main class="app">
     <section class="hero" id="command">
       <div>
@@ -956,16 +964,16 @@
     <section class="workbench" id="workflow">
       <div class="panel">
         <h2>Incident intake</h2>
-        <p class="panel-copy">Keep this short. The buttons use these fields to produce the system drafts and final recap.</p>
+        <p class="panel-copy">Pre-filled for beta testing; clear a field to see its hint.</p>
         <form class="form-grid" id="intake-form">
           <div class="two-col">
             <div class="field">
               <label for="incident-title">Incident title</label>
-              <input id="incident-title" name="title" value="Vendor workspace exposure review">
+              <input id="incident-title" name="title" value="Vendor workspace exposure review" placeholder="Vendor workspace exposure review">
             </div>
             <div class="field">
               <label for="incident-id">Incident ID</label>
-              <input id="incident-id" name="id" value="IR-2026-0429">
+              <input id="incident-id" name="id" value="IR-2026-0429" placeholder="IR-2026-0429">
             </div>
           </div>
           <div class="two-col">
@@ -980,18 +988,17 @@
             </div>
             <div class="field">
               <label for="owner">Response owner</label>
-              <input id="owner" name="owner" value="Response lead">
+              <input id="owner" name="owner" value="Response lead" placeholder="Response lead">
             </div>
           </div>
-          <div class="two-col">
-            <div class="field">
+          <div class="two-col audience-row">
+            <div class="field audience-field">
               <label for="audience">Affected audience</label>
-              <input id="audience" name="audience" value="Internal team and reviewers">
+              <textarea id="audience" name="audience" placeholder="Internal team and reviewers">Internal team and reviewers</textarea>
             </div>
             <div class="field">
               <label for="deadline">Update cadence</label>
-              <input id="deadline" name="deadline" value="30 minutes">
-              <div class="field-hint">Use relative timing, like 15 minutes, 30 minutes, or 1 hour.</div>
+              <input id="deadline" name="deadline" value="30 minutes" placeholder="30 minutes">
               <div class="due-card" aria-live="polite">
                 <span>Next update due</span>
                 <strong id="next-update-preview">Calculated when intake is submitted</strong>
@@ -1002,22 +1009,29 @@
           </div>
           <div class="field">
             <label for="known-facts">Known facts</label>
-            <textarea id="known-facts" name="facts">A vendor workspace may have exposed draft customer communications to a broader internal group than intended. Engineering is validating scope. Legal and privacy review are required before external messaging.</textarea>
+            <textarea id="known-facts" name="facts" placeholder="Known facts for the simulation">A vendor workspace may have exposed draft customer communications to a broader internal group than intended. Engineering is validating scope. Legal and privacy review are required before external messaging.</textarea>
           </div>
           <div class="field">
             <label for="unknowns">Open questions</label>
-            <textarea id="unknowns" name="unknowns">Which documents were visible? Who had access? Was any customer-facing content final or only draft? What is the approved next update time?</textarea>
+            <textarea id="unknowns" name="unknowns" placeholder="Open questions for the simulation">Which documents were visible? Who had access? Was any customer-facing content final or only draft? What is the approved next update time?</textarea>
           </div>
         </form>
         <div class="button-row" style="margin-top: 14px;">
           <button class="button primary" data-action="intake" type="button">Submit intake</button>
           <button class="button subtle" id="reset-intake" type="button">Reset</button>
         </div>
+        <section class="deliverable-tracker" id="deliverable-tracker" aria-label="Deliverable time tracker">
+          <div class="tracker-head">
+            <p id="tracker-summary">Submit intake to start the deliverable clock.</p>
+            <span class="tracker-badge" id="tracker-tier">Tier 2 coordination</span>
+          </div>
+          <div class="deliverable-list" id="deliverable-list" aria-live="polite"></div>
+        </section>
       </div>
 
       <div class="panel">
         <h2>Workflow actions</h2>
-        <p class="panel-copy">Live buttons open existing records. Draft and preview buttons generate safe copy without sending or posting.</p>
+        <p class="panel-copy">Buttons generate drafts, open simulation records, and hold sends.</p>
         <div class="action-grid" aria-label="Workflow actions">
           <button class="action-card" type="button" data-action="asana">
             <span class="action-mode preview">Preview</span>
@@ -1058,18 +1072,6 @@
           <div class="phase" data-phase="approval"><span>Approval</span><strong id="phase-approval">Waiting</strong></div>
           <div class="phase" data-phase="closeout"><span>Closeout</span><strong id="phase-closeout">Waiting</strong></div>
         </div>
-
-        <section class="deliverable-tracker" id="deliverable-tracker" aria-label="Deliverable time tracker">
-          <div class="tracker-head">
-            <div>
-              <span class="tracker-kicker">Tier-based timing</span>
-              <h3>Deliverable tracker</h3>
-              <p id="tracker-summary">Submit intake to start the deliverable clock.</p>
-            </div>
-            <span class="tracker-badge" id="tracker-tier">Tier 2 coordination</span>
-          </div>
-          <div class="deliverable-list" id="deliverable-list" aria-live="polite"></div>
-        </section>
 
         <div class="artifact-tabs" role="tablist" aria-label="Generated draft tabs">
           <button class="artifact-tab active" type="button" role="tab" aria-selected="true" data-artifact="asana">Asana</button>
@@ -1344,6 +1346,14 @@
       }).format(date);
     }
 
+    function formatTimeOnly(date) {
+      return new Intl.DateTimeFormat(undefined, {
+        hour: "numeric",
+        minute: "2-digit",
+        timeZoneName: "short"
+      }).format(date);
+    }
+
     function getNextUpdateInfo(data) {
       const raw = data.deadline || "30 minutes";
       const offsetMs = parseRelativeDeadline(raw);
@@ -1457,11 +1467,12 @@
       trackerTier.textContent = profile.label;
       deliverableTracker.classList.toggle("all-complete", allComplete);
       if (!state.intakeSubmittedAt) {
-        trackerSummary.textContent = `${profile.label} is ready. Submit intake to calculate exact due times.`;
+        trackerSummary.textContent = `Ready. Submit intake to calculate exact due times.`;
       } else if (allComplete) {
-        trackerSummary.textContent = `All ${schedule.length} deliverables are complete for this simulation.`;
+        trackerSummary.textContent = `All ${schedule.length} deliverables complete.`;
       } else {
-        trackerSummary.textContent = `${completeCount}/${schedule.length} complete. Next expected: ${nextOpen.label} by ${nextOpen.dueLabel}.`;
+        const nextDue = nextOpen.dueAt ? formatTimeOnly(nextOpen.dueAt) : nextOpen.dueLabel;
+        trackerSummary.textContent = `${completeCount}/${schedule.length} complete. Next: ${nextOpen.label} by ${nextDue}.`;
       }
 
       const rows = schedule.map((item) => {
@@ -1480,7 +1491,9 @@
         title.textContent = item.label;
         meta.textContent = `${item.system} - ${item.detail}`;
         time.className = "deliverable-time";
-        time.textContent = item.doneAt ? `Due ${item.dueLabel} - done ${formatDateTime(item.doneAt)}` : `Due ${item.dueLabel}`;
+        const dueDisplay = item.dueAt ? formatTimeOnly(item.dueAt) : item.dueLabel;
+        const doneDisplay = item.doneAt ? formatTimeOnly(item.doneAt) : "";
+        time.textContent = item.doneAt ? `Due ${dueDisplay} - done ${doneDisplay}` : `Due ${dueDisplay}`;
         side.className = "deliverable-actions";
         stateLabel.className = "deliverable-state";
         stateLabel.textContent = item.statusLabel === "Late" ? "Late" : item.doneAt ? "Done" : state.intakeSubmittedAt ? "Open" : "Wait";
