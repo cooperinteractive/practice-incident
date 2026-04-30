@@ -1,0 +1,1281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Incident Command Center</title>
+  <style>
+    :root {
+      --ink: #07182d;
+      --ink-2: #17263a;
+      --muted: #607185;
+      --soft: #f4f7fb;
+      --surface: #ffffff;
+      --line: #dbe5ef;
+      --line-strong: #b7c8da;
+      --blue: #0a60ff;
+      --cyan: #00a8d6;
+      --green: #16834f;
+      --orange: #e97800;
+      --red: #c73545;
+      --violet: #635bff;
+      --shadow: 0 18px 48px rgba(7, 24, 45, 0.13);
+      --radius: 8px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink-2);
+      background: var(--soft);
+      font-family: var(--font);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1320px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 18px 0 42px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(244, 247, 251, 0.94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+
+    .topbar-inner {
+      width: min(1320px, calc(100% - 36px));
+      min-height: 62px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 230px;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px;
+      padding: 4px;
+      border-radius: 8px;
+      background: var(--ink);
+      box-shadow: 0 10px 26px rgba(7, 24, 45, 0.18);
+    }
+
+    .brand-mark span {
+      border-radius: 3px;
+    }
+
+    .brand-mark span:nth-child(1) { background: #ffffff; }
+    .brand-mark span:nth-child(2) { background: var(--cyan); }
+    .brand-mark span:nth-child(3) { background: var(--orange); }
+    .brand-mark span:nth-child(4) { background: var(--violet); }
+
+    .brand-title {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.1;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .brand-subtitle {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .nav {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+    }
+
+    .nav a {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--muted);
+      text-decoration: none;
+      white-space: nowrap;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: var(--ink);
+      background: var(--surface);
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 24px;
+      align-items: stretch;
+      padding: 30px;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 82% 15%, rgba(0, 168, 214, 0.34), transparent 30%),
+        linear-gradient(135deg, #07182d, #10263f 68%, #17324f);
+      border-radius: var(--radius);
+      border-bottom: 4px solid var(--cyan);
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      max-width: 780px;
+      margin: 0;
+      color: #ffffff;
+      font-size: clamp(36px, 5vw, 70px);
+      line-height: 0.96;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: 16px 0 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .hero-actions,
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-actions {
+      margin-top: 24px;
+    }
+
+    .button {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--ink);
+      background: #ffffff;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 850;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(7, 24, 45, 0.14);
+    }
+
+    .button.primary {
+      color: #ffffff;
+      background: var(--blue);
+    }
+
+    .button.ghost {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.26);
+    }
+
+    .button.subtle {
+      color: var(--ink);
+      background: var(--surface);
+      border-color: var(--line);
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .status-panel {
+      padding: 18px;
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+    }
+
+    .status-panel h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 42px;
+      padding: 10px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .status-row span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .status-row strong {
+      display: block;
+      margin-top: 2px;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.2;
+    }
+
+    .chip {
+      min-height: 25px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 9px;
+      color: #ffffff;
+      background: var(--green);
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .chip.warn {
+      background: var(--orange);
+    }
+
+    .chip.pending {
+      background: var(--red);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .metric {
+      min-height: 96px;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      box-shadow: 0 10px 26px rgba(7, 24, 45, 0.06);
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .metric-value {
+      margin-top: 9px;
+      color: var(--ink);
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .metric-note {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.42fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+      margin-top: 16px;
+    }
+
+    .panel {
+      padding: 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      box-shadow: 0 12px 34px rgba(7, 24, 45, 0.07);
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0;
+      color: var(--ink);
+      letter-spacing: 0;
+    }
+
+    .panel h2 {
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.05;
+      font-weight: 850;
+    }
+
+    .panel h3 {
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 850;
+    }
+
+    .panel-copy {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line-strong);
+      border-radius: 6px;
+      padding: 10px 11px;
+      color: var(--ink);
+      background: #ffffff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(10, 96, 255, 0.14);
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .action-card {
+      width: 100%;
+      min-height: 76px;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--ink);
+      background: #fbfcfe;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+
+    .action-card:hover,
+    .action-card.active {
+      transform: translateY(-1px);
+      border-color: var(--line-strong);
+      background: #ffffff;
+      box-shadow: 0 12px 26px rgba(7, 24, 45, 0.08);
+    }
+
+    .action-card strong {
+      display: block;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.2;
+      font-weight: 850;
+    }
+
+    .action-card small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.32;
+    }
+
+    .action-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #ffffff;
+      background: var(--blue);
+    }
+
+    .action-icon.green { background: var(--green); }
+    .action-icon.orange { background: var(--orange); }
+    .action-icon.violet { background: var(--violet); }
+    .action-icon.cyan { background: #0a7fa3; }
+    .action-icon.red { background: var(--red); }
+    .action-icon.dark { background: var(--ink); }
+
+    .phase-board {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .phase {
+      min-height: 68px;
+      padding: 11px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .phase.active {
+      border-color: #8fdff1;
+      background: #eefbff;
+    }
+
+    .phase.done {
+      border-color: #b8e2ca;
+      background: #effaf4;
+    }
+
+    .phase span,
+    .phase strong {
+      display: block;
+    }
+
+    .phase span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .phase strong {
+      margin-top: 8px;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    .artifact-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 14px 0 10px;
+    }
+
+    .artifact-tab {
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: var(--muted);
+      background: #ffffff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .artifact-tab.active {
+      color: #ffffff;
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+
+    .artifact-preview {
+      min-height: 330px;
+      margin: 0;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      color: var(--ink-2);
+      background: #fbfcfe;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow: auto;
+    }
+
+    .activity-log {
+      display: grid;
+      gap: 8px;
+      max-height: 160px;
+      overflow: auto;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .log-row {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 10px;
+      padding: 9px;
+      border-radius: 7px;
+      background: #f8fafc;
+    }
+
+    .log-time {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .log-text {
+      color: var(--ink-2);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .link-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .link-card {
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .link-card strong {
+      display: block;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .link-card span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 40;
+      max-width: 320px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      color: #ffffff;
+      background: var(--ink);
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      font-weight: 750;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1120px) {
+      .hero,
+      .workbench {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics,
+      .link-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .phase-board {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar-inner,
+      .app {
+        width: min(100% - 26px, 1320px);
+      }
+
+      .topbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px 0;
+      }
+
+      .nav {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .hero {
+        padding: 22px;
+      }
+
+      .hero h1 {
+        font-size: clamp(34px, 13vw, 54px);
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .metrics,
+      .two-col,
+      .action-grid,
+      .phase-board,
+      .link-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+
+      .button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#command" aria-label="Incident Command Center">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>
+          <span class="brand-title">Incident Command Center</span>
+          <span class="brand-subtitle">Simulation training workspace</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Page sections">
+        <a class="active" href="#command">Command</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#systems">Systems</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app">
+    <section class="hero" id="command">
+      <div>
+        <h1>Incident intake to response recap.</h1>
+        <p>Capture the incident, route the work, and generate clean response drafts without posting anything externally until the team approves it.</p>
+        <div class="hero-actions">
+          <button class="button primary" id="start-incident" type="button">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Start incident
+          </button>
+          <button class="button ghost" data-action="closeout" type="button">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12 10 17 20 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Generate AI recap
+          </button>
+        </div>
+      </div>
+      <aside class="status-panel" aria-label="Current incident status">
+        <h2>Current status</h2>
+        <div class="status-list">
+          <div class="status-row">
+            <span>Incident ID<strong id="metric-id">IR-2026-0429</strong></span>
+            <span class="chip">Ready</span>
+          </div>
+          <div class="status-row">
+            <span>Tier<strong id="metric-tier">Tier 2</strong></span>
+            <span class="chip warn">Review</span>
+          </div>
+          <div class="status-row">
+            <span>Approval<strong id="metric-approval">Draft</strong></span>
+            <span class="chip pending">Hold</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="metrics" aria-label="Incident summary metrics">
+      <div class="metric">
+        <div class="metric-label">Owner</div>
+        <div class="metric-value" id="metric-owner">Response lead</div>
+        <div class="metric-note">Owns next update and routing.</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Next Update</div>
+        <div class="metric-value" id="metric-update">30 min</div>
+        <div class="metric-note">Visible in the response thread.</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Workflow</div>
+        <div class="metric-value" id="metric-workflow">Open</div>
+        <div class="metric-note">Local workflow state only.</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Outputs</div>
+        <div class="metric-value" id="metric-outputs">0</div>
+        <div class="metric-note">Drafts generated in this page.</div>
+      </div>
+    </section>
+
+    <section class="workbench" id="workflow">
+      <div class="panel">
+        <h2>Incident intake</h2>
+        <p class="panel-copy">Keep this short. The buttons use these fields to produce the system drafts and final recap.</p>
+        <form class="form-grid" id="intake-form">
+          <div class="two-col">
+            <div class="field">
+              <label for="incident-title">Incident title</label>
+              <input id="incident-title" name="title" value="Vendor workspace exposure review">
+            </div>
+            <div class="field">
+              <label for="incident-id">Incident ID</label>
+              <input id="incident-id" name="id" value="IR-2026-0429">
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label for="severity">Severity / tier</label>
+              <select id="severity" name="severity">
+                <option>Tier 1 - Monitor</option>
+                <option selected>Tier 2 - Internal coordination</option>
+                <option>Tier 3 - Leadership review</option>
+                <option>Tier 4 - External response</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="owner">Response owner</label>
+              <input id="owner" name="owner" value="Response lead">
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label for="audience">Affected audience</label>
+              <input id="audience" name="audience" value="Internal team and reviewers">
+            </div>
+            <div class="field">
+              <label for="deadline">Next update</label>
+              <input id="deadline" name="deadline" value="30 minutes">
+            </div>
+          </div>
+          <div class="field">
+            <label for="known-facts">Known facts</label>
+            <textarea id="known-facts" name="facts">A vendor workspace may have exposed draft customer communications to a broader internal group than intended. Engineering is validating scope. Legal and privacy review are required before external messaging.</textarea>
+          </div>
+          <div class="field">
+            <label for="unknowns">Open questions</label>
+            <textarea id="unknowns" name="unknowns">Which documents were visible? Who had access? Was any customer-facing content final or only draft? What is the approved next update time?</textarea>
+          </div>
+        </form>
+        <div class="button-row" style="margin-top: 14px;">
+          <button class="button primary" data-action="intake" type="button">Submit intake</button>
+          <button class="button subtle" id="reset-intake" type="button">Reset</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Workflow actions</h2>
+        <p class="panel-copy">Each button completes a step locally and generates the next draft. Real posting or ticket creation stays off until you approve it.</p>
+        <div class="action-grid" aria-label="Workflow actions">
+          <button class="action-card" type="button" data-action="thread">
+            <span class="action-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h10M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <span><strong>Draft response thread</strong><small>Creates the coordination update.</small></span>
+          </button>
+          <button class="action-card" type="button" data-action="jira">
+            <span class="action-icon violet" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="2"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span><strong>Draft Jira task</strong><small>Builds engineering validation work.</small></span>
+          </button>
+          <button class="action-card" type="button" data-action="confluence">
+            <span class="action-icon cyan" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v16H7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 8h4M10 12h4M10 16h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <span><strong>Draft notes page</strong><small>Creates the working incident record.</small></span>
+          </button>
+          <button class="action-card" type="button" data-action="miro">
+            <span class="action-icon orange" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 5h14v14H5z" stroke="currentColor" stroke-width="2"/><path d="M8 9h8M8 13h5M8 17h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <span><strong>Map response board</strong><small>Defines lanes and decision cards.</small></span>
+          </button>
+          <button class="action-card" type="button" data-action="approval">
+            <span class="action-icon red" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3 4 7v6c0 4 3.2 6.7 8 8 4.8-1.3 8-4 8-8V7l-8-4Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span><strong>Draft approval email</strong><small>Prepares reviewer request.</small></span>
+          </button>
+          <button class="action-card" type="button" data-action="closeout">
+            <span class="action-icon dark" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12 10 17 20 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span><strong>AI incident recap</strong><small>Outputs final summary and follow-ups.</small></span>
+          </button>
+        </div>
+
+        <div class="phase-board" aria-label="Workflow phase board">
+          <div class="phase active" data-phase="intake"><span>Intake</span><strong id="phase-intake">Ready</strong></div>
+          <div class="phase" data-phase="triage"><span>Triage</span><strong id="phase-triage">Waiting</strong></div>
+          <div class="phase" data-phase="draft"><span>Draft</span><strong id="phase-draft">Waiting</strong></div>
+          <div class="phase" data-phase="approval"><span>Approval</span><strong id="phase-approval">Waiting</strong></div>
+          <div class="phase" data-phase="closeout"><span>Closeout</span><strong id="phase-closeout">Waiting</strong></div>
+        </div>
+
+        <div class="artifact-tabs" role="tablist" aria-label="Generated draft tabs">
+          <button class="artifact-tab active" type="button" data-artifact="thread">Thread</button>
+          <button class="artifact-tab" type="button" data-artifact="jira">Jira</button>
+          <button class="artifact-tab" type="button" data-artifact="notes">Notes</button>
+          <button class="artifact-tab" type="button" data-artifact="board">Board</button>
+          <button class="artifact-tab" type="button" data-artifact="email">Email</button>
+          <button class="artifact-tab" type="button" data-artifact="recap">AI Recap</button>
+        </div>
+        <pre class="artifact-preview" id="artifact-preview" aria-live="polite"></pre>
+        <div class="button-row" style="margin-top: 12px;">
+          <button class="button primary" id="copy-artifact" type="button">Copy active draft</button>
+          <button class="button subtle" id="reset-workflow" type="button">Reset workflow</button>
+        </div>
+        <div class="activity-log" id="activity-log" aria-live="polite" aria-label="Activity log"></div>
+      </div>
+    </section>
+
+    <section class="link-strip" id="systems" aria-label="Connected systems">
+      <div class="link-card">
+        <strong>Jira</strong>
+        <span>Engineering validation, evidence, owner, and acceptance criteria.</span>
+      </div>
+      <div class="link-card">
+        <strong>Confluence</strong>
+        <span>Working notes, decision log, recap, and reusable improvements.</span>
+      </div>
+      <div class="link-card">
+        <strong>Miro</strong>
+        <span>Visual response map with facts, roles, deliverables, and closeout lanes.</span>
+      </div>
+    </section>
+
+    <p class="footer-note">This page is a training surface. Buttons create local drafts only. Use a hosted HTTPS version as a space website tab when you are ready to place it in the collaboration space.</p>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const defaults = {
+      title: "Vendor workspace exposure review",
+      id: "IR-2026-0429",
+      severity: "Tier 2 - Internal coordination",
+      owner: "Response lead",
+      audience: "Internal team and reviewers",
+      deadline: "30 minutes",
+      facts: "A vendor workspace may have exposed draft customer communications to a broader internal group than intended. Engineering is validating scope. Legal and privacy review are required before external messaging.",
+      unknowns: "Which documents were visible? Who had access? Was any customer-facing content final or only draft? What is the approved next update time?"
+    };
+
+    const phaseOrder = ["intake", "triage", "draft", "approval", "closeout"];
+    const form = document.querySelector("#intake-form");
+    const preview = document.querySelector("#artifact-preview");
+    const log = document.querySelector("#activity-log");
+    const toast = document.querySelector("#toast");
+
+    const state = {
+      activeArtifact: "thread",
+      complete: new Set(),
+      outputs: {},
+      log: []
+    };
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function getData() {
+      const data = new FormData(form);
+      return {
+        title: data.get("title").trim(),
+        id: data.get("id").trim(),
+        severity: data.get("severity").trim(),
+        owner: data.get("owner").trim(),
+        audience: data.get("audience").trim(),
+        deadline: data.get("deadline").trim(),
+        facts: data.get("facts").trim(),
+        unknowns: data.get("unknowns").trim()
+      };
+    }
+
+    function updateMetrics() {
+      const data = getData();
+      document.querySelector("#metric-id").textContent = data.id || "Unassigned";
+      document.querySelector("#metric-tier").textContent = (data.severity || "Tier").split(" - ")[0];
+      document.querySelector("#metric-owner").textContent = data.owner || "Unassigned";
+      document.querySelector("#metric-update").textContent = data.deadline || "TBD";
+      document.querySelector("#metric-outputs").textContent = Object.values(state.outputs).filter(Boolean).length;
+      document.querySelector("#metric-workflow").textContent = state.complete.has("closeout") ? "Closed" : "Open";
+      document.querySelector("#metric-approval").textContent = state.complete.has("approval") ? "Pending" : state.complete.has("closeout") ? "Closed" : "Draft";
+    }
+
+    function makeOutputs() {
+      const data = getData();
+      return {
+        thread: `[Declare] ${data.id} - ${data.title}
+
+Owner: ${data.owner}
+Severity: ${data.severity}
+Audience: ${data.audience}
+Next update: ${data.deadline}
+
+Known facts:
+${data.facts}
+
+Open questions:
+${data.unknowns}
+
+Next action:
+Route engineering validation, capture notes, and keep external language draft-only until approval is explicit.`,
+
+        jira: `Jira task draft
+
+Summary: ${data.id} - Validate scope for ${data.title}
+Issue type: Task
+Priority: ${data.severity.includes("Tier 4") ? "High" : "Medium"}
+Owner: Engineering validation lead
+
+Description:
+${data.facts}
+
+Acceptance criteria:
+- Identify which documents were visible.
+- Confirm who had access and whether any access occurred.
+- Confirm whether visible content was draft-only or final.
+- Attach evidence or source links.
+- Add final engineering finding to the triage record.`,
+
+        notes: `Confluence notes draft
+
+Title: ${data.id} Incident Record
+
+Purpose:
+Document the scenario, decisions, approvals, and lessons learned.
+
+Known facts:
+${data.facts}
+
+Open questions:
+${data.unknowns}
+
+Decision log:
+- Owner: ${data.owner}
+- First update: ${data.deadline}
+- Approval rule: external language remains draft-only until reviewer approval.
+
+Sections:
+- Timeline
+- Decisions
+- Engineering findings
+- Approved language
+- Follow-up tasks
+- Process improvements`,
+
+        board: `Miro board update
+
+Create four lanes:
+1. Facts
+   - ${data.title}
+   - Known facts
+   - Open questions
+2. Roles
+   - Owner: ${data.owner}
+   - Reviewers
+   - Engineering validation lead
+3. Deliverables
+   - Internal update
+   - Holding statement
+   - Approval request
+4. Closeout
+   - Recap
+   - Lessons learned
+   - Follow-up tasks`,
+
+        email: `Approval email draft
+
+Subject: [Approval needed] ${data.id} - holding statement
+
+Hi team,
+
+Please review the draft holding update for ${data.title}.
+
+Known facts:
+${data.facts}
+
+Open questions:
+${data.unknowns}
+
+Requested decision:
+Approve, revise, or hold. External language remains draft-only until approval is explicit.
+
+Owner: ${data.owner}
+Deadline: ${data.deadline}`,
+
+        recap: `AI incident recap
+
+Incident:
+${data.id} - ${data.title}
+
+Executive summary:
+A possible workspace exposure was reported. The response team captured known facts, separated open questions, routed engineering validation, prepared reviewer materials, and held external language until approval.
+
+Timeline:
+- Intake captured by ${data.owner}.
+- Engineering validation task drafted.
+- Notes page drafted for decisions and evidence.
+- Response board mapped with facts, roles, deliverables, and closeout lanes.
+- Approval email drafted for reviewer decision.
+
+Known facts:
+${data.facts}
+
+Open questions:
+${data.unknowns}
+
+Recommended follow-ups:
+1. Confirm access scope and evidence.
+2. Record final reviewer decision.
+3. Store approved language in the source library.
+4. Update the incident playbook if the workflow missed any owner, approval, or timing detail.
+5. Close the incident only after all follow-up tasks are assigned.`
+      };
+    }
+
+    function setArtifact(name) {
+      state.activeArtifact = name;
+      state.outputs = { ...makeOutputs(), ...state.outputs };
+      document.querySelectorAll("[data-artifact]").forEach((tab) => {
+        tab.classList.toggle("active", tab.dataset.artifact === name);
+      });
+      preview.textContent = state.outputs[name] || "";
+    }
+
+    function addLog(message) {
+      state.log.unshift(message);
+      state.log = state.log.slice(0, 8);
+      log.innerHTML = state.log.map((entry, index) => `
+        <div class="log-row">
+          <span class="log-time">${String(index + 1).padStart(2, "0")}</span>
+          <span class="log-text">${entry}</span>
+        </div>
+      `).join("");
+    }
+
+    function setPhase(phase, label) {
+      state.complete.add(phase);
+      phaseOrder.forEach((item) => {
+        const block = document.querySelector(`[data-phase="${item}"]`);
+        const text = document.querySelector(`#phase-${item}`);
+        const itemIndex = phaseOrder.indexOf(item);
+        const phaseIndex = phaseOrder.indexOf(phase);
+        block.classList.toggle("active", item === phase);
+        block.classList.toggle("done", itemIndex < phaseIndex || state.complete.has(item));
+        if (item === phase) text.textContent = label;
+      });
+      updateMetrics();
+    }
+
+    function runAction(action) {
+      const outputs = makeOutputs();
+      state.outputs = { ...state.outputs, ...outputs };
+      document.querySelectorAll("[data-action]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.action === action);
+      });
+
+      if (action === "intake") {
+        setPhase("intake", "Captured");
+        setArtifact("thread");
+        addLog("Intake submitted locally and response thread draft generated.");
+      }
+
+      if (action === "thread") {
+        setPhase("triage", "Thread ready");
+        setArtifact("thread");
+        addLog("Response thread draft completed.");
+      }
+
+      if (action === "jira") {
+        setPhase("draft", "Jira ready");
+        setArtifact("jira");
+        addLog("Jira task draft completed with acceptance criteria.");
+      }
+
+      if (action === "confluence") {
+        setPhase("draft", "Notes ready");
+        setArtifact("notes");
+        addLog("Notes page draft completed with decision log and sections.");
+      }
+
+      if (action === "miro") {
+        setPhase("draft", "Board mapped");
+        setArtifact("board");
+        addLog("Response board update generated.");
+      }
+
+      if (action === "approval") {
+        setPhase("approval", "Email ready");
+        setArtifact("email");
+        addLog("Approval email draft completed.");
+      }
+
+      if (action === "closeout") {
+        setPhase("closeout", "Recap ready");
+        setArtifact("recap");
+        addLog("AI incident recap generated.");
+      }
+
+      showToast("Workflow updated");
+    }
+
+    function resetWorkflow() {
+      state.activeArtifact = "thread";
+      state.complete = new Set();
+      state.outputs = makeOutputs();
+      state.log = [];
+      phaseOrder.forEach((phase) => {
+        document.querySelector(`[data-phase="${phase}"]`).classList.remove("active", "done");
+        document.querySelector(`#phase-${phase}`).textContent = phase === "intake" ? "Ready" : "Waiting";
+      });
+      document.querySelector('[data-phase="intake"]').classList.add("active");
+      document.querySelectorAll("[data-action]").forEach((button) => button.classList.remove("active"));
+      log.innerHTML = "";
+      setArtifact("thread");
+      updateMetrics();
+      showToast("Workflow reset");
+    }
+
+    function resetIntake() {
+      document.querySelector("#incident-title").value = defaults.title;
+      document.querySelector("#incident-id").value = defaults.id;
+      document.querySelector("#severity").value = defaults.severity;
+      document.querySelector("#owner").value = defaults.owner;
+      document.querySelector("#audience").value = defaults.audience;
+      document.querySelector("#deadline").value = defaults.deadline;
+      document.querySelector("#known-facts").value = defaults.facts;
+      document.querySelector("#unknowns").value = defaults.unknowns;
+      resetWorkflow();
+    }
+
+    async function copyActiveDraft() {
+      try {
+        await navigator.clipboard.writeText(preview.textContent.trim());
+        showToast("Draft copied");
+      } catch (error) {
+        showToast("Copy failed. Select the text manually.");
+      }
+    }
+
+    document.querySelector("#start-incident").addEventListener("click", () => {
+      document.querySelector("#workflow").scrollIntoView({ behavior: "smooth", block: "start" });
+      runAction("intake");
+    });
+
+    document.querySelectorAll("[data-action]").forEach((button) => {
+      button.addEventListener("click", () => runAction(button.dataset.action));
+    });
+
+    document.querySelectorAll("[data-artifact]").forEach((button) => {
+      button.addEventListener("click", () => setArtifact(button.dataset.artifact));
+    });
+
+    document.querySelector("#copy-artifact").addEventListener("click", copyActiveDraft);
+    document.querySelector("#reset-workflow").addEventListener("click", resetWorkflow);
+    document.querySelector("#reset-intake").addEventListener("click", resetIntake);
+    form.addEventListener("input", () => {
+      state.outputs = makeOutputs();
+      setArtifact(state.activeArtifact);
+      updateMetrics();
+    });
+
+    state.outputs = makeOutputs();
+    setArtifact("thread");
+    updateMetrics();
+  </script>
+</body>
+</html>
