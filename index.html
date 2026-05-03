@@ -1326,15 +1326,16 @@
         </div>
         <div class="platform-launchpad" aria-label="Platform launchpad">
           <button class="platform-link local" type="button" data-local-artifact="asana">Show Task Draft</button>
-          <a class="platform-link" data-platform-key="asana" href="https://app.clickup.com/t/86b9qpd7z" target="_blank" rel="noopener noreferrer">Open ClickUp Example</a>
+          <a class="platform-link" data-platform-key="asana" href="https://app.clickup.com/t/86b9qw4rn" target="_blank" rel="noopener noreferrer">Open ClickUp Task</a>
           <button class="platform-link local" type="button" data-local-artifact="jira">Show Jira Draft</button>
-          <a class="platform-link" data-platform-key="jira" href="https://cooperinteractive.atlassian.net/browse/KAN-2" target="_blank" rel="noopener noreferrer">Open Jira Example</a>
+          <a class="platform-link" data-platform-key="jira" href="https://cooperinteractive.atlassian.net/browse/KAN-3" target="_blank" rel="noopener noreferrer">Open Jira Issue</a>
           <button class="platform-link local" type="button" data-local-artifact="notes">Show Notes Draft</button>
+          <a class="platform-link" data-platform-key="confluence" href="https://cooperinteractive.atlassian.net/wiki/spaces/PM/pages/589825/IR-2026-0429+Incident+Recap+-+Vendor+Workspace+Exposure+Review?focusedCommentId=1277953" target="_blank" rel="noopener noreferrer">Open Notes Record</a>
           <button class="platform-link local" type="button" data-run-action="miro">Build Miro Brief</button>
           <a class="platform-link" data-platform-key="outlook" href="https://outlook.office.com/mail/" target="_blank" rel="noopener noreferrer">Open Outlook Draft</a>
           <a class="platform-link" data-platform-key="github" href="https://github.com/cooperinteractive/practice-incident" target="_blank" rel="noopener noreferrer">Open GitHub</a>
         </div>
-        <p class="launch-note">Live simulation: current drafts update here. ClickUp and Jira examples are static until a workflow endpoint syncs them. Miro builds a board brief here first.</p>
+        <p class="launch-note">Live simulation: current drafts update here. ClickUp, Jira, and notes now point to current simulation artifacts. Miro builds a board brief here first.</p>
 
         <div class="phase-board" aria-label="Workflow phase board">
           <div class="phase active" data-phase="intake"><span>Intake</span><strong id="phase-intake">Ready</strong></div>
@@ -1477,20 +1478,19 @@
 
     const platformLinks = {
       asana: {
-        label: "Open ClickUp Example",
-        url: "https://app.clickup.com/t/86b9qpd7z",
-        example: true
+        label: "Open ClickUp Task",
+        url: "https://app.clickup.com/t/86b9qw4rn",
+        example: false
       },
       jira: {
-        label: "Open Jira Example",
-        url: "https://cooperinteractive.atlassian.net/browse/KAN-2",
-        example: true
+        label: "Open Jira Issue",
+        url: "https://cooperinteractive.atlassian.net/browse/KAN-3",
+        example: false
       },
       confluence: {
-        label: "Show Notes Draft",
-        url: "#artifact-preview",
-        artifact: "notes",
-        local: true
+        label: "Open Notes Record",
+        url: "https://cooperinteractive.atlassian.net/wiki/spaces/PM/pages/589825/IR-2026-0429+Incident+Recap+-+Vendor+Workspace+Exposure+Review?focusedCommentId=1277953",
+        example: false
       },
       miro: {
         label: "Open Miro Dashboard",
@@ -2321,9 +2321,8 @@ This is a saved simulation intake packet. External systems update only through a
 Task: [${simulationLabel}] ${data.id} - Coordinate ${data.title}
 Project: Animal Farm / Incident Command
 Owner: ${data.owner}
-External example task: https://app.clickup.com/t/86b9qpd7z
-External example checklist task: https://app.clickup.com/t/86b9qpda9
-Sync status: This draft reflects the current intake. The ClickUp example does not update until an approved endpoint syncs it.
+Live task: https://app.clickup.com/t/86b9qw4rn
+Sync status: This draft reflects the current intake. The linked ClickUp task is the current simulation proof artifact.
 Submitted at: ${timing.submittedLabel}
 Next update due: ${timing.dueLabel}
 Cadence: ${timing.cadence}
@@ -2375,13 +2374,13 @@ Route engineering validation, capture notes, and keep external language draft-on
 
 Summary: [${simulationLabel}] ${data.id} - Validate scope for ${data.title}
 Issue type: Task
-External example issue: https://cooperinteractive.atlassian.net/browse/KAN-2
+Live issue: https://cooperinteractive.atlassian.net/browse/KAN-3
 Priority: ${data.severity.includes("Tier 4") ? "High" : "Medium"}
 Owner: Engineering validation lead
-Sync status: This draft reflects the current intake. The Jira example does not update until an approved endpoint syncs it.
+Sync status: This draft reflects the current intake. The linked Jira issue is the current simulation proof artifact.
 
 Simulation note:
-Training artifact only. KAN-2 is an external simulation example, not a production incident.
+Training artifact only. KAN-3 is an external simulation proof issue, not a production incident.
 
 Description:
 ${data.facts}
