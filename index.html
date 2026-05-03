@@ -1097,12 +1097,12 @@
           <button class="action-card" type="button" data-action="asana">
             <span class="action-mode">Draft</span>
             <span class="action-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h10M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Asana task draft</strong><small>Staged in page.</small></span>
+            <span><strong>Task tracker</strong><small>Live ClickUp record.</small></span>
           </button>
           <button class="action-card" type="button" data-action="jira">
             <span class="action-mode">Draft</span>
             <span class="action-icon violet" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="2"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Jira validation draft</strong><small>Staged in page.</small></span>
+            <span><strong>Jira validation</strong><small>Live issue.</small></span>
           </button>
           <button class="action-card" type="button" data-action="confluence">
             <span class="action-mode">Draft</span>
@@ -1126,14 +1126,14 @@
           </button>
         </div>
         <div class="platform-launchpad" aria-label="Platform launchpad">
-          <a class="platform-link" href="https://app.asana.com/0/home" target="_blank" rel="noopener noreferrer">Open Asana</a>
-          <a class="platform-link" href="https://cooperinteractive.atlassian.net/jira/your-work" target="_blank" rel="noopener noreferrer">Open Jira</a>
+          <a class="platform-link" href="https://app.clickup.com/t/86b9qpd7z" target="_blank" rel="noopener noreferrer">Open Task Tracker</a>
+          <a class="platform-link" href="https://cooperinteractive.atlassian.net/browse/KAN-2" target="_blank" rel="noopener noreferrer">Open Jira Issue</a>
           <button class="platform-link local" type="button" data-local-artifact="notes">Show Notes Draft</button>
           <a class="platform-link" href="https://miro.com/app/dashboard/" target="_blank" rel="noopener noreferrer">Open Miro</a>
           <a class="platform-link" href="https://outlook.office.com/mail/" target="_blank" rel="noopener noreferrer">Open Outlook</a>
           <a class="platform-link" href="https://github.com/cooperinteractive/practice-incident" target="_blank" rel="noopener noreferrer">Open GitHub</a>
         </div>
-        <p class="launch-note">Current state: local simulation. App buttons do not create new Asana, Jira, or email records until an approved endpoint is connected.</p>
+        <p class="launch-note">Live simulation: ClickUp and Jira open real SIMULATION records. Notes and AI recap stay in-page. Email opens compose only.</p>
 
         <div class="phase-board" aria-label="Workflow phase board">
           <div class="phase active" data-phase="intake"><span>Intake</span><strong id="phase-intake">Ready</strong></div>
@@ -1144,7 +1144,7 @@
         </div>
 
         <div class="artifact-tabs" role="tablist" aria-label="Generated draft tabs">
-          <button class="artifact-tab active" type="button" role="tab" aria-selected="true" data-artifact="asana">Asana</button>
+          <button class="artifact-tab active" type="button" role="tab" aria-selected="true" data-artifact="asana">Task</button>
           <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="jira">Jira</button>
           <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="notes">Notes</button>
           <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="board">Board</button>
@@ -1207,14 +1207,14 @@
         requestedOutputs: ["asana-task", "incident-record"]
       },
       asana: {
-        label: "Asana task",
+        label: "Task tracker",
         phase: "triage",
         artifact: "asana",
-        system: "asana",
+        system: "clickup",
         requestedOutputs: ["task-url", "action-list"]
       },
       jira: {
-        label: "Jira issue",
+        label: "Jira validation",
         phase: "draft",
         artifact: "jira",
         system: "jira",
@@ -1252,12 +1252,14 @@
 
     const platformLinks = {
       asana: {
-        label: "Open Asana",
-        url: "https://app.asana.com/0/home"
+        label: "Open Task Tracker",
+        url: "https://app.clickup.com/t/86b9qpd7z",
+        live: true
       },
       jira: {
-        label: "Open Jira",
-        url: "https://cooperinteractive.atlassian.net/jira/your-work"
+        label: "Open Jira Issue",
+        url: "https://cooperinteractive.atlassian.net/browse/KAN-2",
+        live: true
       },
       confluence: {
         label: "Show Notes Draft",
@@ -1270,8 +1272,8 @@
         url: "https://miro.com/app/dashboard/"
       },
       outlook: {
-        label: "Open Outlook",
-        url: "https://outlook.office.com/mail/"
+        label: "Open Outlook Compose",
+        url: "https://outlook.office.com/mail/deeplink/compose?subject=%5BSIMULATION%5D%20IR-2026-0429%20approval%20request&body=SIMULATION%20ONLY%0A%0APlease%20review%20the%20approval%20draft%20inside%20the%20Practice%20Incident%20command%20center.%0A%0AThis%20is%20a%20training%20artifact%20and%20not%20a%20live%20incident."
       },
       github: {
         label: "Open GitHub",
@@ -1318,8 +1320,8 @@
       {
         id: "asana",
         action: "asana",
-        label: "Asana task",
-        system: "Asana",
+        label: "Task tracker",
+        system: "ClickUp",
         owner: "Response lead",
         detail: "Task, owner, and response checklist"
       },
@@ -1658,13 +1660,14 @@
       const scheduleText = makeScheduleText(data);
       const brandStyle = "Brand style: header #07182d, primary action #0a60ff, timing lane #00a8d6, approval accent #ad5900, blockers #c73545.";
       return {
-        asana: `${simulationLabel} Asana task draft
+        asana: `${simulationLabel} Live task tracker
 
 Task: [${simulationLabel}] ${data.id} - Coordinate ${data.title}
-Project: Incident Command
+Project: Animal Farm / Incident Command
 Owner: ${data.owner}
-Simulation record ID: ASANA-SIM-${data.id || "UNASSIGNED"}
-Status: Staged in this Webex training page
+Live ClickUp task: https://app.clickup.com/t/86b9qpd7z
+Live checklist task: https://app.clickup.com/t/86b9qpda9
+Status: Live SIMULATION task pack created in ClickUp
 Submitted at: ${timing.submittedLabel}
 Next update due: ${timing.dueLabel}
 Cadence: ${timing.cadence}
@@ -1712,15 +1715,16 @@ ${scheduleText}
 Next action:
 Route engineering validation, capture notes, and keep external language draft-only until approval is explicit.`,
 
-        jira: `${simulationLabel} Jira issue draft
+        jira: `${simulationLabel} Live Jira validation
 
 Summary: [${simulationLabel}] ${data.id} - Validate scope for ${data.title}
 Issue type: Task
+Live Jira issue: https://cooperinteractive.atlassian.net/browse/KAN-2
 Priority: ${data.severity.includes("Tier 4") ? "High" : "Medium"}
 Owner: Engineering validation lead
 
 Simulation note:
-Training artifact only. Do not classify as a live production incident.
+Training artifact only. KAN-2 is a live simulation issue, not a production incident.
 
 Description:
 ${data.facts}
@@ -2004,6 +2008,22 @@ Recommended follow-ups:
       setGitHubTrigger(action, payload);
     }
 
+    function attachLiveArtifactLink(action) {
+      const actionConfig = workflowActions[action] || workflowActions.intake;
+      const platform = platformLinks[platformByAction[action] || ""];
+      if (!platform || !platform.live || !platform.url) return false;
+      const artifact = actionConfig.artifact || state.activeArtifact;
+      const line = `${platform.label}: ${platform.url}`;
+      const current = state.outputs[artifact] || "";
+      if (!current.includes(line)) {
+        state.outputs[artifact] = `${current}\n\nLive simulation artifact:\n${line}`;
+      }
+      if (state.activeArtifact === artifact) {
+        preview.textContent = state.outputs[artifact] || "";
+      }
+      return true;
+    }
+
     function applyWorkflowResult(action, result = {}) {
       const actionConfig = workflowActions[action] || workflowActions.intake;
       const artifact = actionConfig.artifact || state.activeArtifact;
@@ -2034,9 +2054,12 @@ Recommended follow-ups:
 
       if (!workflow.endpoint) {
         const triggerUrl = setGitHubTrigger(action, payload);
-        workflow.lastStatus = "Local draft only";
-        addLog(`${actionConfig.label} staged in this page. Approved workflow endpoint not connected.`);
-        return { mode: "local", payload, triggerUrl };
+        const liveLinked = attachLiveArtifactLink(action);
+        workflow.lastStatus = liveLinked ? "Live simulation artifact linked" : "Local draft only";
+        addLog(liveLinked
+          ? `${actionConfig.label} linked to live SIMULATION artifact.`
+          : `${actionConfig.label} staged in this page. Approved workflow endpoint not connected.`);
+        return { mode: liveLinked ? "live-link" : "local", payload, triggerUrl };
       }
 
       githubTrigger.hidden = true;
@@ -2086,19 +2109,19 @@ Recommended follow-ups:
       if (action === "intake") {
         setPhase("intake", "Captured");
         setArtifact("asana");
-        addLog("Intake submitted and Asana action list drafted.");
+        addLog("Intake submitted and live task tracker ready.");
       }
 
       if (action === "asana") {
-        setPhase("triage", "Asana ready");
+        setPhase("triage", "Task live");
         setArtifact("asana");
-        addLog("Asana task draft completed.");
+        addLog("Live task tracker opened.");
       }
 
       if (action === "jira") {
-        setPhase("draft", "Jira ready");
+        setPhase("draft", "Jira live");
         setArtifact("jira");
-        addLog("Jira validation draft generated.");
+        addLog("Live Jira validation issue ready.");
       }
 
       if (action === "confluence") {
