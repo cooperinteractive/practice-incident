@@ -845,12 +845,35 @@
       font-size: 12px;
       font-weight: 850;
       white-space: nowrap;
+      cursor: pointer;
+      font-family: inherit;
     }
 
     .platform-link:hover {
       color: #ffffff;
       border-color: var(--blue);
       background: var(--blue);
+    }
+
+    .platform-link.local {
+      color: var(--blue);
+      border-style: dashed;
+      background: #eef6ff;
+    }
+
+    .platform-link.local:hover {
+      color: #ffffff;
+      border-style: solid;
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+
+    .launch-note {
+      margin: 8px 2px 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.4;
     }
 
     .activity-log {
@@ -1069,22 +1092,22 @@
 
       <div class="panel">
         <h2>Workflow actions</h2>
-        <p class="panel-copy">Buttons generate drafts, open simulation records, and hold sends.</p>
+        <p class="panel-copy">Simulation mode: cards stage drafts in this page. Platform buttons open apps only.</p>
         <div class="action-grid" aria-label="Workflow actions">
           <button class="action-card" type="button" data-action="asana">
-            <span class="action-mode preview">Generate</span>
+            <span class="action-mode">Draft</span>
             <span class="action-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h10M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Asana task</strong><small>Generates task card.</small></span>
+            <span><strong>Asana task draft</strong><small>Staged in page.</small></span>
           </button>
           <button class="action-card" type="button" data-action="jira">
             <span class="action-mode">Draft</span>
             <span class="action-icon violet" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="2"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Jira issue</strong><small>Builds validation draft.</small></span>
+            <span><strong>Jira validation draft</strong><small>Staged in page.</small></span>
           </button>
           <button class="action-card" type="button" data-action="confluence">
             <span class="action-mode">Draft</span>
             <span class="action-icon cyan" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v16H7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 8h4M10 12h4M10 16h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Confluence notes</strong><small>Builds notes draft.</small></span>
+            <span><strong>Notes draft</strong><small>Stays in page.</small></span>
           </button>
           <button class="action-card" type="button" data-action="miro">
             <span class="action-mode">Draft</span>
@@ -1099,17 +1122,18 @@
           <button class="action-card" type="button" data-action="closeout">
             <span class="action-mode preview">Generate</span>
             <span class="action-icon dark" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12 10 17 20 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>AI recap</strong><small>Writes recap draft.</small></span>
+            <span><strong>AI recap</strong><small>Stays in page.</small></span>
           </button>
         </div>
         <div class="platform-launchpad" aria-label="Platform launchpad">
           <a class="platform-link" href="https://app.asana.com/0/home" target="_blank" rel="noopener noreferrer">Open Asana</a>
           <a class="platform-link" href="https://cooperinteractive.atlassian.net/jira/your-work" target="_blank" rel="noopener noreferrer">Open Jira</a>
-          <a class="platform-link" href="https://cooperinteractive.atlassian.net/wiki/home" target="_blank" rel="noopener noreferrer">Open Confluence</a>
+          <button class="platform-link local" type="button" data-local-artifact="notes">Show Notes Draft</button>
           <a class="platform-link" href="https://miro.com/app/dashboard/" target="_blank" rel="noopener noreferrer">Open Miro</a>
           <a class="platform-link" href="https://outlook.office.com/mail/" target="_blank" rel="noopener noreferrer">Open Outlook</a>
           <a class="platform-link" href="https://github.com/cooperinteractive/practice-incident" target="_blank" rel="noopener noreferrer">Open GitHub</a>
         </div>
+        <p class="launch-note">Current state: local simulation. App buttons do not create new Asana, Jira, or email records until an approved endpoint is connected.</p>
 
         <div class="phase-board" aria-label="Workflow phase board">
           <div class="phase active" data-phase="intake"><span>Intake</span><strong id="phase-intake">Ready</strong></div>
@@ -1197,11 +1221,11 @@
         requestedOutputs: ["issue-url", "engineering-task"]
       },
       confluence: {
-        label: "Confluence notes",
+        label: "Notes draft",
         phase: "draft",
         artifact: "notes",
-        system: "confluence",
-        requestedOutputs: ["page-url", "decision-log"]
+        system: "notes",
+        requestedOutputs: ["decision-log", "incident-record"]
       },
       miro: {
         label: "Miro board",
@@ -1236,8 +1260,10 @@
         url: "https://cooperinteractive.atlassian.net/jira/your-work"
       },
       confluence: {
-        label: "Open Confluence",
-        url: "https://cooperinteractive.atlassian.net/wiki/home"
+        label: "Show Notes Draft",
+        url: "#artifact-preview",
+        artifact: "notes",
+        local: true
       },
       miro: {
         label: "Open Miro",
@@ -1250,6 +1276,12 @@
       github: {
         label: "Open GitHub",
         url: "https://github.com/cooperinteractive/practice-incident"
+      },
+      recap: {
+        label: "Show AI Recap",
+        url: "#artifact-preview",
+        artifact: "recap",
+        local: true
       }
     };
 
@@ -1260,7 +1292,7 @@
       confluence: "confluence",
       miro: "miro",
       approval: "outlook",
-      closeout: "confluence"
+      closeout: "recap"
     };
 
     const tierProfiles = {
@@ -1302,8 +1334,8 @@
       {
         id: "notes",
         action: "confluence",
-        label: "Confluence notes",
-        system: "Confluence",
+        label: "Notes draft",
+        system: "In-page notes",
         owner: "Scribe",
         detail: "Decision log and incident record"
       },
@@ -1631,7 +1663,7 @@
 Task: [${simulationLabel}] ${data.id} - Coordinate ${data.title}
 Project: Incident Command
 Owner: ${data.owner}
-Generated record: ASANA-SIM-${data.id || "UNASSIGNED"}
+Simulation record ID: ASANA-SIM-${data.id || "UNASSIGNED"}
 Status: Staged in this Webex training page
 Submitted at: ${timing.submittedLabel}
 Next update due: ${timing.dueLabel}
@@ -1641,7 +1673,7 @@ Tier timing: ${profile.label}
 Checklist:
 - Confirm owner for engineering validation.
 - Generate Jira scope review draft.
-- Generate Confluence incident notes draft.
+- Generate notes draft.
 - Prepare Outlook approval email.
 - Hold external language until approval is explicit.
 
@@ -1702,7 +1734,7 @@ Acceptance criteria:
 - Attach evidence or source links.
 - Add final engineering finding to the triage record.`,
 
-        notes: `${simulationLabel} Confluence notes draft
+        notes: `${simulationLabel} Notes draft
 
 Title: [${simulationLabel}] ${data.id} Incident Record
 
@@ -1849,6 +1881,12 @@ Recommended follow-ups:
       refreshWorkflowLinkForArtifact(name);
     }
 
+    function showLocalArtifact(name) {
+      setArtifact(name);
+      preview.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      showToast("Draft shown in this page");
+    }
+
     function addLog(message) {
       state.log.unshift(message);
       state.log = state.log.slice(0, 8);
@@ -1936,15 +1974,25 @@ Recommended follow-ups:
       const platformKey = platformByAction[action] || "";
       const platform = platformLinks[platformKey];
       githubTrigger.dataset.action = action;
+      githubTrigger.dataset.platformKey = platformKey;
       if (!platform) {
         githubTrigger.dataset.mode = "local";
+        githubTrigger.removeAttribute("target");
+        githubTrigger.removeAttribute("rel");
         githubTrigger.href = "#";
         githubTrigger.textContent = "";
         githubTrigger.hidden = true;
         return "";
       }
-      githubTrigger.dataset.mode = "platform";
+      githubTrigger.dataset.mode = platform.local ? "local-artifact" : "platform";
       githubTrigger.href = platform.url;
+      if (platform.local) {
+        githubTrigger.removeAttribute("target");
+        githubTrigger.removeAttribute("rel");
+      } else {
+        githubTrigger.target = "_blank";
+        githubTrigger.rel = "noopener noreferrer";
+      }
       githubTrigger.textContent = platform.label;
       githubTrigger.hidden = false;
       return platform.url;
@@ -1987,7 +2035,7 @@ Recommended follow-ups:
       if (!workflow.endpoint) {
         const triggerUrl = setGitHubTrigger(action, payload);
         workflow.lastStatus = "Local draft only";
-        addLog(`${actionConfig.label} generated in this page; approved ${actionConfig.system} endpoint not connected.`);
+        addLog(`${actionConfig.label} staged in this page. Approved workflow endpoint not connected.`);
         return { mode: "local", payload, triggerUrl };
       }
 
@@ -2056,7 +2104,7 @@ Recommended follow-ups:
       if (action === "confluence") {
         setPhase("draft", "Notes ready");
         setArtifact("notes");
-        addLog("Confluence notes draft generated.");
+        addLog("Notes draft generated in this page.");
       }
 
       if (action === "miro") {
@@ -2135,6 +2183,18 @@ Recommended follow-ups:
 
     document.querySelectorAll("[data-artifact]").forEach((button) => {
       button.addEventListener("click", () => setArtifact(button.dataset.artifact));
+    });
+
+    document.querySelectorAll("[data-local-artifact]").forEach((button) => {
+      button.addEventListener("click", () => showLocalArtifact(button.dataset.localArtifact));
+    });
+
+    githubTrigger.addEventListener("click", (event) => {
+      const platform = platformLinks[githubTrigger.dataset.platformKey];
+      if (platform && platform.local && platform.artifact) {
+        event.preventDefault();
+        showLocalArtifact(platform.artifact);
+      }
     });
 
     document.querySelector("#copy-artifact").addEventListener("click", copyActiveDraft);

@@ -6,12 +6,12 @@ The page runs entirely in the browser by default. Buttons generate local simulat
 
 - Asana task
 - Jira validation issue
-- Confluence notes
+- Notes draft
 - Miro board brief
 - Approval email
 - AI incident recap
 
-Without an endpoint, workflow cards update the in-page draft preview and expose a contextual platform link. A platform launchpad also provides direct entry buttons for Asana, Jira, Confluence, Miro, Outlook, and GitHub.
+Without an endpoint, workflow cards update the in-page draft preview and expose a contextual platform link. A platform launchpad provides direct entry buttons for Asana, Jira, Miro, Outlook, and GitHub. Notes and AI recap stay in the page by default because embedded browser sessions may block some knowledge-base pages.
 
 This keeps the Webex/GitHub Pages version useful without putting credentials in the browser or relying on long encoded trigger URLs.
 
@@ -21,7 +21,7 @@ External systems are modified only if the page is opened with an approved workfl
 https://cooperinteractive.github.io/practice-incident/?endpoint=https://your-workflow-url
 ```
 
-When an endpoint is configured, each button posts an `incident.workflow.action` JSON event. The endpoint can create or update Jira, Confluence, Outlook, Miro, or AI outputs and return links or revised draft text to the page.
+When an endpoint is configured, each button posts an `incident.workflow.action` JSON event. The endpoint can create or update Jira, notes records, Outlook, Miro, or AI outputs and return links or revised draft text to the page.
 
 Current live page:
 
