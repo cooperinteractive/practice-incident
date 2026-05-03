@@ -1522,6 +1522,29 @@
       closeout: "recap"
     };
 
+    const artifactPlatformKeys = {
+      clickupUrl: "asana",
+      taskUrl: "asana",
+      jiraUrl: "jira",
+      issueUrl: "jira",
+      confluenceUrl: "confluence",
+      notesUrl: "confluence",
+      miroBoardUrl: "miro",
+      boardUrl: "miro",
+      outlookDraftUrl: "outlook",
+      emailUrl: "outlook",
+      recapUrl: "recap"
+    };
+
+    const syncedPlatformLabels = {
+      asana: "Open ClickUp Task",
+      jira: "Open Jira Issue",
+      confluence: "Open Notes Record",
+      miro: "Open Miro Board",
+      outlook: "Open Outlook Draft",
+      recap: "Open AI Recap"
+    };
+
     const tierProfiles = {
       tier1: {
         label: "Tier 1 monitor",
@@ -1622,7 +1645,8 @@
       deliverablesDone: new Map(),
       currentRecord: null,
       currentRecordId: "",
-      recordDirty: false
+      recordDirty: false,
+      syncedPlatformLinks: {}
     };
 
     function showToast(message) {
@@ -1860,6 +1884,17 @@
     function getPlatformConfig(platformKey) {
       const platform = platformLinks[platformKey];
       if (!platform) return null;
+      const synced = state.syncedPlatformLinks[platformKey];
+      if (synced?.url) {
+        return {
+          ...platform,
+          label: synced.label || syncedPlatformLabels[platformKey] || platform.label,
+          url: synced.url,
+          example: false,
+          local: false,
+          dynamic: ""
+        };
+      }
       if (platform.dynamic === "outlook-compose") {
         return { ...platform, url: makeOutlookComposeUrl() };
       }
@@ -2652,6 +2687,38 @@ Recommended follow-ups:
       return true;
     }
 
+    function isHttpUrl(value) {
+      try {
+        const url = new URL(value);
+        return url.protocol === "https:" || url.protocol === "http:";
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function workflowArtifactEntries(result = {}) {
+      return Object.entries({ ...(result.artifacts || {}), ...(result.urls || {}) })
+        .filter(([, value]) => typeof value === "string" && value.trim());
+    }
+
+    function recordSyncedPlatformLinks(action, result = {}) {
+      let updated = false;
+      workflowArtifactEntries(result).forEach(([key, value]) => {
+        if (!isHttpUrl(value)) return;
+        const platformKey = artifactPlatformKeys[key] || platformByAction[action];
+        if (!platformKey) return;
+        state.syncedPlatformLinks[platformKey] = {
+          url: value,
+          label: syncedPlatformLabels[platformKey] || "Open workflow result"
+        };
+        updated = true;
+      });
+      if (updated) {
+        refreshPlatformLaunchLinks();
+        refreshWorkflowLinkForArtifact(state.activeArtifact);
+      }
+    }
+
     function applyWorkflowResult(action, result = {}) {
       const actionConfig = workflowActions[action] || workflowActions.intake;
       const artifact = actionConfig.artifact || state.activeArtifact;
@@ -2662,8 +2729,9 @@ Recommended follow-ups:
         }
       }
 
-      const links = Object.entries(result.artifacts || result.urls || {})
-        .filter(([, value]) => typeof value === "string" && value.trim())
+      recordSyncedPlatformLinks(action, result);
+
+      const links = workflowArtifactEntries(result)
         .map(([key, value]) => `${key}: ${value}`);
 
       if (links.length) {
@@ -2802,6 +2870,7 @@ Recommended follow-ups:
       state.currentRecord = null;
       state.currentRecordId = "";
       state.recordDirty = false;
+      state.syncedPlatformLinks = {};
       state.outputs = makeOutputs();
       state.log = [];
       phaseOrder.forEach((phase) => {
@@ -2816,6 +2885,7 @@ Recommended follow-ups:
       setArtifact("asana");
       updateMetrics();
       renderIntakeRecord();
+      refreshPlatformLaunchLinks();
       showToast("Workflow reset");
     }
 
@@ -2862,7 +2932,7 @@ Recommended follow-ups:
     });
 
     githubTrigger.addEventListener("click", (event) => {
-      const platform = platformLinks[githubTrigger.dataset.platformKey];
+      const platform = getPlatformConfig(githubTrigger.dataset.platformKey);
       if (platform && platform.local && platform.artifact) {
         event.preventDefault();
         showLocalArtifact(platform.artifact);
