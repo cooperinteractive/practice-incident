@@ -1092,17 +1092,17 @@
 
       <div class="panel">
         <h2>Workflow actions</h2>
-        <p class="panel-copy">Simulation mode: cards stage drafts in this page. Platform buttons open apps only.</p>
+        <p class="panel-copy">Current drafts update from the intake. External examples stay unchanged until an endpoint is connected.</p>
         <div class="action-grid" aria-label="Workflow actions">
           <button class="action-card" type="button" data-action="asana">
             <span class="action-mode">Draft</span>
             <span class="action-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h10M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Task tracker</strong><small>Live ClickUp record.</small></span>
+            <span><strong>Task tracker</strong><small>Current draft plus example link.</small></span>
           </button>
           <button class="action-card" type="button" data-action="jira">
             <span class="action-mode">Draft</span>
             <span class="action-icon violet" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="2"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Jira validation</strong><small>Live issue.</small></span>
+            <span><strong>Jira validation</strong><small>Current draft plus example link.</small></span>
           </button>
           <button class="action-card" type="button" data-action="confluence">
             <span class="action-mode">Draft</span>
@@ -1112,7 +1112,7 @@
           <button class="action-card" type="button" data-action="miro">
             <span class="action-mode">Draft</span>
             <span class="action-icon orange" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 5h14v14H5z" stroke="currentColor" stroke-width="2"/><path d="M8 9h8M8 13h5M8 17h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Miro board</strong><small>Builds board brief.</small></span>
+            <span><strong>Miro board</strong><small>Builds board brief in page.</small></span>
           </button>
           <button class="action-card" type="button" data-action="approval">
             <span class="action-mode">Draft</span>
@@ -1126,14 +1126,16 @@
           </button>
         </div>
         <div class="platform-launchpad" aria-label="Platform launchpad">
-          <a class="platform-link" href="https://app.clickup.com/t/86b9qpd7z" target="_blank" rel="noopener noreferrer">Open Task Tracker</a>
-          <a class="platform-link" href="https://cooperinteractive.atlassian.net/browse/KAN-2" target="_blank" rel="noopener noreferrer">Open Jira Issue</a>
+          <button class="platform-link local" type="button" data-local-artifact="asana">Show Task Draft</button>
+          <a class="platform-link" data-platform-key="asana" href="https://app.clickup.com/t/86b9qpd7z" target="_blank" rel="noopener noreferrer">Open ClickUp Example</a>
+          <button class="platform-link local" type="button" data-local-artifact="jira">Show Jira Draft</button>
+          <a class="platform-link" data-platform-key="jira" href="https://cooperinteractive.atlassian.net/browse/KAN-2" target="_blank" rel="noopener noreferrer">Open Jira Example</a>
           <button class="platform-link local" type="button" data-local-artifact="notes">Show Notes Draft</button>
-          <a class="platform-link" href="https://miro.com/app/dashboard/" target="_blank" rel="noopener noreferrer">Open Miro</a>
-          <a class="platform-link" href="https://outlook.office.com/mail/" target="_blank" rel="noopener noreferrer">Open Outlook</a>
-          <a class="platform-link" href="https://github.com/cooperinteractive/practice-incident" target="_blank" rel="noopener noreferrer">Open GitHub</a>
+          <button class="platform-link local" type="button" data-run-action="miro">Build Miro Brief</button>
+          <a class="platform-link" data-platform-key="outlook" href="https://outlook.office.com/mail/" target="_blank" rel="noopener noreferrer">Open Outlook Draft</a>
+          <a class="platform-link" data-platform-key="github" href="https://github.com/cooperinteractive/practice-incident" target="_blank" rel="noopener noreferrer">Open GitHub</a>
         </div>
-        <p class="launch-note">Live simulation: ClickUp and Jira open real SIMULATION records. Notes and AI recap stay in-page. Email opens compose only.</p>
+        <p class="launch-note">Live simulation: current drafts update here. ClickUp and Jira examples are static until a workflow endpoint syncs them. Miro builds a board brief here first.</p>
 
         <div class="phase-board" aria-label="Workflow phase board">
           <div class="phase active" data-phase="intake"><span>Intake</span><strong id="phase-intake">Ready</strong></div>
@@ -1252,14 +1254,14 @@
 
     const platformLinks = {
       asana: {
-        label: "Open Task Tracker",
+        label: "Open ClickUp Example",
         url: "https://app.clickup.com/t/86b9qpd7z",
-        live: true
+        example: true
       },
       jira: {
-        label: "Open Jira Issue",
+        label: "Open Jira Example",
         url: "https://cooperinteractive.atlassian.net/browse/KAN-2",
-        live: true
+        example: true
       },
       confluence: {
         label: "Show Notes Draft",
@@ -1268,12 +1270,12 @@
         local: true
       },
       miro: {
-        label: "Open Miro",
+        label: "Open Miro Dashboard",
         url: "https://miro.com/app/dashboard/"
       },
       outlook: {
-        label: "Open Outlook Compose",
-        url: "https://outlook.office.com/mail/deeplink/compose?subject=%5BSIMULATION%5D%20IR-2026-0429%20approval%20request&body=SIMULATION%20ONLY%0A%0APlease%20review%20the%20approval%20draft%20inside%20the%20Practice%20Incident%20command%20center.%0A%0AThis%20is%20a%20training%20artifact%20and%20not%20a%20live%20incident."
+        label: "Open Outlook Draft",
+        dynamic: "outlook-compose"
       },
       github: {
         label: "Open GitHub",
@@ -1559,6 +1561,53 @@
       return `Deliverable tracker (${profile.label}):\n${rows.join("\n")}`;
     }
 
+    function truncateForUrl(value, limit = 520) {
+      const text = String(value || "").replace(/\s+/g, " ").trim();
+      return text.length > limit ? `${text.slice(0, limit - 1)}...` : text;
+    }
+
+    function makeOutlookComposeUrl() {
+      const data = getData();
+      const timing = getNextUpdateInfo(data);
+      const subject = `[${simulationLabel}] ${data.id || "Incident"} approval request`;
+      const body = [
+        `${simulationLabel} ONLY`,
+        "",
+        `Incident: ${data.id || "Unassigned"} - ${data.title || "Untitled"}`,
+        `Owner: ${data.owner || "Unassigned"}`,
+        `Severity: ${data.severity || "Unclassified"}`,
+        `Next update due: ${timing.dueLabel}`,
+        `Audience: ${data.audience || "Not specified"}`,
+        "",
+        "Known facts:",
+        truncateForUrl(data.facts),
+        "",
+        "Open questions:",
+        truncateForUrl(data.unknowns),
+        "",
+        "Requested decision: approve, revise, or hold. This is a training artifact and not a live incident."
+      ].join("\n");
+      return `https://outlook.office.com/mail/deeplink/compose?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    function getPlatformConfig(platformKey) {
+      const platform = platformLinks[platformKey];
+      if (!platform) return null;
+      if (platform.dynamic === "outlook-compose") {
+        return { ...platform, url: makeOutlookComposeUrl() };
+      }
+      return platform;
+    }
+
+    function refreshPlatformLaunchLinks() {
+      document.querySelectorAll("[data-platform-key]").forEach((link) => {
+        const platform = getPlatformConfig(link.dataset.platformKey);
+        if (!platform) return;
+        link.href = platform.url || "#";
+        link.textContent = platform.label;
+      });
+    }
+
     function markDeliverableDone(action) {
       const item = deliverableDefinitions.find((definition) => definition.action === action);
       if (!item || state.deliverablesDone.has(item.id)) return;
@@ -1660,14 +1709,14 @@
       const scheduleText = makeScheduleText(data);
       const brandStyle = "Brand style: header #07182d, primary action #0a60ff, timing lane #00a8d6, approval accent #ad5900, blockers #c73545.";
       return {
-        asana: `${simulationLabel} Live task tracker
+        asana: `${simulationLabel} Current task tracker draft
 
 Task: [${simulationLabel}] ${data.id} - Coordinate ${data.title}
 Project: Animal Farm / Incident Command
 Owner: ${data.owner}
-Live ClickUp task: https://app.clickup.com/t/86b9qpd7z
-Live checklist task: https://app.clickup.com/t/86b9qpda9
-Status: Live SIMULATION task pack created in ClickUp
+External example task: https://app.clickup.com/t/86b9qpd7z
+External example checklist task: https://app.clickup.com/t/86b9qpda9
+Sync status: This draft reflects the current intake. The ClickUp example does not update until an approved endpoint syncs it.
 Submitted at: ${timing.submittedLabel}
 Next update due: ${timing.dueLabel}
 Cadence: ${timing.cadence}
@@ -1715,16 +1764,17 @@ ${scheduleText}
 Next action:
 Route engineering validation, capture notes, and keep external language draft-only until approval is explicit.`,
 
-        jira: `${simulationLabel} Live Jira validation
+        jira: `${simulationLabel} Current Jira validation draft
 
 Summary: [${simulationLabel}] ${data.id} - Validate scope for ${data.title}
 Issue type: Task
-Live Jira issue: https://cooperinteractive.atlassian.net/browse/KAN-2
+External example issue: https://cooperinteractive.atlassian.net/browse/KAN-2
 Priority: ${data.severity.includes("Tier 4") ? "High" : "Medium"}
 Owner: Engineering validation lead
+Sync status: This draft reflects the current intake. The Jira example does not update until an approved endpoint syncs it.
 
 Simulation note:
-Training artifact only. KAN-2 is a live simulation issue, not a production incident.
+Training artifact only. KAN-2 is an external simulation example, not a production incident.
 
 Description:
 ${data.facts}
@@ -1774,9 +1824,12 @@ Sections:
 - Follow-up tasks
 - Process improvements`,
 
-        board: `${simulationLabel} Miro board update
+        board: `${simulationLabel} Miro board brief
 
 ${brandStyle}
+
+Sync status:
+This brief reflects the current intake. The page cannot create a real Miro board until an approved endpoint or Miro app workflow is connected.
 
 Next update due:
 ${timing.dueLabel}
@@ -1790,8 +1843,8 @@ ${profile.label}
 Create four lanes:
 1. Facts
    - ${data.title}
-   - Known facts
-   - Open questions
+   - Known facts: ${data.facts}
+   - Open questions: ${data.unknowns}
 2. Roles
    - Owner: ${data.owner}
    - Reviewers
@@ -1873,9 +1926,12 @@ Recommended follow-ups:
       };
     }
 
-    function setArtifact(name) {
+    function setArtifact(name, options = {}) {
+      const shouldRefresh = options.refresh !== false;
       state.activeArtifact = name;
-      state.outputs = { ...makeOutputs(), ...state.outputs };
+      if (shouldRefresh) {
+        state.outputs = { ...state.outputs, ...makeOutputs() };
+      }
       document.querySelectorAll("[data-artifact]").forEach((tab) => {
         const isActive = tab.dataset.artifact === name;
         tab.classList.toggle("active", isActive);
@@ -1883,6 +1939,7 @@ Recommended follow-ups:
       });
       preview.textContent = state.outputs[name] || "";
       refreshWorkflowLinkForArtifact(name);
+      refreshPlatformLaunchLinks();
     }
 
     function showLocalArtifact(name) {
@@ -1976,7 +2033,7 @@ Recommended follow-ups:
 
     function setGitHubTrigger(action, payload) {
       const platformKey = platformByAction[action] || "";
-      const platform = platformLinks[platformKey];
+      const platform = getPlatformConfig(platformKey);
       githubTrigger.dataset.action = action;
       githubTrigger.dataset.platformKey = platformKey;
       if (!platform) {
@@ -2008,15 +2065,15 @@ Recommended follow-ups:
       setGitHubTrigger(action, payload);
     }
 
-    function attachLiveArtifactLink(action) {
+    function attachExternalArtifactNote(action) {
       const actionConfig = workflowActions[action] || workflowActions.intake;
-      const platform = platformLinks[platformByAction[action] || ""];
-      if (!platform || !platform.live || !platform.url) return false;
+      const platform = getPlatformConfig(platformByAction[action] || "");
+      if (!platform || !platform.example || !platform.url) return false;
       const artifact = actionConfig.artifact || state.activeArtifact;
       const line = `${platform.label}: ${platform.url}`;
       const current = state.outputs[artifact] || "";
       if (!current.includes(line)) {
-        state.outputs[artifact] = `${current}\n\nLive simulation artifact:\n${line}`;
+        state.outputs[artifact] = `${current}\n\nExternal example link (static until endpoint sync):\n${line}`;
       }
       if (state.activeArtifact === artifact) {
         preview.textContent = state.outputs[artifact] || "";
@@ -2030,7 +2087,7 @@ Recommended follow-ups:
       if (result.outputs && typeof result.outputs === "object") {
         state.outputs = { ...state.outputs, ...result.outputs };
         if (Object.prototype.hasOwnProperty.call(result.outputs, artifact)) {
-          setArtifact(artifact);
+          setArtifact(artifact, { refresh: false });
         }
       }
 
@@ -2040,7 +2097,7 @@ Recommended follow-ups:
 
       if (links.length) {
         state.outputs[artifact] = `${state.outputs[artifact] || ""}\n\nWorkflow result:\n${links.join("\n")}`;
-        setArtifact(artifact);
+        setArtifact(artifact, { refresh: false });
       }
 
       if (Array.isArray(result.messages)) {
@@ -2054,12 +2111,12 @@ Recommended follow-ups:
 
       if (!workflow.endpoint) {
         const triggerUrl = setGitHubTrigger(action, payload);
-        const liveLinked = attachLiveArtifactLink(action);
-        workflow.lastStatus = liveLinked ? "Live simulation artifact linked" : "Local draft only";
-        addLog(liveLinked
-          ? `${actionConfig.label} linked to live SIMULATION artifact.`
+        const exampleLinked = attachExternalArtifactNote(action);
+        workflow.lastStatus = exampleLinked ? "Current draft ready; external example static" : "Local draft only";
+        addLog(exampleLinked
+          ? `${actionConfig.label} rebuilt from current intake. External example is static until endpoint sync.`
           : `${actionConfig.label} staged in this page. Approved workflow endpoint not connected.`);
-        return { mode: liveLinked ? "live-link" : "local", payload, triggerUrl };
+        return { mode: exampleLinked ? "example-link" : "local", payload, triggerUrl };
       }
 
       githubTrigger.hidden = true;
@@ -2109,19 +2166,19 @@ Recommended follow-ups:
       if (action === "intake") {
         setPhase("intake", "Captured");
         setArtifact("asana");
-        addLog("Intake submitted and live task tracker ready.");
+        addLog("Intake submitted and current task draft ready.");
       }
 
       if (action === "asana") {
-        setPhase("triage", "Task live");
+        setPhase("triage", "Task draft");
         setArtifact("asana");
-        addLog("Live task tracker opened.");
+        addLog("Task tracker draft rebuilt from intake.");
       }
 
       if (action === "jira") {
-        setPhase("draft", "Jira live");
+        setPhase("draft", "Jira draft");
         setArtifact("jira");
-        addLog("Live Jira validation issue ready.");
+        addLog("Jira validation draft rebuilt from intake.");
       }
 
       if (action === "confluence") {
@@ -2212,6 +2269,10 @@ Recommended follow-ups:
       button.addEventListener("click", () => showLocalArtifact(button.dataset.localArtifact));
     });
 
+    document.querySelectorAll("[data-run-action]").forEach((button) => {
+      button.addEventListener("click", () => runAction(button.dataset.runAction));
+    });
+
     githubTrigger.addEventListener("click", (event) => {
       const platform = platformLinks[githubTrigger.dataset.platformKey];
       if (platform && platform.local && platform.artifact) {
@@ -2227,10 +2288,12 @@ Recommended follow-ups:
       state.outputs = makeOutputs();
       setArtifact(state.activeArtifact);
       updateMetrics();
+      refreshPlatformLaunchLinks();
     });
 
     state.outputs = makeOutputs();
     setArtifact("asana");
+    refreshPlatformLaunchLinks();
     updateMetrics();
   </script>
 </body>

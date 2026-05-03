@@ -2,7 +2,7 @@
 
 Static incident command center training page for a Webex website shortcut.
 
-The page runs in the browser and now includes a live simulation artifact pack for:
+The page runs in the browser and now includes a simulation artifact pack for:
 
 - ClickUp task tracker
 - Jira validation issue
@@ -11,7 +11,7 @@ The page runs in the browser and now includes a live simulation artifact pack fo
 - Approval email
 - AI incident recap
 
-Without an endpoint, workflow cards update the in-page draft preview and expose contextual links. The task tracker opens a real ClickUp SIMULATION task pack, and Jira opens a real SIMULATION issue. Notes and AI recap stay in the page by default because embedded browser sessions may block some knowledge-base pages. Outlook opens a compose screen only and does not send.
+Without an endpoint, workflow cards update the in-page draft preview and expose contextual links. ClickUp and Jira links are labeled as static examples so the user does not mistake them for records that are rewritten by the browser. Notes, Miro board brief, and AI recap stay in the page by default because embedded browser sessions may block some platform pages. Outlook opens a compose screen using the current intake values and does not send.
 
 This keeps the Webex/GitHub Pages version useful without putting credentials in the browser or relying on long encoded trigger URLs.
 
