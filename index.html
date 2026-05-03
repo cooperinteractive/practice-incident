@@ -350,6 +350,13 @@
       gap: 6px;
     }
 
+    .field.invalid input,
+    .field.invalid select,
+    .field.invalid textarea {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(199, 53, 69, 0.12);
+    }
+
     label {
       align-self: start;
       color: var(--ink);
@@ -442,6 +449,158 @@
     textarea:focus {
       border-color: var(--blue);
       box-shadow: 0 0 0 3px rgba(10, 96, 255, 0.14);
+    }
+
+    .form-error {
+      min-height: 20px;
+      color: var(--red);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 850;
+    }
+
+    .intake-record {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--blue);
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .record-head,
+    .history-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .record-head h3,
+    .history-head h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.15;
+      font-weight: 850;
+    }
+
+    .record-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .record-metric {
+      min-height: 62px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .record-metric span,
+    .record-metric strong {
+      display: block;
+    }
+
+    .record-metric span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    .record-metric strong {
+      margin-top: 5px;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.3;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+
+    .packet-preview {
+      max-height: 230px;
+      margin: 12px 0 0;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      color: var(--ink-2);
+      background: #fbfcfe;
+      white-space: pre-wrap;
+      overflow: auto;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .submission-history {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .history-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .history-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .history-copy strong,
+    .history-copy span {
+      display: block;
+    }
+
+    .history-copy strong {
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.25;
+      font-weight: 900;
+    }
+
+    .history-copy span {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 650;
+    }
+
+    .history-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .history-action {
+      min-height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      background: #ffffff;
+      cursor: pointer;
+      font-size: 11px;
+      line-height: 1;
+      font-weight: 850;
+    }
+
+    .history-action:hover {
+      color: #ffffff;
+      border-color: var(--blue);
+      background: var(--blue);
     }
 
     .action-grid {
@@ -972,7 +1131,9 @@
       .action-grid,
       .phase-board,
       .platform-launchpad,
-      .deliverable-list {
+      .deliverable-list,
+      .record-grid,
+      .history-item {
         grid-template-columns: 1fr;
       }
 
@@ -1081,6 +1242,44 @@
           <button class="button primary" data-action="intake" type="button">Submit intake</button>
           <button class="button subtle" id="reset-intake" type="button">Reset</button>
         </div>
+        <div class="form-error" id="intake-error" role="alert" aria-live="polite"></div>
+        <section class="intake-record" id="intake-record" aria-label="Submitted intake packet">
+          <div class="record-head">
+            <h3>Intake packet</h3>
+            <span class="tracker-badge" id="record-status">Not submitted</span>
+          </div>
+          <div class="record-grid">
+            <div class="record-metric">
+              <span>Record ID</span>
+              <strong id="record-id">Not created yet</strong>
+            </div>
+            <div class="record-metric">
+              <span>Saved locally</span>
+              <strong id="record-saved">Not saved yet</strong>
+            </div>
+            <div class="record-metric">
+              <span>Submitted at</span>
+              <strong id="record-submitted">Not submitted yet</strong>
+            </div>
+            <div class="record-metric">
+              <span>Next update</span>
+              <strong id="record-next-update">Calculated when intake is submitted</strong>
+            </div>
+          </div>
+          <div class="button-row">
+            <button class="button primary" id="copy-packet" type="button" disabled>Copy intake packet</button>
+            <button class="button subtle" id="download-packet" type="button" disabled>Download JSON</button>
+            <button class="button subtle" id="toggle-packet" type="button" disabled>Show packet</button>
+          </div>
+          <pre class="packet-preview" id="packet-preview" hidden></pre>
+          <div class="submission-history">
+            <div class="history-head">
+              <h3>Saved submissions</h3>
+              <span class="tracker-badge" id="history-count">0 saved</span>
+            </div>
+            <div class="history-list" id="history-list" aria-live="polite"></div>
+          </div>
+        </section>
         <section class="deliverable-tracker" id="deliverable-tracker" aria-label="Deliverable time tracker">
           <div class="tracker-head">
             <p id="tracker-summary">Submit intake to start the deliverable clock.</p>
@@ -1191,6 +1390,30 @@
     const deliverableList = document.querySelector("#deliverable-list");
     const trackerSummary = document.querySelector("#tracker-summary");
     const trackerTier = document.querySelector("#tracker-tier");
+    const intakeError = document.querySelector("#intake-error");
+    const recordStatus = document.querySelector("#record-status");
+    const recordId = document.querySelector("#record-id");
+    const recordSaved = document.querySelector("#record-saved");
+    const recordSubmitted = document.querySelector("#record-submitted");
+    const recordNextUpdate = document.querySelector("#record-next-update");
+    const copyPacketButton = document.querySelector("#copy-packet");
+    const downloadPacketButton = document.querySelector("#download-packet");
+    const togglePacketButton = document.querySelector("#toggle-packet");
+    const packetPreview = document.querySelector("#packet-preview");
+    const historyCount = document.querySelector("#history-count");
+    const historyList = document.querySelector("#history-list");
+    const intakeRecordStorageKey = "practiceIncidentIntakeRecords";
+    const maxSavedRecords = 10;
+    const requiredFields = [
+      ["title", "Incident title"],
+      ["id", "Incident ID"],
+      ["severity", "Severity / tier"],
+      ["owner", "Response owner"],
+      ["audience", "Affected audience"],
+      ["deadline", "Update cadence"],
+      ["facts", "Known facts"],
+      ["unknowns", "Open questions"]
+    ];
     const artifactActions = {
       asana: "asana",
       jira: "jira",
@@ -1396,7 +1619,10 @@
       outputs: {},
       log: [],
       intakeSubmittedAt: null,
-      deliverablesDone: new Map()
+      deliverablesDone: new Map(),
+      currentRecord: null,
+      currentRecordId: "",
+      recordDirty: false
     };
 
     function showToast(message) {
@@ -1418,6 +1644,47 @@
         facts: data.get("facts").trim(),
         unknowns: data.get("unknowns").trim()
       };
+    }
+
+    function getField(name) {
+      return form.querySelector(`[name="${name}"]`);
+    }
+
+    function setFieldInvalid(name, invalid) {
+      const field = getField(name);
+      if (!field) return;
+      field.setAttribute("aria-invalid", String(Boolean(invalid)));
+      field.closest(".field")?.classList.toggle("invalid", Boolean(invalid));
+    }
+
+    function clearValidation() {
+      intakeError.textContent = "";
+      requiredFields.forEach(([name]) => setFieldInvalid(name, false));
+    }
+
+    function validateIntake() {
+      const data = getData();
+      const missing = requiredFields.filter(([name]) => !data[name]).map(([, label]) => label);
+      requiredFields.forEach(([name]) => setFieldInvalid(name, !data[name]));
+
+      if (missing.length) {
+        intakeError.textContent = `Complete required fields: ${missing.join(", ")}.`;
+        const firstMissing = requiredFields.find(([name]) => !data[name]);
+        getField(firstMissing[0])?.focus();
+        showToast("Intake needs required fields");
+        return false;
+      }
+
+      if (!parseRelativeDeadline(data.deadline)) {
+        intakeError.textContent = "Use a relative update cadence like 30 minutes, 1 hour, or 2 days.";
+        setFieldInvalid("deadline", true);
+        getField("deadline")?.focus();
+        showToast("Update cadence needs a relative time");
+        return false;
+      }
+
+      clearValidation();
+      return true;
     }
 
     function getValidWorkflowEndpoint(value) {
@@ -1606,6 +1873,310 @@
         link.href = platform.url || "#";
         link.textContent = platform.label;
       });
+    }
+
+    function safeIdPart(value) {
+      return String(value || "incident")
+        .trim()
+        .replace(/[^a-z0-9]+/gi, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 48) || "incident";
+    }
+
+    function makeRecordId(data, submittedAt) {
+      const stamp = submittedAt.toISOString().replace(/\.\d{3}Z$/, "Z").replace(/[:.]/g, "");
+      return `${safeIdPart(data.id)}-${stamp}`;
+    }
+
+    function loadSavedRecords() {
+      try {
+        const records = JSON.parse(localStorage.getItem(intakeRecordStorageKey) || "[]");
+        return Array.isArray(records) ? records : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function persistSavedRecord(record) {
+      const records = loadSavedRecords().filter((item) => item.recordId !== record.recordId);
+      records.unshift(record);
+      localStorage.setItem(intakeRecordStorageKey, JSON.stringify(records.slice(0, maxSavedRecords)));
+    }
+
+    function makeIntakeRecord(outputs = state.outputs) {
+      const data = getData();
+      const timing = getNextUpdateInfo(data);
+      const profile = getTierProfile(data);
+      const submittedAt = timing.submittedAt || state.intakeSubmittedAt || new Date();
+      const savedAt = new Date();
+      const recordIdValue = state.currentRecordId || makeRecordId(data, submittedAt);
+      const deliverables = getDeliverableSchedule(data).map((item) => ({
+        id: item.id,
+        label: item.label,
+        system: item.system,
+        owner: item.owner,
+        dueInMinutes: item.minutes,
+        dueAt: item.dueAt ? item.dueAt.toISOString() : "",
+        doneAt: item.doneAt ? item.doneAt.toISOString() : "",
+        status: item.status
+      }));
+      return {
+        recordId: recordIdValue,
+        simulation: true,
+        source: "Practice Incident Command Center",
+        savedAt: savedAt.toISOString(),
+        incident: {
+          title: data.title,
+          id: data.id,
+          severity: data.severity,
+          owner: data.owner,
+          audience: data.audience,
+          updateCadence: data.deadline,
+          knownFacts: data.facts,
+          openQuestions: data.unknowns
+        },
+        timing: {
+          submittedAt: submittedAt.toISOString(),
+          submittedLabel: timing.submittedLabel,
+          nextUpdateAt: timing.iso,
+          nextUpdateLabel: timing.dueLabel,
+          nextUpdateSummary: timing.summary,
+          tier: profile.label,
+          tierKey: profile.key,
+          deliverables
+        },
+        artifacts: {
+          task: outputs.asana || "",
+          jira: outputs.jira || "",
+          notes: outputs.notes || "",
+          board: outputs.board || "",
+          email: outputs.email || "",
+          recap: outputs.recap || ""
+        },
+        workflow: {
+          endpointConfigured: Boolean(workflow.endpoint),
+          endpointStatus: workflow.lastStatus,
+          externalWrites: Boolean(workflow.endpoint)
+        }
+      };
+    }
+
+    function makeIntakePacket(record = state.currentRecord) {
+      if (!record) return "";
+      const incident = record.incident;
+      const deliverables = record.timing.deliverables.map((item) => {
+        const due = item.dueAt ? formatDateTime(new Date(item.dueAt)) : `+${formatMinutes(item.dueInMinutes)} after intake`;
+        const done = item.doneAt ? `; done ${formatDateTime(new Date(item.doneAt))}` : "";
+        return `- ${item.label} (${item.system}, ${item.owner}): ${item.status}; due ${due}${done}`;
+      }).join("\n");
+      return `[${simulationLabel}] Intake packet
+
+Record ID: ${record.recordId}
+Saved locally: ${formatDateTime(new Date(record.savedAt))}
+Submitted at: ${formatDateTime(new Date(record.timing.submittedAt))}
+Next update due: ${record.timing.nextUpdateLabel}
+Tier timing: ${record.timing.tier}
+
+Incident:
+${incident.id} - ${incident.title}
+
+Owner:
+${incident.owner}
+
+Affected audience:
+${incident.audience}
+
+Known facts:
+${incident.knownFacts}
+
+Open questions:
+${incident.openQuestions}
+
+Deliverables:
+${deliverables}
+
+Workflow boundary:
+This is a saved simulation intake packet. External systems update only through an approved endpoint.`;
+    }
+
+    function saveCurrentIntakeRecord(outputs = state.outputs) {
+      const record = makeIntakeRecord(outputs);
+      state.currentRecord = record;
+      state.currentRecordId = record.recordId;
+      state.recordDirty = false;
+      persistSavedRecord(record);
+      renderIntakeRecord();
+      return record;
+    }
+
+    function renderIntakeRecord() {
+      const record = state.currentRecord;
+      const records = loadSavedRecords();
+      historyCount.textContent = `${records.length} saved`;
+
+      if (!record) {
+        recordStatus.textContent = "Not submitted";
+        recordId.textContent = "Not created yet";
+        recordSaved.textContent = "Not saved yet";
+        recordSubmitted.textContent = "Not submitted yet";
+        recordNextUpdate.textContent = "Calculated when intake is submitted";
+        copyPacketButton.disabled = true;
+        downloadPacketButton.disabled = true;
+        togglePacketButton.disabled = true;
+        packetPreview.hidden = true;
+        packetPreview.textContent = "";
+      } else {
+        recordStatus.textContent = state.recordDirty ? "Unsaved edits" : "Saved";
+        recordId.textContent = record.recordId;
+        recordSaved.textContent = formatDateTime(new Date(record.savedAt));
+        recordSubmitted.textContent = formatDateTime(new Date(record.timing.submittedAt));
+        recordNextUpdate.textContent = record.timing.nextUpdateLabel;
+        copyPacketButton.disabled = false;
+        downloadPacketButton.disabled = false;
+        togglePacketButton.disabled = false;
+        if (!packetPreview.hidden) packetPreview.textContent = makeIntakePacket(record);
+      }
+
+      renderSubmissionHistory(records);
+    }
+
+    function renderSubmissionHistory(records = loadSavedRecords()) {
+      if (!records.length) {
+        const empty = document.createElement("div");
+        empty.className = "history-item";
+        const copy = document.createElement("div");
+        copy.className = "history-copy";
+        const title = document.createElement("strong");
+        const meta = document.createElement("span");
+        title.textContent = "No saved simulation submissions yet";
+        meta.textContent = "Submit intake to create the first local packet.";
+        copy.append(title, meta);
+        empty.append(copy);
+        historyList.replaceChildren(empty);
+        return;
+      }
+
+      const rows = records.map((record) => {
+        const row = document.createElement("div");
+        const copy = document.createElement("div");
+        const title = document.createElement("strong");
+        const meta = document.createElement("span");
+        const actions = document.createElement("div");
+        const load = document.createElement("button");
+        const packet = document.createElement("button");
+
+        row.className = "history-item";
+        copy.className = "history-copy";
+        actions.className = "history-actions";
+        title.textContent = `${record.incident.id} - ${record.incident.title}`;
+        meta.textContent = `${formatDateTime(new Date(record.savedAt))} | ${record.timing.tier} | Next ${record.timing.nextUpdateLabel}`;
+        load.className = "history-action";
+        load.type = "button";
+        load.textContent = "Load";
+        load.dataset.historyAction = "load";
+        load.dataset.recordId = record.recordId;
+        packet.className = "history-action";
+        packet.type = "button";
+        packet.textContent = "Packet";
+        packet.dataset.historyAction = "packet";
+        packet.dataset.recordId = record.recordId;
+
+        copy.append(title, meta);
+        actions.append(load, packet);
+        row.append(copy, actions);
+        return row;
+      });
+
+      historyList.replaceChildren(...rows);
+    }
+
+    function applyRecordToForm(record) {
+      const incident = record.incident;
+      document.querySelector("#incident-title").value = incident.title || "";
+      document.querySelector("#incident-id").value = incident.id || "";
+      document.querySelector("#severity").value = incident.severity || defaults.severity;
+      document.querySelector("#owner").value = incident.owner || "";
+      document.querySelector("#audience").value = incident.audience || "";
+      document.querySelector("#deadline").value = incident.updateCadence || defaults.deadline;
+      document.querySelector("#known-facts").value = incident.knownFacts || "";
+      document.querySelector("#unknowns").value = incident.openQuestions || "";
+    }
+
+    function loadSavedRecord(recordIdValue) {
+      const record = loadSavedRecords().find((item) => item.recordId === recordIdValue);
+      if (!record) return;
+      applyRecordToForm(record);
+      state.currentRecord = record;
+      state.currentRecordId = record.recordId;
+      state.recordDirty = false;
+      state.intakeSubmittedAt = new Date(record.timing.submittedAt);
+      state.deliverablesDone = new Map((record.timing.deliverables || [])
+        .filter((item) => item.doneAt)
+        .map((item) => [item.id, new Date(item.doneAt)]));
+      state.complete = new Set(["intake"]);
+      phaseOrder.forEach((phase) => {
+        document.querySelector(`[data-phase="${phase}"]`).classList.remove("active", "done");
+        document.querySelector(`#phase-${phase}`).textContent = phase === "intake" ? "Ready" : "Waiting";
+      });
+      document.querySelector('[data-phase="intake"]').classList.add("active");
+      state.outputs = {
+        ...makeOutputs(),
+        asana: record.artifacts.task || "",
+        jira: record.artifacts.jira || "",
+        notes: record.artifacts.notes || "",
+        board: record.artifacts.board || "",
+        email: record.artifacts.email || "",
+        recap: record.artifacts.recap || ""
+      };
+      setPhase("intake", "Captured");
+      setArtifact("asana", { refresh: false });
+      renderIntakeRecord();
+      updateMetrics();
+      addLog(`Loaded saved intake packet ${record.recordId}.`);
+      showToast("Saved intake loaded");
+    }
+
+    function showPacketForRecord(recordIdValue) {
+      const record = loadSavedRecords().find((item) => item.recordId === recordIdValue);
+      if (!record) return;
+      packetPreview.textContent = makeIntakePacket(record);
+      packetPreview.hidden = false;
+      togglePacketButton.textContent = state.currentRecord && state.currentRecord.recordId === record.recordId ? "Hide packet" : "Show packet";
+      packetPreview.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    async function copyIntakePacket() {
+      if (!state.currentRecord) return;
+      try {
+        await navigator.clipboard.writeText(makeIntakePacket(state.currentRecord));
+        showToast("Intake packet copied");
+      } catch (error) {
+        showToast("Copy failed. Select the packet manually.");
+      }
+    }
+
+    function downloadIntakeJson() {
+      if (!state.currentRecord) return;
+      const blob = new Blob([JSON.stringify(state.currentRecord, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${safeIdPart(state.currentRecord.recordId)}.json`;
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+      showToast("JSON download started");
+    }
+
+    function togglePacketPreview() {
+      if (!state.currentRecord) return;
+      packetPreview.hidden = !packetPreview.hidden;
+      togglePacketButton.textContent = packetPreview.hidden ? "Show packet" : "Hide packet";
+      if (!packetPreview.hidden) {
+        packetPreview.textContent = makeIntakePacket(state.currentRecord);
+        packetPreview.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
     }
 
     function markDeliverableDone(action) {
@@ -2150,8 +2721,14 @@ Recommended follow-ups:
     }
 
     async function runAction(action) {
-      if (action === "intake" || !state.intakeSubmittedAt) {
+      const needsSubmission = action === "intake" || !state.intakeSubmittedAt;
+      if (needsSubmission || state.recordDirty) {
+        if (!validateIntake()) return;
+      }
+      if (needsSubmission) {
         state.intakeSubmittedAt = new Date();
+        state.currentRecordId = "";
+        state.currentRecord = null;
       }
       if (state.intakeSubmittedAt) {
         state.complete.add("intake");
@@ -2159,6 +2736,9 @@ Recommended follow-ups:
       markDeliverableDone(action);
       const outputs = makeOutputs();
       state.outputs = { ...state.outputs, ...outputs };
+      if (state.intakeSubmittedAt) {
+        saveCurrentIntakeRecord(state.outputs);
+      }
       document.querySelectorAll("[data-action]").forEach((button) => {
         button.classList.toggle("active", button.dataset.action === action);
       });
@@ -2167,6 +2747,7 @@ Recommended follow-ups:
         setPhase("intake", "Captured");
         setArtifact("asana");
         addLog("Intake submitted and current task draft ready.");
+        addLog(`Intake packet saved locally as ${state.currentRecordId}.`);
       }
 
       if (action === "asana") {
@@ -2208,6 +2789,9 @@ Recommended follow-ups:
       renderDeliverableTracker();
       showToast("Workflow updated");
       await sendWorkflowEvent(action, state.outputs);
+      if (state.currentRecord) {
+        saveCurrentIntakeRecord(state.outputs);
+      }
     }
 
     function resetWorkflow() {
@@ -2215,6 +2799,9 @@ Recommended follow-ups:
       state.complete = new Set();
       state.intakeSubmittedAt = null;
       state.deliverablesDone = new Map();
+      state.currentRecord = null;
+      state.currentRecordId = "";
+      state.recordDirty = false;
       state.outputs = makeOutputs();
       state.log = [];
       phaseOrder.forEach((phase) => {
@@ -2228,6 +2815,7 @@ Recommended follow-ups:
       log.innerHTML = "";
       setArtifact("asana");
       updateMetrics();
+      renderIntakeRecord();
       showToast("Workflow reset");
     }
 
@@ -2282,12 +2870,26 @@ Recommended follow-ups:
     });
 
     document.querySelector("#copy-artifact").addEventListener("click", copyActiveDraft);
+    copyPacketButton.addEventListener("click", copyIntakePacket);
+    downloadPacketButton.addEventListener("click", downloadIntakeJson);
+    togglePacketButton.addEventListener("click", togglePacketPreview);
+    historyList.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-history-action]");
+      if (!button) return;
+      if (button.dataset.historyAction === "load") loadSavedRecord(button.dataset.recordId);
+      if (button.dataset.historyAction === "packet") showPacketForRecord(button.dataset.recordId);
+    });
     document.querySelector("#reset-workflow").addEventListener("click", resetWorkflow);
     document.querySelector("#reset-intake").addEventListener("click", resetIntake);
     form.addEventListener("input", () => {
+      clearValidation();
+      if (state.currentRecord) {
+        state.recordDirty = true;
+      }
       state.outputs = makeOutputs();
       setArtifact(state.activeArtifact);
       updateMetrics();
+      renderIntakeRecord();
       refreshPlatformLaunchLinks();
     });
 
@@ -2295,6 +2897,7 @@ Recommended follow-ups:
     setArtifact("asana");
     refreshPlatformLaunchLinks();
     updateMetrics();
+    renderIntakeRecord();
   </script>
 </body>
 </html>
