@@ -1616,6 +1616,7 @@
     ];
 
     const workflowStorageKey = "practiceIncidentWorkflowEndpoint";
+    const defaultWorkflowEndpoint = "https://practice-incident-workflow.vercel.app/incident";
     const pageParams = new URLSearchParams(window.location.search);
     const endpointParam = pageParams.get("endpoint");
     if (endpointParam) {
@@ -1632,7 +1633,7 @@
     }
 
     const workflow = {
-      endpoint: getValidWorkflowEndpoint(endpointParam || localStorage.getItem(workflowStorageKey) || ""),
+      endpoint: getValidWorkflowEndpoint(endpointParam || localStorage.getItem(workflowStorageKey) || defaultWorkflowEndpoint),
       lastStatus: "No external calls"
     };
 

@@ -11,7 +11,13 @@ The page runs in the browser and now includes a simulation artifact pack for:
 - Approval email
 - AI incident recap
 
-Without an endpoint, workflow cards update the in-page draft preview and expose contextual links. ClickUp and Jira links are labeled as static examples so the user does not mistake them for records that are rewritten by the browser. Notes, Miro board brief, and AI recap stay in the page by default because embedded browser sessions may block some platform pages. Outlook opens a compose screen using the current intake values and does not send.
+The deployed demo uses this safe workflow endpoint by default:
+
+```text
+https://practice-incident-workflow.vercel.app/incident
+```
+
+If the endpoint is disabled with `?endpoint=off`, workflow cards update the in-page draft preview and expose contextual links. ClickUp and Jira links are labeled as static examples so the user does not mistake them for records that are rewritten by the browser. Notes, Miro board brief, and AI recap stay in the page by default because embedded browser sessions may block some platform pages. Outlook opens a compose screen using the current intake values and does not send.
 
 When an approved endpoint is configured, workflow buttons post the current simulation intake to that server-side bridge. If the bridge returns real artifact URLs, the launch buttons update from static examples to those returned links, such as `Open ClickUp Task` or `Open Jira Issue`. The page still stores no platform credentials.
 
