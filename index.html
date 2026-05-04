@@ -3,34 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Incident Command Center</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2307182d'/%3E%3Crect x='12' y='12' width='17' height='17' rx='3' fill='white'/%3E%3Crect x='35' y='12' width='17' height='17' rx='3' fill='%2300a8d6'/%3E%3Crect x='12' y='35' width='17' height='17' rx='3' fill='%23e97800'/%3E%3Crect x='35' y='35' width='17' height='17' rx='3' fill='%23635bff'/%3E%3C/svg%3E">
+  <title>Practice Incident Webex Space Builder</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a6b73'/%3E%3Cpath d='M18 32h28M32 18v28' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
   <style>
     :root {
-      --ink: #07182d;
-      --ink-2: #17263a;
-      --muted: #607185;
-      --soft: #f4f7fb;
-      --surface: #ffffff;
-      --line: #dbe5ef;
-      --line-strong: #b7c8da;
-      --blue: #0a60ff;
-      --cyan: #00a8d6;
-      --green: #16834f;
-      --orange: #ad5900;
-      --red: #c73545;
-      --violet: #635bff;
-      --shadow: 0 18px 48px rgba(7, 24, 45, 0.13);
+      color-scheme: light;
+      --ink: #151a23;
+      --muted: #5b6472;
+      --soft: #7b8491;
+      --line: #d7dde6;
+      --paper: #ffffff;
+      --wash: #f4f6f9;
+      --wash-2: #eaf7f6;
+      --brand: #0a6b73;
+      --brand-2: #1667d9;
+      --lime: #9bc53d;
+      --amber: #c97518;
+      --rose: #c7364a;
+      --violet: #6956c5;
+      --ok: #147a4d;
+      --shadow: 0 18px 50px rgba(26, 35, 48, 0.12);
       --radius: 8px;
-      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     * {
       box-sizing: border-box;
-    }
-
-    [hidden] {
-      display: none !important;
     }
 
     html {
@@ -39,9 +38,23 @@
 
     body {
       margin: 0;
-      color: var(--ink-2);
-      background: var(--soft);
-      font-family: var(--font);
+      min-height: 100dvh;
+      background:
+        linear-gradient(180deg, #f7f9fb 0%, #eef3f7 42%, #f7f9fb 100%);
+      color: var(--ink);
+      font-family: var(--sans);
+      letter-spacing: 0;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(10, 107, 115, 0.08), transparent 34%, rgba(105, 86, 197, 0.08)),
+        repeating-linear-gradient(90deg, rgba(21, 26, 35, 0.035) 0 1px, transparent 1px 80px);
+      opacity: 0.85;
     }
 
     button,
@@ -51,295 +64,173 @@
       font: inherit;
     }
 
-    .app {
-      width: min(1240px, calc(100% - 28px));
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(22, 103, 217, 0.28);
+      outline-offset: 2px;
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: min(1540px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 12px 0 26px;
+      padding: 24px 0 36px;
     }
 
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(244, 247, 251, 0.94);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(16px);
-    }
-
-    .topbar-inner {
-      width: min(1240px, calc(100% - 28px));
-      min-height: 52px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 16px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      min-width: 230px;
-      text-decoration: none;
-    }
-
-    .brand-mark {
-      width: 38px;
-      height: 38px;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 3px;
-      padding: 4px;
-      border-radius: 8px;
-      background: var(--ink);
-      box-shadow: 0 10px 26px rgba(7, 24, 45, 0.18);
-    }
-
-    .brand-mark span {
-      border-radius: 3px;
-    }
-
-    .brand-mark span:nth-child(1) { background: #ffffff; }
-    .brand-mark span:nth-child(2) { background: var(--cyan); }
-    .brand-mark span:nth-child(3) { background: var(--orange); }
-    .brand-mark span:nth-child(4) { background: var(--violet); }
-
-    .brand-title {
-      display: block;
-      color: var(--ink);
-      font-size: 15px;
-      line-height: 1.1;
-      font-weight: 850;
-      letter-spacing: 0;
-    }
-
-    .brand-subtitle {
-      display: block;
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 750;
-    }
-
-    .button:focus-visible,
-    .action-card:focus-visible,
-    .artifact-tab:focus-visible,
-    .deliverable-run:focus-visible {
-      outline: 3px solid rgba(10, 96, 255, 0.45);
-      outline-offset: 3px;
-    }
-
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 310px;
-      gap: 16px;
-      align-items: stretch;
-      padding: 22px;
-      color: #ffffff;
-      background:
-        radial-gradient(circle at 82% 15%, rgba(0, 168, 214, 0.34), transparent 30%),
-        linear-gradient(135deg, #07182d, #10263f 68%, #17324f),
-        #07182d;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: start;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid rgba(215, 221, 230, 0.88);
       border-radius: var(--radius);
-      border-bottom: 4px solid var(--cyan);
       box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
     }
 
-    .hero h1 {
-      max-width: 780px;
-      margin: 0;
-      color: #ffffff;
-      font-size: clamp(32px, 4.1vw, 56px);
-      line-height: 1;
-      font-weight: 850;
-      letter-spacing: 0;
-    }
-
-    .hero p {
-      max-width: 720px;
-      margin: 12px 0 0;
-      color: rgba(255, 255, 255, 0.78);
-      font-size: 15px;
-      line-height: 1.4;
-    }
-
-    .hero-actions,
-    .button-row {
+    .product-lockup {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      gap: 14px;
+      align-items: flex-start;
+      min-width: 0;
     }
 
-    .hero-actions {
-      margin-top: 18px;
-    }
-
-    .button {
-      min-height: 42px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border: 1px solid transparent;
-      border-radius: 6px;
-      padding: 10px 14px;
-      color: var(--ink);
-      background: #ffffff;
-      cursor: pointer;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 850;
-      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-    }
-
-    .button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 24px rgba(7, 24, 45, 0.14);
-    }
-
-    .button.primary {
-      color: #ffffff;
-      background: var(--blue);
-    }
-
-    .button.ghost {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.26);
-    }
-
-    .button.subtle {
-      color: var(--ink);
-      background: var(--surface);
-      border-color: var(--line);
-    }
-
-    .icon {
-      width: 18px;
-      height: 18px;
+    .mark {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff;
+      box-shadow: 0 12px 30px rgba(10, 107, 115, 0.22);
       flex: 0 0 auto;
     }
 
-    .status-panel {
-      padding: 14px;
-      border-radius: var(--radius);
-      color: var(--ink);
-      background: rgba(255, 255, 255, 0.96);
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+    .mark svg {
+      width: 23px;
+      height: 23px;
     }
 
-    .status-panel h2 {
-      margin: 0 0 10px;
-      font-size: 16px;
-      line-height: 1.2;
-    }
-
-    .status-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .status-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 10px;
-      align-items: center;
-      min-height: 38px;
-      padding: 8px;
-      border-radius: 7px;
-      border: 1px solid var(--line);
-      background: #f8fafc;
-    }
-
-    .status-row span {
-      color: #35465b;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .status-row strong {
-      display: block;
-      margin-top: 2px;
-      color: var(--ink);
-      font-size: 14px;
-      line-height: 1.2;
-    }
-
-    .chip {
-      min-height: 25px;
-      display: inline-flex;
-      align-items: center;
-      border-radius: 999px;
-      padding: 4px 9px;
-      color: #ffffff;
-      background: var(--green);
-      font-size: 11px;
-      font-weight: 850;
-      white-space: nowrap;
-    }
-
-    .chip.warn {
-      background: var(--orange);
-    }
-
-    .chip.pending {
-      background: var(--red);
-    }
-
-    .status-row .chip {
-      color: #ffffff;
-    }
-
-    .workbench {
-      display: grid;
-      grid-template-columns: minmax(600px, 0.78fr) minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-      margin-top: 14px;
-    }
-
-    .panel {
-      padding: 16px;
-      border-radius: var(--radius);
-      border: 1px solid var(--line);
-      background: var(--surface);
-      box-shadow: 0 12px 34px rgba(7, 24, 45, 0.07);
-    }
-
-    .panel h2,
-    .panel h3 {
+    h1,
+    h2,
+    h3,
+    p {
       margin: 0;
-      color: var(--ink);
+    }
+
+    h1 {
+      font-size: clamp(26px, 3.1vw, 46px);
+      line-height: 1.02;
+      max-width: 900px;
       letter-spacing: 0;
     }
 
-    .panel h2 {
-      font-size: clamp(22px, 2.4vw, 30px);
-      line-height: 1.05;
-      font-weight: 850;
-    }
-
-    .panel h3 {
-      font-size: 16px;
-      line-height: 1.2;
-      font-weight: 850;
-    }
-
-    .panel-copy {
-      margin: 7px 0 0;
+    .top-copy {
+      margin-top: 8px;
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
+      font-size: 15px;
+      line-height: 1.55;
+      max-width: 900px;
     }
 
-    .form-grid {
+    .status-cluster {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 11px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .chip .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--brand);
+    }
+
+    .chip.warn .dot {
+      background: var(--amber);
+    }
+
+    .chip.safe .dot {
+      background: var(--ok);
+    }
+
+    .workspace {
       display: grid;
-      gap: 12px;
-      margin-top: 12px;
+      grid-template-columns: minmax(500px, 0.95fr) minmax(520px, 1.05fr) minmax(290px, 0.55fr);
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
     }
 
-    .two-col {
+    .panel {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(215, 221, 230, 0.94);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: clip;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%);
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .panel-meta {
+      font-size: 12px;
+      font-weight: 750;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+
+    .intake-form {
+      display: grid;
+      gap: 13px;
+    }
+
+    .field-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
@@ -350,737 +241,569 @@
       gap: 6px;
     }
 
-    .field.invalid input,
-    .field.invalid select,
-    .field.invalid textarea {
-      border-color: var(--red);
-      box-shadow: 0 0 0 3px rgba(199, 53, 69, 0.12);
+    .field.full {
+      grid-column: 1 / -1;
     }
 
     label {
-      align-self: start;
-      color: var(--ink);
+      color: #313946;
       font-size: 12px;
-      font-weight: 850;
+      font-weight: 780;
     }
 
     input,
     select,
     textarea {
       width: 100%;
-      min-height: 42px;
-      border: 1px solid var(--line-strong);
-      border-radius: 6px;
-      padding: 10px 11px;
+      border: 1px solid #cfd7e2;
+      border-radius: var(--radius);
+      background: #fff;
       color: var(--ink);
-      background: #ffffff;
+      min-height: 44px;
+      padding: 11px 12px;
       font-size: 14px;
-      outline: none;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color: #7a8da3;
-      opacity: 1;
+      line-height: 1.35;
+      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
     }
 
     textarea {
-      min-height: 116px;
-      resize: vertical;
-      line-height: 1.45;
-    }
-
-    .audience-row {
-      align-items: stretch;
-    }
-
-    .audience-field {
-      align-self: stretch;
-      align-content: start;
-    }
-
-    .cadence-field {
-      align-self: stretch;
-    }
-
-    .audience-field textarea {
-      min-height: 150px;
+      min-height: 128px;
       resize: vertical;
     }
 
-    .field-hint {
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 750;
-      line-height: 1.35;
-    }
-
-    .due-card {
-      display: grid;
-      gap: 7px;
-      margin-top: 8px;
-      padding: 10px;
-      border-radius: 7px;
-      border: 1px solid var(--line);
-      background: #f8fafc;
-    }
-
-    .due-card span,
-    .due-card strong {
-      display: block;
-    }
-
-    .due-card span {
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 850;
-    }
-
-    .due-card strong {
-      margin-top: 2px;
-      color: var(--ink);
-      font-size: 13px;
-      line-height: 1.3;
-      font-weight: 850;
+    input:hover,
+    select:hover,
+    textarea:hover {
+      border-color: #a9b7c9;
     }
 
     input:focus,
     select:focus,
     textarea:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(10, 96, 255, 0.14);
+      border-color: var(--brand-2);
+      box-shadow: 0 0 0 4px rgba(22, 103, 217, 0.12);
     }
 
-    .form-error {
-      min-height: 20px;
-      color: var(--red);
-      font-size: 12px;
-      line-height: 1.35;
-      font-weight: 850;
-    }
-
-    .intake-record {
-      margin-top: 14px;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-top: 4px solid var(--blue);
-      border-radius: 8px;
-      background: #ffffff;
-    }
-
-    .record-head,
-    .history-head {
+    .form-actions,
+    .button-row {
       display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 9px;
     }
 
-    .record-head h3,
-    .history-head h3 {
-      margin: 0;
-      color: var(--ink);
-      font-size: 18px;
-      line-height: 1.15;
-      font-weight: 850;
-    }
-
-    .record-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .record-metric {
-      min-height: 62px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: #f8fafc;
-    }
-
-    .record-metric span,
-    .record-metric strong {
-      display: block;
-    }
-
-    .record-metric span {
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.25;
-      font-weight: 850;
-    }
-
-    .record-metric strong {
-      margin-top: 5px;
-      color: var(--ink);
+    .button {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 10px 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      color: #fff;
+      background: var(--brand-2);
+      cursor: pointer;
       font-size: 13px;
-      line-height: 1.3;
-      font-weight: 850;
+      font-weight: 820;
+      text-decoration: none;
+      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 26px rgba(22, 103, 217, 0.22);
+    }
+
+    .button.secondary {
+      color: var(--ink);
+      background: #fff;
+      border-color: #cfd7e2;
+    }
+
+    .button.secondary:hover {
+      box-shadow: 0 10px 24px rgba(26, 35, 48, 0.12);
+    }
+
+    .button.agent {
+      background: var(--brand);
+    }
+
+    .button.done {
+      background: var(--ok);
+    }
+
+    .button svg {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      min-height: 92px;
+      padding: 14px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      display: grid;
+      align-content: space-between;
+      gap: 10px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 780;
+    }
+
+    .metric strong {
+      font-size: 18px;
+      line-height: 1.18;
       overflow-wrap: anywhere;
     }
 
-    .packet-preview {
-      max-height: 230px;
-      margin: 12px 0 0;
-      padding: 14px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      color: var(--ink-2);
-      background: #fbfcfe;
-      white-space: pre-wrap;
-      overflow: auto;
-      font-size: 12px;
-      line-height: 1.45;
+    .stage {
+      display: contents;
     }
 
-    .submission-history {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--line);
+    .space-preview {
+      background: linear-gradient(180deg, #202634 0%, #161c28 100%);
+      color: #f8fbff;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
     }
 
-    .history-list {
-      display: grid;
-      gap: 8px;
-    }
-
-    .history-item {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 10px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: #fbfcfe;
-    }
-
-    .history-copy strong,
-    .history-copy span {
-      display: block;
-    }
-
-    .history-copy strong {
-      color: var(--ink);
-      font-size: 13px;
-      line-height: 1.25;
-      font-weight: 900;
-    }
-
-    .history-copy span {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-      font-weight: 650;
-    }
-
-    .history-actions {
+    .webex-bar {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 6px;
-    }
-
-    .history-action {
-      min-height: 30px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      color: var(--ink);
-      background: #ffffff;
-      cursor: pointer;
-      font-size: 11px;
-      line-height: 1;
-      font-weight: 850;
-    }
-
-    .history-action:hover {
-      color: #ffffff;
-      border-color: var(--blue);
-      background: var(--blue);
-    }
-
-    .action-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .action-card {
-      position: relative;
-      width: 100%;
-      min-height: 72px;
-      display: grid;
-      grid-template-columns: 36px minmax(0, 1fr);
       align-items: center;
-      gap: 12px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 12px;
-      color: var(--ink);
-      background: #fbfcfe;
-      cursor: pointer;
-      text-align: left;
-      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
-    }
-
-    .action-card:hover,
-    .action-card.active {
-      transform: translateY(-1px);
-      border-color: var(--line-strong);
-      background: #ffffff;
-      box-shadow: 0 12px 26px rgba(7, 24, 45, 0.08);
-    }
-
-    .action-card strong {
-      display: block;
-      color: var(--ink);
-      font-size: 14px;
-      line-height: 1.2;
-      font-weight: 850;
-    }
-
-    .action-card small {
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.32;
-    }
-
-    .action-mode {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      min-height: 19px;
-      display: inline-flex;
-      align-items: center;
-      border-radius: 999px;
-      padding: 2px 7px;
-      color: #2c3d51;
-      background: #eef3f8;
-      font-size: 10px;
-      font-weight: 850;
-      line-height: 1;
-    }
-
-    .action-mode.live {
-      color: #ffffff;
-      background: var(--green);
-    }
-
-    .action-mode.preview {
-      color: #ffffff;
-      background: var(--violet);
-    }
-
-    .action-icon {
-      width: 36px;
-      height: 36px;
-      display: grid;
-      place-items: center;
-      border-radius: 8px;
-      color: #ffffff;
-      background: var(--blue);
-    }
-
-    .action-icon.green { background: var(--green); }
-    .action-icon.orange { background: var(--orange); }
-    .action-icon.violet { background: var(--violet); }
-    .action-icon.cyan { background: #0a7fa3; }
-    .action-icon.red { background: var(--red); }
-    .action-icon.dark { background: var(--ink); }
-
-    .phase-board {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
-      margin-top: 14px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     }
 
-    .phase {
-      min-height: 54px;
-      padding: 9px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: #f8fafc;
+    .webex-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--lime);
     }
 
-    .phase.active {
-      border-color: #8fdff1;
-      background: #eefbff;
+    .webex-dot:nth-child(2) {
+      background: #f1b94c;
     }
 
-    .phase.done {
-      border-color: #b8e2ca;
-      background: #effaf4;
+    .webex-dot:nth-child(3) {
+      background: #f36562;
     }
 
-    .phase span,
-    .phase strong {
-      display: block;
+    .webex-title {
+      margin-left: 8px;
+      color: #e8edf5;
+      font-size: 13px;
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .phase span {
-      color: var(--muted);
+    .space-content {
+      display: grid;
+      grid-template-columns: 170px minmax(0, 1fr);
+      min-height: 560px;
+    }
+
+    .space-rail {
+      padding: 14px;
+      background: rgba(0, 0, 0, 0.16);
+      border-right: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .rail-label {
+      color: #9facbd;
       font-size: 11px;
       font-weight: 850;
+      text-transform: uppercase;
+      margin: 2px 0 10px;
     }
 
-    .phase strong {
-      margin-top: 5px;
+    .rail-item {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 9px;
+      margin-bottom: 7px;
+      border-radius: var(--radius);
+      color: #e8edf5;
+      background: rgba(255, 255, 255, 0.05);
+      font-size: 12px;
+      font-weight: 740;
+    }
+
+    .rail-item.active {
+      background: rgba(32, 188, 182, 0.18);
+      color: #fff;
+      box-shadow: inset 3px 0 0 #20bcb6;
+    }
+
+    .space-main {
+      min-width: 0;
+      padding: 16px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 14px;
+    }
+
+    .command-post {
+      background: #f8fbff;
       color: var(--ink);
-      font-size: 13px;
-      line-height: 1.25;
-      font-weight: 850;
-    }
-
-    .deliverable-tracker {
-      margin-top: 14px;
+      border-radius: var(--radius);
       padding: 14px;
-      border: 1px solid var(--line);
-      border-top: 4px solid var(--cyan);
-      border-radius: 8px;
-      background: #ffffff;
+      display: grid;
+      gap: 12px;
     }
 
-    .deliverable-tracker.all-complete {
-      border-top-color: var(--green);
-      background: #f4fbf7;
-    }
-
-    .tracker-head {
+    .post-top {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
     }
 
-    .tracker-head h3 {
-      margin: 2px 0 4px;
-      color: var(--ink);
+    .post-top h2 {
       font-size: 18px;
-      line-height: 1.15;
-      font-weight: 850;
-      letter-spacing: 0;
+      line-height: 1.2;
     }
 
-    .tracker-head p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-      font-weight: 650;
-    }
-
-    .deliverable-tracker.all-complete .tracker-head p {
-      color: var(--green);
-      text-decoration: line-through;
-      text-decoration-thickness: 2px;
-    }
-
-    .tracker-kicker {
-      display: block;
-      color: var(--blue);
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0;
-      text-transform: uppercase;
-    }
-
-    .tracker-badge {
+    .post-top .badge {
       flex: 0 0 auto;
-      min-height: 28px;
+    }
+
+    .badge {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 7px 9px;
-      border-radius: 7px;
-      color: #ffffff;
-      background: var(--ink);
+      min-height: 28px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: #eaf7f6;
+      color: #07575e;
       font-size: 11px;
-      font-weight: 900;
+      font-weight: 850;
+      border: 1px solid #b9e6e3;
       white-space: nowrap;
     }
 
-    .deliverable-list {
+    .post-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
 
-    .deliverable-item {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: 10px;
-      min-height: 76px;
+    .post-cell {
+      border: 1px solid #dce3ed;
+      border-radius: var(--radius);
       padding: 10px;
-      border: 1px solid var(--line);
-      border-left: 4px solid var(--blue);
-      border-radius: 8px;
-      background: #fbfcfe;
+      min-height: 66px;
+      background: #fff;
     }
 
-    .deliverable-item.waiting {
-      border-left-color: #9aa8b8;
-    }
-
-    .deliverable-item.late {
-      border-left-color: var(--red);
-      background: #fff6f7;
-    }
-
-    .deliverable-item.done {
-      border-left-color: var(--green);
-      background: #f4fbf7;
-    }
-
-    .deliverable-copy {
-      min-width: 0;
-    }
-
-    .deliverable-copy strong,
-    .deliverable-copy span {
+    .post-cell span {
       display: block;
-    }
-
-    .deliverable-copy strong {
-      color: var(--ink);
-      font-size: 13px;
-      line-height: 1.2;
-      font-weight: 900;
-    }
-
-    .deliverable-copy span {
-      margin-top: 4px;
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-      font-weight: 650;
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 4px;
     }
 
-    .deliverable-time {
-      margin-top: 5px;
-      color: var(--blue);
+    .post-cell strong {
+      display: block;
+      font-size: 13px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .phase-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .phase {
+      min-height: 74px;
+      border-radius: var(--radius);
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: grid;
+      gap: 6px;
+      align-content: start;
+    }
+
+    .phase span {
+      color: #9facbd;
       font-size: 11px;
-      line-height: 1.35;
       font-weight: 850;
     }
 
-    .deliverable-item.done .deliverable-copy strong,
-    .deliverable-item.done .deliverable-copy span,
-    .deliverable-item.done .deliverable-time {
-      color: var(--green);
-      text-decoration: line-through;
-      text-decoration-thickness: 2px;
+    .phase strong {
+      color: #fff;
+      font-size: 13px;
     }
 
-    .deliverable-state {
-      display: inline-flex;
-      min-width: 66px;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 8px;
-      border-radius: 999px;
-      color: var(--ink);
-      background: #eef3f8;
-      font-size: 10px;
-      line-height: 1;
-      font-weight: 900;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .deliverable-actions {
+    .message-stack {
       display: grid;
-      justify-items: end;
-      gap: 7px;
+      gap: 10px;
+      align-content: start;
     }
 
-    .deliverable-item.open .deliverable-state {
-      color: #ffffff;
-      background: var(--blue);
+    .message {
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
     }
 
-    .deliverable-item.late .deliverable-state {
-      color: #ffffff;
-      background: var(--red);
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #20bcb6, #6956c5);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 850;
     }
 
-    .deliverable-item.done .deliverable-state {
-      color: #ffffff;
-      background: var(--green);
+    .bubble {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius);
+      padding: 11px;
+      color: #edf3fa;
+      font-size: 13px;
+      line-height: 1.45;
     }
 
-    .deliverable-run {
-      width: 42px;
-      min-height: 32px;
-      border: 0;
-      border-radius: 7px;
-      color: #ffffff;
-      background: var(--ink);
-      cursor: pointer;
-      font-size: 11px;
-      font-weight: 900;
+    .bubble strong {
+      color: #fff;
     }
 
-    .deliverable-run:hover {
-      background: var(--blue);
+    .action-panel {
+      display: grid;
+      gap: 10px;
     }
 
-    .deliverable-run:disabled {
-      cursor: default;
-      color: #ffffff;
-      background: var(--green);
+    .action-step {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
     }
 
-    .artifact-tabs {
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #edf2f7;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .action-step.done .step-num {
+      background: #dff2e9;
+      color: var(--ok);
+    }
+
+    .action-step strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    .action-step span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .artifact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .tabs {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin: 14px 0 10px;
-    }
-
-    .artifact-tab {
-      min-height: 34px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 8px 10px;
-      color: var(--muted);
-      background: #ffffff;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 850;
-      white-space: nowrap;
-    }
-
-    .artifact-tab.active {
-      color: #ffffff;
-      border-color: var(--blue);
-      background: var(--blue);
-    }
-
-    .artifact-preview {
-      min-height: 245px;
-      margin: 0;
-      padding: 16px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      color: var(--ink-2);
-      background: #fbfcfe;
-      white-space: pre-wrap;
-      font-size: 13px;
-      line-height: 1.5;
-      overflow: auto;
-    }
-
-    .platform-launchpad {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: #f8fafc;
+      padding: 10px 16px 0;
     }
 
-    .platform-link {
+    .tab {
       min-height: 38px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
       border: 1px solid var(--line);
+      background: #fff;
       color: var(--ink);
-      background: #ffffff;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 850;
-      white-space: nowrap;
+      border-radius: var(--radius);
+      padding: 8px 10px;
       cursor: pointer;
-      font-family: inherit;
-    }
-
-    .platform-link:hover {
-      color: #ffffff;
-      border-color: var(--blue);
-      background: var(--blue);
-    }
-
-    .platform-link.local {
-      color: var(--blue);
-      border-style: dashed;
-      background: #eef6ff;
-    }
-
-    .platform-link.local:hover {
-      color: #ffffff;
-      border-style: solid;
-      border-color: var(--blue);
-      background: var(--blue);
-    }
-
-    .launch-note {
-      margin: 8px 2px 0;
-      color: var(--muted);
       font-size: 12px;
-      font-weight: 750;
-      line-height: 1.4;
+      font-weight: 800;
     }
 
-    .activity-log {
+    .tab[aria-selected="true"] {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .artifact-text,
+    pre {
+      margin: 0;
+      width: 100%;
+      min-height: 330px;
+      max-height: 520px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: #101722;
+      color: #edf5ff;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .log-list {
       display: grid;
       gap: 8px;
-      max-height: 118px;
+      max-height: 360px;
       overflow: auto;
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid var(--line);
-      background: #ffffff;
+      padding-right: 4px;
     }
 
-    .log-row {
+    .log-item {
       display: grid;
       grid-template-columns: 34px minmax(0, 1fr);
       gap: 10px;
-      padding: 9px;
-      border-radius: 7px;
-      background: #f8fafc;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      font-size: 12px;
+      line-height: 1.4;
     }
 
-    .log-time {
-      color: var(--blue);
-      font-size: 12px;
+    .log-index {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #f0f4f8;
+      color: var(--muted);
       font-weight: 850;
     }
 
-    .log-text {
-      color: var(--ink-2);
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .timeline-row.done {
+      border-color: #cce8d9;
+      background: #f7fbf9;
+    }
+
+    .timeline-row.done time,
+    .timeline-row.done div strong,
+    .timeline-row.done div span {
+      color: #718074;
+      text-decoration: line-through;
+      text-decoration-color: rgba(20, 122, 77, 0.58);
+      text-decoration-thickness: 1.5px;
+    }
+
+    .timeline-row time {
+      color: var(--brand);
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .timeline-row strong {
+      display: block;
       font-size: 13px;
-      line-height: 1.35;
+      margin-bottom: 2px;
+    }
+
+    .timeline-row span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      padding: 5px 8px;
+      background: #f3f6fa;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .status-pill.done {
+      background: #dff2e9;
+      color: var(--ok);
     }
 
     .toast {
       position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 40;
-      max-width: 320px;
-      padding: 12px 14px;
-      border-radius: 8px;
-      color: #ffffff;
-      background: var(--ink);
-      box-shadow: var(--shadow);
+      right: 20px;
+      bottom: 20px;
+      z-index: 10;
+      min-width: 260px;
+      max-width: min(420px, calc(100vw - 40px));
+      border-radius: var(--radius);
+      padding: 13px 14px;
+      background: #151a23;
+      color: #fff;
       font-size: 13px;
-      font-weight: 750;
+      font-weight: 760;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
       opacity: 0;
       transform: translateY(12px);
       pointer-events: none;
@@ -1092,661 +815,397 @@
       transform: translateY(0);
     }
 
-    @media (max-width: 1120px) {
-      .hero,
-      .workbench {
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1360px) {
+      .workspace {
         grid-template-columns: 1fr;
       }
 
-      .phase-board {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+      .stage {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 310px;
+        gap: 18px;
+        align-items: start;
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .workspace,
+      .stage,
+      .artifact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
     @media (max-width: 760px) {
-      .topbar-inner,
-      .app {
-        width: min(100% - 26px, 1320px);
+      .app-shell {
+        width: min(100% - 18px, 1540px);
+        padding-top: 10px;
       }
 
-      .topbar-inner {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 12px 0;
-      }
-
-      .hero {
-        padding: 22px;
-      }
-
-      .hero h1 {
-        font-size: clamp(34px, 13vw, 54px);
-      }
-
-      .hero p {
-        font-size: 16px;
-      }
-
-      .two-col,
-      .action-grid,
-      .phase-board,
-      .platform-launchpad,
-      .deliverable-list,
-      .record-grid,
-      .history-item {
+      .topbar,
+      .field-grid,
+      .metrics,
+      .post-grid,
+      .phase-grid,
+      .space-content {
         grid-template-columns: 1fr;
       }
 
-      .panel {
-        padding: 16px;
+      .topbar {
+        gap: 14px;
       }
 
-      .button {
-        width: 100%;
+      .status-cluster {
+        justify-content: flex-start;
+      }
+
+      .space-content {
+        min-height: auto;
+      }
+
+      .space-rail {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      }
+
+      .rail-label {
+        grid-column: 1 / -1;
+      }
+
+      .rail-item {
+        margin: 0;
+      }
+
+      .timeline-row {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
       }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <section class="hero" id="command">
-      <div>
-        <h1>Incident intake to response recap.</h1>
-        <p>Capture, route, draft, and hold approvals before anything is posted.</p>
-        <div class="hero-actions">
-          <button class="button primary" id="start-incident" type="button">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-            Start incident
-          </button>
-          <button class="button ghost" data-action="closeout" type="button">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12 10 17 20 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Generate AI recap
-          </button>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="product-lockup">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4.5 7.5 12 3l7.5 4.5v9L12 21l-7.5-4.5v-9Z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Webex incident space builder</h1>
+          <p class="top-copy">Simulation workspace for provisioning a dedicated Webex incident space, command-post card, phase threads, responders, and closeout packet from one editable intake.</p>
         </div>
       </div>
-      <aside class="status-panel" aria-label="Current incident status">
-        <h2>Current status</h2>
-        <div class="status-list">
-          <div class="status-row">
-            <span>Incident ID<strong id="metric-id">IR-2026-0429</strong></span>
-            <span class="chip" id="chip-intake">Ready</span>
-          </div>
-          <div class="status-row">
-            <span>Tier<strong id="metric-tier">Tier 2</strong></span>
-            <span class="chip warn" id="chip-tier">Review</span>
-          </div>
-          <div class="status-row">
-            <span>Approval<strong id="metric-approval">Draft</strong></span>
-            <span class="chip pending" id="chip-approval">Hold</span>
-          </div>
-        </div>
-      </aside>
+      <div class="status-cluster" aria-label="Workflow status">
+        <span class="chip safe"><span class="dot"></span>Simulation only</span>
+        <span class="chip"><span class="dot"></span>Webex-native plan</span>
+        <span class="chip warn"><span class="dot"></span>No external writes</span>
+      </div>
+    </header>
+
+    <section class="metrics" aria-label="Incident summary">
+      <div class="metric">
+        <span>Incident ID</span>
+        <strong id="metric-id">IR-2026-0429</strong>
+      </div>
+      <div class="metric">
+        <span>Webex space</span>
+        <strong id="metric-room">Draft space</strong>
+      </div>
+      <div class="metric">
+        <span>Next update</span>
+        <strong id="metric-update">Submit intake</strong>
+      </div>
+      <div class="metric">
+        <span>Provisioning</span>
+        <strong id="metric-state">Local plan</strong>
+      </div>
     </section>
 
-    <section class="workbench" id="workflow">
-      <div class="panel">
-        <h2>Incident intake</h2>
-        <p class="panel-copy">Pre-filled for beta testing; clear a field to see its hint.</p>
-        <form class="form-grid" id="intake-form">
-          <div class="two-col">
-            <div class="field">
-              <label for="incident-title">Incident title</label>
-              <input id="incident-title" name="title" value="Vendor workspace exposure review" placeholder="Vendor workspace exposure review">
+    <main class="workspace">
+      <section class="panel" aria-labelledby="intake-title">
+        <div class="panel-header">
+          <h2 id="intake-title" class="panel-title">Incident intake</h2>
+          <span class="panel-meta" id="saved-state">Not submitted</span>
+        </div>
+        <div class="panel-body">
+          <form class="intake-form" id="intake-form">
+            <div class="field-grid">
+              <div class="field">
+                <label for="incident-title">Incident title</label>
+                <input id="incident-title" name="title" value="Vendor workspace exposure review" required>
+              </div>
+              <div class="field">
+                <label for="incident-id">Incident ID</label>
+                <input id="incident-id" name="incidentId" value="IR-2026-0429" required>
+              </div>
+              <div class="field">
+                <label for="tier">Response tier</label>
+                <select id="tier" name="tier">
+                  <option>Tier 1 - Monitor</option>
+                  <option selected>Tier 2 - Coordination</option>
+                  <option>Tier 3 - Leadership review</option>
+                  <option>Tier 4 - External response</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="owner">Response owner</label>
+                <input id="owner" name="owner" value="Response lead" required>
+              </div>
+              <div class="field">
+                <label for="audience">Affected audience</label>
+                <input id="audience" name="audience" value="Internal responders and reviewers" required>
+              </div>
+              <div class="field">
+                <label for="cadence">Update cadence</label>
+                <input id="cadence" name="cadence" value="30 minutes" required>
+              </div>
+              <div class="field">
+                <label for="source">Source channel</label>
+                <select id="source" name="source">
+                  <option selected>Webex request</option>
+                  <option>Email request</option>
+                  <option>Existing dashboard link</option>
+                  <option>Manual training injection</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="responders">Responder groups</label>
+                <input id="responders" name="responders" value="Comms, Legal, Privacy, Engineering, Leadership">
+              </div>
+              <div class="field full">
+                <label for="facts">Known facts</label>
+                <textarea id="facts" name="facts">A vendor workspace may have exposed draft customer communications to a broader internal group than intended. Engineering is validating scope. Legal and privacy review are required before external messaging.</textarea>
+              </div>
+              <div class="field full">
+                <label for="questions">Open questions</label>
+                <textarea id="questions" name="questions">Which documents were visible? Who had access? Was any customer-facing content final or only draft? What is the approved next update time?</textarea>
+              </div>
             </div>
-            <div class="field">
-              <label for="incident-id">Incident ID</label>
-              <input id="incident-id" name="id" value="IR-2026-0429" placeholder="IR-2026-0429">
+            <div class="form-actions">
+              <button class="button" type="submit">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h12M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Submit intake
+              </button>
+              <button class="button secondary" type="button" id="reset-demo">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7v5h5M20 17v-5h-5M6.5 9A6.5 6.5 0 0 1 18 6.5M17.5 15A6.5 6.5 0 0 1 6 17.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Reset
+              </button>
+              <button class="button secondary" type="button" id="download-packet">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v10m0 0 4-4m-4 4-4-4M5 20h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Download packet
+              </button>
             </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="stage">
+        <div class="space-preview" aria-labelledby="space-title">
+          <div class="webex-bar">
+            <span class="webex-dot"></span>
+            <span class="webex-dot"></span>
+            <span class="webex-dot"></span>
+            <div class="webex-title" id="space-title">Practice Incident - Draft Webex Space</div>
           </div>
-          <div class="two-col">
-            <div class="field">
-              <label for="severity">Severity / tier</label>
-              <select id="severity" name="severity">
-                <option>Tier 1 - Monitor</option>
-                <option selected>Tier 2 - Internal coordination</option>
-                <option>Tier 3 - Leadership review</option>
-                <option>Tier 4 - External response</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="owner">Response owner</label>
-              <input id="owner" name="owner" value="Response lead" placeholder="Response lead">
-            </div>
-          </div>
-          <div class="two-col audience-row">
-            <div class="field audience-field">
-              <label for="audience">Affected audience</label>
-              <textarea id="audience" name="audience" placeholder="Internal team and reviewers">Internal team and reviewers</textarea>
-            </div>
-            <div class="field cadence-field">
-              <label for="deadline">Update cadence</label>
-              <input id="deadline" name="deadline" value="30 minutes" placeholder="30 minutes">
-              <div class="due-card" aria-live="polite">
-                <span>Next update due</span>
-                <strong id="next-update-preview">Calculated when intake is submitted</strong>
-                <span>Submitted at</span>
-                <strong id="submitted-at-preview">Not submitted yet</strong>
+          <div class="space-content">
+            <aside class="space-rail" aria-label="Space navigation">
+              <div class="rail-label">Incident room</div>
+              <div class="rail-item active">Command <span>Live</span></div>
+              <div class="rail-item">Declare <span id="rail-declare">Wait</span></div>
+              <div class="rail-item">Triage <span id="rail-triage">Wait</span></div>
+              <div class="rail-item">Review <span id="rail-review">Wait</span></div>
+              <div class="rail-item">Closeout <span id="rail-closeout">Wait</span></div>
+            </aside>
+            <div class="space-main">
+              <article class="command-post" aria-label="Command post preview">
+                <div class="post-top">
+                  <div>
+                    <h2 id="post-heading">[SIMULATION] Vendor workspace exposure review</h2>
+                    <p class="top-copy" id="post-subcopy">Command post card for the dedicated Webex space.</p>
+                  </div>
+                  <span class="badge" id="post-badge">Draft card</span>
+                </div>
+                <div class="post-grid">
+                  <div class="post-cell"><span>Owner</span><strong id="post-owner">Response lead</strong></div>
+                  <div class="post-cell"><span>Tier</span><strong id="post-tier">Tier 2 - Coordination</strong></div>
+                  <div class="post-cell"><span>Next update</span><strong id="post-update">Submit intake</strong></div>
+                  <div class="post-cell"><span>Approval</span><strong id="post-approval">Draft only</strong></div>
+                </div>
+              </article>
+
+              <div class="phase-grid" aria-label="Phase preview">
+                <div class="phase"><span>01</span><strong>Declare</strong></div>
+                <div class="phase"><span>02</span><strong>Triage</strong></div>
+                <div class="phase"><span>03</span><strong>Draft</strong></div>
+                <div class="phase"><span>04</span><strong>Approval</strong></div>
+                <div class="phase"><span>05</span><strong>Closeout</strong></div>
+              </div>
+
+              <div class="message-stack">
+                <div class="message">
+                  <div class="avatar">IR</div>
+                  <div class="bubble" id="bot-message"><strong>Incident concierge</strong><br>Submit the intake to generate the Webex room plan, command card, phase threads, membership plan, and closeout packet.</div>
+                </div>
+                <div class="message">
+                  <div class="avatar">CP</div>
+                  <div class="bubble" id="human-message"><strong>Command post</strong><br>All artifacts remain simulation-labeled until the organization-approved Webex bot or MCP workflow writes to Webex.</div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="field">
-            <label for="known-facts">Known facts</label>
-            <textarea id="known-facts" name="facts" placeholder="Known facts for the simulation">A vendor workspace may have exposed draft customer communications to a broader internal group than intended. Engineering is validating scope. Legal and privacy review are required before external messaging.</textarea>
-          </div>
-          <div class="field">
-            <label for="unknowns">Open questions</label>
-            <textarea id="unknowns" name="unknowns" placeholder="Open questions for the simulation">Which documents were visible? Who had access? Was any customer-facing content final or only draft? What is the approved next update time?</textarea>
-          </div>
-        </form>
-        <div class="button-row" style="margin-top: 14px;">
-          <button class="button primary" data-action="intake" type="button">Submit intake</button>
-          <button class="button subtle" id="reset-intake" type="button">Reset</button>
-        </div>
-        <div class="form-error" id="intake-error" role="alert" aria-live="polite"></div>
-        <section class="intake-record" id="intake-record" aria-label="Submitted intake packet">
-          <div class="record-head">
-            <h3>Intake packet</h3>
-            <span class="tracker-badge" id="record-status">Not submitted</span>
-          </div>
-          <div class="record-grid">
-            <div class="record-metric">
-              <span>Record ID</span>
-              <strong id="record-id">Not created yet</strong>
-            </div>
-            <div class="record-metric">
-              <span>Saved locally</span>
-              <strong id="record-saved">Not saved yet</strong>
-            </div>
-            <div class="record-metric">
-              <span>Submitted at</span>
-              <strong id="record-submitted">Not submitted yet</strong>
-            </div>
-            <div class="record-metric">
-              <span>Next update</span>
-              <strong id="record-next-update">Calculated when intake is submitted</strong>
-            </div>
-          </div>
-          <div class="button-row">
-            <button class="button primary" id="copy-packet" type="button" disabled>Copy intake packet</button>
-            <button class="button subtle" id="download-packet" type="button" disabled>Download JSON</button>
-            <button class="button subtle" id="toggle-packet" type="button" disabled>Show packet</button>
-          </div>
-          <pre class="packet-preview" id="packet-preview" hidden></pre>
-          <div class="submission-history">
-            <div class="history-head">
-              <h3>Saved submissions</h3>
-              <span class="tracker-badge" id="history-count">0 saved</span>
-            </div>
-            <div class="history-list" id="history-list" aria-live="polite"></div>
-          </div>
-        </section>
-        <section class="deliverable-tracker" id="deliverable-tracker" aria-label="Deliverable time tracker">
-          <div class="tracker-head">
-            <p id="tracker-summary">Submit intake to start the deliverable clock.</p>
-            <span class="tracker-badge" id="tracker-tier">Tier 2 coordination</span>
-          </div>
-          <div class="deliverable-list" id="deliverable-list" aria-live="polite"></div>
-        </section>
-      </div>
-
-      <div class="panel">
-        <h2>Workflow actions</h2>
-        <p class="panel-copy">Current drafts update from the intake. External examples stay unchanged until an endpoint is connected.</p>
-        <div class="action-grid" aria-label="Workflow actions">
-          <button class="action-card" type="button" data-action="asana">
-            <span class="action-mode">Draft</span>
-            <span class="action-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h10M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Task tracker</strong><small>Current draft plus example link.</small></span>
-          </button>
-          <button class="action-card" type="button" data-action="jira">
-            <span class="action-mode">Draft</span>
-            <span class="action-icon violet" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="2"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Jira validation</strong><small>Current draft plus example link.</small></span>
-          </button>
-          <button class="action-card" type="button" data-action="confluence">
-            <span class="action-mode">Draft</span>
-            <span class="action-icon cyan" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v16H7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 8h4M10 12h4M10 16h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Notes draft</strong><small>Stays in page.</small></span>
-          </button>
-          <button class="action-card" type="button" data-action="miro">
-            <span class="action-mode">Draft</span>
-            <span class="action-icon orange" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 5h14v14H5z" stroke="currentColor" stroke-width="2"/><path d="M8 9h8M8 13h5M8 17h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
-            <span><strong>Miro board</strong><small>Builds board brief in page.</small></span>
-          </button>
-          <button class="action-card" type="button" data-action="approval">
-            <span class="action-mode">Draft</span>
-            <span class="action-icon red" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 3 4 7v6c0 4 3.2 6.7 8 8 4.8-1.3 8-4 8-8V7l-8-4Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>Outlook email</strong><small>Drafts reviewer request.</small></span>
-          </button>
-          <button class="action-card" type="button" data-action="closeout">
-            <span class="action-mode preview">Generate</span>
-            <span class="action-icon dark" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M5 12 10 17 20 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-            <span><strong>AI recap</strong><small>Stays in page.</small></span>
-          </button>
-        </div>
-        <div class="platform-launchpad" aria-label="Platform launchpad">
-          <button class="platform-link local" type="button" data-local-artifact="asana">Show Task Draft</button>
-          <a class="platform-link" data-platform-key="asana" href="https://app.clickup.com/t/86b9qw4rn" target="_blank" rel="noopener noreferrer">Open ClickUp Task</a>
-          <button class="platform-link local" type="button" data-local-artifact="jira">Show Jira Draft</button>
-          <a class="platform-link" data-platform-key="jira" href="https://cooperinteractive.atlassian.net/browse/KAN-3" target="_blank" rel="noopener noreferrer">Open Jira Issue</a>
-          <button class="platform-link local" type="button" data-local-artifact="notes">Show Notes Draft</button>
-          <a class="platform-link" data-platform-key="confluence" href="https://cooperinteractive.atlassian.net/wiki/spaces/PM/pages/589825/IR-2026-0429+Incident+Recap+-+Vendor+Workspace+Exposure+Review?focusedCommentId=1277953" target="_blank" rel="noopener noreferrer">Open Notes Record</a>
-          <button class="platform-link local" type="button" data-run-action="miro">Build Miro Brief</button>
-          <a class="platform-link" data-platform-key="outlook" href="https://outlook.office.com/mail/" target="_blank" rel="noopener noreferrer">Open Outlook Draft</a>
-          <a class="platform-link" data-platform-key="github" href="https://github.com/cooperinteractive/practice-incident" target="_blank" rel="noopener noreferrer">Open GitHub</a>
-        </div>
-        <p class="launch-note">Live simulation: current drafts update here. ClickUp, Jira, and notes now point to current simulation artifacts. Miro builds a board brief here first.</p>
-
-        <div class="phase-board" aria-label="Workflow phase board">
-          <div class="phase active" data-phase="intake"><span>Intake</span><strong id="phase-intake">Ready</strong></div>
-          <div class="phase" data-phase="triage"><span>Triage</span><strong id="phase-triage">Waiting</strong></div>
-          <div class="phase" data-phase="draft"><span>Draft</span><strong id="phase-draft">Waiting</strong></div>
-          <div class="phase" data-phase="approval"><span>Approval</span><strong id="phase-approval">Waiting</strong></div>
-          <div class="phase" data-phase="closeout"><span>Closeout</span><strong id="phase-closeout">Waiting</strong></div>
         </div>
 
-        <div class="artifact-tabs" role="tablist" aria-label="Generated draft tabs">
-          <button class="artifact-tab active" type="button" role="tab" aria-selected="true" data-artifact="asana">Task</button>
-          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="jira">Jira</button>
-          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="notes">Notes</button>
-          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="board">Board</button>
-          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="email">Email</button>
-          <button class="artifact-tab" type="button" role="tab" aria-selected="false" data-artifact="recap">AI Recap</button>
+        <aside class="panel" aria-labelledby="actions-title">
+          <div class="panel-header">
+            <h2 id="actions-title" class="panel-title">Provisioning path</h2>
+            <span class="panel-meta" id="action-count">0/6 run</span>
+          </div>
+          <div class="panel-body action-panel">
+            <button class="button agent" type="button" data-action="space">Provision Webex space</button>
+            <button class="button secondary" type="button" data-action="card">Post command card</button>
+            <button class="button secondary" type="button" data-action="threads">Start phase threads</button>
+            <button class="button secondary" type="button" data-action="members">Invite responders</button>
+            <button class="button secondary" type="button" data-action="workstream">Create workstream handoffs</button>
+            <button class="button secondary" type="button" data-action="closeout">Close scenario</button>
+            <div class="action-step" data-step="space"><span class="step-num">1</span><div><strong>Space</strong><span>Creates a dedicated Webex room from the intake criteria.</span></div></div>
+            <div class="action-step" data-step="card"><span class="step-num">2</span><div><strong>Command card</strong><span>Posts the command-post Adaptive Card with action buttons.</span></div></div>
+            <div class="action-step" data-step="threads"><span class="step-num">3</span><div><strong>Phase threads</strong><span>Starts Declare, Triage, Draft, Approval, and Closeout threads.</span></div></div>
+            <div class="action-step" data-step="members"><span class="step-num">4</span><div><strong>Roster</strong><span>Builds the invitation and moderator plan for responder groups.</span></div></div>
+            <div class="action-step" data-step="workstream"><span class="step-num">5</span><div><strong>Handoffs</strong><span>Prepares Jira, notes, tracker, and Outlook draft handoff objects.</span></div></div>
+            <div class="action-step" data-step="closeout"><span class="step-num">6</span><div><strong>Recap</strong><span>Generates a closeout recap and lessons-learned packet.</span></div></div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <section class="artifact-grid">
+      <section class="panel" aria-labelledby="artifact-title">
+        <div class="panel-header">
+          <h2 id="artifact-title" class="panel-title">Agent handoff artifacts</h2>
+          <button class="button secondary" type="button" id="copy-artifact">Copy active artifact</button>
         </div>
-        <pre class="artifact-preview" id="artifact-preview" role="tabpanel" aria-live="polite"></pre>
-        <div class="button-row" style="margin-top: 12px;">
-          <button class="button primary" id="copy-artifact" type="button">Copy current draft</button>
-          <a class="button subtle" id="github-trigger" href="#" target="_blank" rel="noopener" hidden>Open workflow result</a>
-          <button class="button subtle" id="reset-workflow" type="button">Reset workflow</button>
+        <div class="tabs" role="tablist" aria-label="Artifacts">
+          <button class="tab" role="tab" aria-selected="true" data-tab="packet">Incident packet</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="card">Webex card JSON</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="threads">Thread starters</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="api">Bot API plan</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="recap">AI recap</button>
         </div>
-        <div class="activity-log" id="activity-log" aria-live="polite" aria-label="Activity log"></div>
-      </div>
+        <div class="panel-body">
+          <pre id="artifact-output" tabindex="0"></pre>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="timeline-title">
+        <div class="panel-header">
+          <h2 id="timeline-title" class="panel-title">Operational timeline</h2>
+          <span class="panel-meta" id="timeline-state">Waiting</span>
+        </div>
+        <div class="panel-body">
+          <div class="timeline" id="timeline"></div>
+          <div style="height: 14px"></div>
+          <div class="log-list" id="activity-log" aria-live="polite"></div>
+        </div>
+      </section>
     </section>
-  </main>
+  </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    const defaults = {
-      title: "Vendor workspace exposure review",
-      id: "IR-2026-0429",
-      severity: "Tier 2 - Internal coordination",
-      owner: "Response lead",
-      audience: "Internal team and reviewers",
-      deadline: "30 minutes",
-      facts: "A vendor workspace may have exposed draft customer communications to a broader internal group than intended. Engineering is validating scope. Legal and privacy review are required before external messaging.",
-      unknowns: "Which documents were visible? Who had access? Was any customer-facing content final or only draft? What is the approved next update time?"
+    const iconCheck = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const phases = ["Declare", "Triage", "Draft", "Approval", "Closeout"];
+    const actionLabels = {
+      space: "Webex space plan created",
+      card: "Command card generated",
+      threads: "Phase threads prepared",
+      members: "Responder roster staged",
+      workstream: "External handoff plan staged",
+      closeout: "Closeout recap generated"
     };
-
-    const phaseOrder = ["intake", "triage", "draft", "approval", "closeout"];
-    const form = document.querySelector("#intake-form");
-    const preview = document.querySelector("#artifact-preview");
-    const log = document.querySelector("#activity-log");
-    const toast = document.querySelector("#toast");
-    const githubTrigger = document.querySelector("#github-trigger");
-    const nextUpdatePreview = document.querySelector("#next-update-preview");
-    const submittedAtPreview = document.querySelector("#submitted-at-preview");
-    const simulationLabel = "SIMULATION";
-    const deliverableTracker = document.querySelector("#deliverable-tracker");
-    const deliverableList = document.querySelector("#deliverable-list");
-    const trackerSummary = document.querySelector("#tracker-summary");
-    const trackerTier = document.querySelector("#tracker-tier");
-    const intakeError = document.querySelector("#intake-error");
-    const recordStatus = document.querySelector("#record-status");
-    const recordId = document.querySelector("#record-id");
-    const recordSaved = document.querySelector("#record-saved");
-    const recordSubmitted = document.querySelector("#record-submitted");
-    const recordNextUpdate = document.querySelector("#record-next-update");
-    const copyPacketButton = document.querySelector("#copy-packet");
-    const downloadPacketButton = document.querySelector("#download-packet");
-    const togglePacketButton = document.querySelector("#toggle-packet");
-    const packetPreview = document.querySelector("#packet-preview");
-    const historyCount = document.querySelector("#history-count");
-    const historyList = document.querySelector("#history-list");
-    const intakeRecordStorageKey = "practiceIncidentIntakeRecords";
-    const maxSavedRecords = 10;
-    const requiredFields = [
-      ["title", "Incident title"],
-      ["id", "Incident ID"],
-      ["severity", "Severity / tier"],
-      ["owner", "Response owner"],
-      ["audience", "Affected audience"],
-      ["deadline", "Update cadence"],
-      ["facts", "Known facts"],
-      ["unknowns", "Open questions"]
-    ];
-    const artifactActions = {
-      asana: "asana",
-      jira: "jira",
-      notes: "confluence",
-      board: "miro",
-      email: "approval",
-      recap: "closeout"
-    };
-
-    const workflowActions = {
-      intake: {
-        label: "Intake",
-        phase: "intake",
-        artifact: "asana",
-        system: "command-center",
-        requestedOutputs: ["asana-task", "incident-record"]
-      },
-      asana: {
-        label: "Task tracker",
-        phase: "triage",
-        artifact: "asana",
-        system: "clickup",
-        requestedOutputs: ["task-url", "action-list"]
-      },
-      jira: {
-        label: "Jira validation",
-        phase: "draft",
-        artifact: "jira",
-        system: "jira",
-        requestedOutputs: ["issue-url", "engineering-task"]
-      },
-      confluence: {
-        label: "Notes draft",
-        phase: "draft",
-        artifact: "notes",
-        system: "notes",
-        requestedOutputs: ["decision-log", "incident-record"]
-      },
-      miro: {
-        label: "Miro board",
-        phase: "draft",
-        artifact: "board",
-        system: "miro",
-        requestedOutputs: ["board-url", "lane-map"]
-      },
-      approval: {
-        label: "Outlook email",
-        phase: "approval",
-        artifact: "email",
-        system: "outlook",
-        requestedOutputs: ["draft-email-url", "approval-request"]
-      },
-      closeout: {
-        label: "AI incident recap",
-        phase: "closeout",
-        artifact: "recap",
-        system: "ai-agent",
-        requestedOutputs: ["recap", "follow-up-actions"]
-      }
-    };
-
-    const platformLinks = {
-      asana: {
-        label: "Open ClickUp Task",
-        url: "https://app.clickup.com/t/86b9qw4rn",
-        example: false
-      },
-      jira: {
-        label: "Open Jira Issue",
-        url: "https://cooperinteractive.atlassian.net/browse/KAN-3",
-        example: false
-      },
-      confluence: {
-        label: "Open Notes Record",
-        url: "https://cooperinteractive.atlassian.net/wiki/spaces/PM/pages/589825/IR-2026-0429+Incident+Recap+-+Vendor+Workspace+Exposure+Review?focusedCommentId=1277953",
-        example: false
-      },
-      miro: {
-        label: "Open Miro Dashboard",
-        url: "https://miro.com/app/dashboard/"
-      },
-      outlook: {
-        label: "Open Outlook Draft",
-        dynamic: "outlook-compose"
-      },
-      github: {
-        label: "Open GitHub",
-        url: "https://github.com/cooperinteractive/practice-incident"
-      },
-      recap: {
-        label: "Show AI Recap",
-        url: "#artifact-preview",
-        artifact: "recap",
-        local: true
-      }
-    };
-
-    const platformByAction = {
-      intake: "asana",
-      asana: "asana",
-      jira: "jira",
-      confluence: "confluence",
-      miro: "miro",
-      approval: "outlook",
-      closeout: "recap"
-    };
-
-    const artifactPlatformKeys = {
-      clickupUrl: "asana",
-      taskUrl: "asana",
-      jiraUrl: "jira",
-      issueUrl: "jira",
-      confluenceUrl: "confluence",
-      notesUrl: "confluence",
-      miroBoardUrl: "miro",
-      boardUrl: "miro",
-      outlookDraftUrl: "outlook",
-      emailUrl: "outlook",
-      recapUrl: "recap"
-    };
-
-    const syncedPlatformLabels = {
-      asana: "Open ClickUp Task",
-      jira: "Open Jira Issue",
-      confluence: "Open Notes Record",
-      miro: "Open Miro Board",
-      outlook: "Open Outlook Draft",
-      recap: "Open AI Recap"
-    };
-
-    const tierProfiles = {
-      tier1: {
-        label: "Tier 1 monitor",
-        minutes: { asana: 20, jira: 45, notes: 60, board: 75, email: 90, recap: 180 }
-      },
-      tier2: {
-        label: "Tier 2 coordination",
-        minutes: { asana: 10, jira: 20, notes: 30, board: 40, email: 45, recap: 90 }
-      },
-      tier3: {
-        label: "Tier 3 leadership",
-        minutes: { asana: 5, jira: 15, notes: 20, board: 30, email: 30, recap: 60 }
-      },
-      tier4: {
-        label: "Tier 4 external",
-        minutes: { asana: 5, jira: 10, notes: 15, board: 20, email: 20, recap: 45 }
-      }
-    };
-
-    const deliverableDefinitions = [
-      {
-        id: "asana",
-        action: "asana",
-        label: "Task tracker",
-        system: "ClickUp",
-        owner: "Response lead",
-        detail: "Task, owner, and response checklist"
-      },
-      {
-        id: "jira",
-        action: "jira",
-        label: "Jira validation",
-        system: "Jira",
-        owner: "Engineering",
-        detail: "Scope review and evidence criteria"
-      },
-      {
-        id: "notes",
-        action: "confluence",
-        label: "Notes draft",
-        system: "In-page notes",
-        owner: "Scribe",
-        detail: "Decision log and incident record"
-      },
-      {
-        id: "board",
-        action: "miro",
-        label: "Miro board brief",
-        system: "Miro",
-        owner: "Facilitator",
-        detail: "Scenario lanes and visual map"
-      },
-      {
-        id: "email",
-        action: "approval",
-        label: "Approval email",
-        system: "Outlook",
-        owner: "Reviewer",
-        detail: "Approval request and holding language"
-      },
-      {
-        id: "recap",
-        action: "closeout",
-        label: "AI recap",
-        system: "AI recap",
-        owner: "Response lead",
-        detail: "Final recap and follow-up actions"
-      }
-    ];
-
-    const workflowStorageKey = "practiceIncidentWorkflowEndpoint";
-    const defaultWorkflowEndpoint = "";
-    const blockedWorkflowHosts = new Set(["practice-incident-workflow.vercel.app"]);
-    const pageParams = new URLSearchParams(window.location.search);
-    const endpointParam = pageParams.get("endpoint");
-    if (endpointParam) {
-      if (endpointParam === "local" || endpointParam === "off") {
-        localStorage.removeItem(workflowStorageKey);
-      } else {
-        const validatedEndpoint = getValidWorkflowEndpoint(endpointParam);
-        if (validatedEndpoint) {
-          localStorage.setItem(workflowStorageKey, validatedEndpoint);
-        } else {
-          localStorage.removeItem(workflowStorageKey);
-        }
-      }
-    }
-
-    const storedWorkflowEndpoint = getValidWorkflowEndpoint(localStorage.getItem(workflowStorageKey) || "");
-    if (storedWorkflowEndpoint && blockedWorkflowHosts.has(new URL(storedWorkflowEndpoint).hostname)) {
-      localStorage.removeItem(workflowStorageKey);
-    }
-
-    const workflow = {
-      endpoint: getValidWorkflowEndpoint(endpointParam || localStorage.getItem(workflowStorageKey) || defaultWorkflowEndpoint),
-      lastStatus: "No external calls"
-    };
-
     const state = {
-      activeArtifact: "asana",
-      complete: new Set(),
-      outputs: {},
+      submittedAt: null,
+      nextUpdateAt: null,
+      completed: new Set(),
+      activeTab: "packet",
       log: [],
-      intakeSubmittedAt: null,
-      deliverablesDone: new Map(),
-      currentRecord: null,
-      currentRecordId: "",
-      recordDirty: false,
-      syncedPlatformLinks: {}
+      packet: null
     };
 
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add("show");
-      window.clearTimeout(showToast.timer);
-      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2200);
+    const form = document.querySelector("#intake-form");
+    const fields = {
+      title: document.querySelector("#incident-title"),
+      incidentId: document.querySelector("#incident-id"),
+      tier: document.querySelector("#tier"),
+      owner: document.querySelector("#owner"),
+      audience: document.querySelector("#audience"),
+      cadence: document.querySelector("#cadence"),
+      source: document.querySelector("#source"),
+      responders: document.querySelector("#responders"),
+      facts: document.querySelector("#facts"),
+      questions: document.querySelector("#questions")
+    };
+
+    function escapeText(value) {
+      return String(value || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
     }
 
-    function getData() {
-      const data = new FormData(form);
-      return {
-        title: data.get("title").trim(),
-        id: data.get("id").trim(),
-        severity: data.get("severity").trim(),
-        owner: data.get("owner").trim(),
-        audience: data.get("audience").trim(),
-        deadline: data.get("deadline").trim(),
-        facts: data.get("facts").trim(),
-        unknowns: data.get("unknowns").trim()
-      };
+    function getIntake() {
+      return Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value.trim()]));
     }
 
-    function getField(name) {
-      return form.querySelector(`[name="${name}"]`);
-    }
-
-    function setFieldInvalid(name, invalid) {
-      const field = getField(name);
-      if (!field) return;
-      field.setAttribute("aria-invalid", String(Boolean(invalid)));
-      field.closest(".field")?.classList.toggle("invalid", Boolean(invalid));
-    }
-
-    function clearValidation() {
-      intakeError.textContent = "";
-      requiredFields.forEach(([name]) => setFieldInvalid(name, false));
-    }
-
-    function validateIntake() {
-      const data = getData();
-      const missing = requiredFields.filter(([name]) => !data[name]).map(([, label]) => label);
-      requiredFields.forEach(([name]) => setFieldInvalid(name, !data[name]));
-
-      if (missing.length) {
-        intakeError.textContent = `Complete required fields: ${missing.join(", ")}.`;
-        const firstMissing = requiredFields.find(([name]) => !data[name]);
-        getField(firstMissing[0])?.focus();
-        showToast("Intake needs required fields");
-        return false;
-      }
-
-      if (!parseRelativeDeadline(data.deadline)) {
-        intakeError.textContent = "Use a relative update cadence like 30 minutes, 1 hour, or 2 days.";
-        setFieldInvalid("deadline", true);
-        getField("deadline")?.focus();
-        showToast("Update cadence needs a relative time");
-        return false;
-      }
-
-      clearValidation();
-      return true;
-    }
-
-    function getValidWorkflowEndpoint(value) {
-      if (!value) return "";
-      try {
-        const url = new URL(value);
-        const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
-        if (url.protocol === "https:" || (url.protocol === "http:" && localHosts.has(url.hostname))) {
-          return url.toString();
-        }
-      } catch (error) {
-        return "";
-      }
-      return "";
-    }
-
-    function parseRelativeDeadline(value) {
-      const text = String(value || "").trim().toLowerCase();
-      const match = text.match(/(\d+(?:\.\d+)?)\s*(minute|min|m|hour|hr|h|day|d)s?/);
-      if (!match) return null;
+    function parseCadence(value) {
+      const match = String(value || "").toLowerCase().match(/(\d+)\s*(minute|minutes|hour|hours|day|days)/);
+      if (!match) return 30 * 60 * 1000;
       const amount = Number(match[1]);
       const unit = match[2];
-      if (!Number.isFinite(amount)) return null;
-      if (["minute", "min", "m"].includes(unit)) return amount * 60 * 1000;
-      if (["hour", "hr", "h"].includes(unit)) return amount * 60 * 60 * 1000;
-      if (["day", "d"].includes(unit)) return amount * 24 * 60 * 60 * 1000;
-      return null;
+      if (unit.startsWith("hour")) return amount * 60 * 60 * 1000;
+      if (unit.startsWith("day")) return amount * 24 * 60 * 60 * 1000;
+      return amount * 60 * 1000;
     }
 
     function formatDateTime(date) {
-      return new Intl.DateTimeFormat(undefined, {
+      if (!date) return "Submit intake";
+      return new Intl.DateTimeFormat([], {
         month: "short",
         day: "numeric",
         year: "numeric",
@@ -1756,1224 +1215,400 @@
       }).format(date);
     }
 
-    function formatTimeOnly(date) {
-      return new Intl.DateTimeFormat(undefined, {
-        hour: "numeric",
-        minute: "2-digit",
-        timeZoneName: "short"
-      }).format(date);
+    function formatTime(date) {
+      if (!date) return "Pending";
+      return new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit", timeZoneName: "short" }).format(date);
     }
 
-    function getNextUpdateInfo(data) {
-      const raw = data.deadline || "30 minutes";
-      const offsetMs = parseRelativeDeadline(raw);
-      if (state.intakeSubmittedAt && offsetMs) {
-        const date = new Date(state.intakeSubmittedAt.getTime() + offsetMs);
-        return {
-          raw,
-          cadence: raw,
-          submittedAt: state.intakeSubmittedAt,
-          submittedLabel: formatDateTime(state.intakeSubmittedAt),
-          at: date,
-          iso: date.toISOString(),
-          dueLabel: formatDateTime(date),
-          label: `${formatDateTime(date)} (${raw} from intake)`,
-          summary: `Submitted ${formatDateTime(state.intakeSubmittedAt)}. Next update due ${formatDateTime(date)}.`
-        };
-      }
-      if (state.intakeSubmittedAt) {
-        return {
-          raw,
-          cadence: raw,
-          submittedAt: state.intakeSubmittedAt,
-          submittedLabel: formatDateTime(state.intakeSubmittedAt),
-          at: null,
-          iso: "",
-          dueLabel: raw,
-          label: raw,
-          summary: `Submitted ${formatDateTime(state.intakeSubmittedAt)}. Next update timing entered manually: ${raw}.`
-        };
-      }
+    function buildPacket() {
+      const intake = getIntake();
+      const submittedAt = state.submittedAt || new Date();
+      const nextUpdateAt = state.nextUpdateAt || new Date(submittedAt.getTime() + parseCadence(intake.cadence));
+      const responders = intake.responders.split(",").map((item) => item.trim()).filter(Boolean);
+      const roomTitle = `[SIMULATION] ${intake.incidentId} - ${intake.title}`;
       return {
-        raw,
-        cadence: raw,
-        submittedAt: null,
-        submittedLabel: "Not submitted yet",
-        at: null,
-        iso: "",
-        dueLabel: "Calculated when intake is submitted",
-        label: offsetMs ? `${raw} after intake is submitted` : raw,
-        summary: offsetMs ? `Next update will be due ${raw} after intake is submitted.` : `Next update timing entered manually: ${raw}.`
+        simulation: true,
+        recordId: `${intake.incidentId}-${submittedAt.toISOString().replace(/[-:]/g, "").slice(0, 13)}Z`,
+        incident: {
+          id: intake.incidentId,
+          title: intake.title,
+          tier: intake.tier,
+          owner: intake.owner,
+          audience: intake.audience,
+          source: intake.source,
+          knownFacts: intake.facts,
+          openQuestions: intake.questions,
+          submittedAt: submittedAt.toISOString(),
+          nextUpdateAt: nextUpdateAt.toISOString(),
+          updateCadence: intake.cadence
+        },
+        webex: {
+          roomTitle,
+          roomPurpose: "Dedicated simulation coordination space",
+          tabs: ["Command", "Declare", "Triage", "Draft", "Approval", "Closeout"],
+          responderGroups: responders,
+          commandPost: buildCommandPost(intake, submittedAt, nextUpdateAt),
+          adaptiveCard: buildAdaptiveCard(intake, nextUpdateAt),
+          threadStarters: buildThreadStarters(intake, nextUpdateAt)
+        },
+        agentBoundaries: {
+          allowed: [
+            "Create simulation Webex room",
+            "Post command card",
+            "Prepare phase threads",
+            "Create draft handoff payloads",
+            "Generate recap draft"
+          ],
+          blocked: [
+            "No real incident data",
+            "No automatic external send",
+            "No secrets in browser",
+            "No production write without approved bot or MCP owner"
+          ]
+        }
       };
     }
 
-    function getTierKey(severity) {
-      const text = String(severity || "").toLowerCase();
-      if (text.includes("tier 4")) return "tier4";
-      if (text.includes("tier 3")) return "tier3";
-      if (text.includes("tier 1")) return "tier1";
-      return "tier2";
-    }
-
-    function getTierProfile(data) {
-      const key = getTierKey(data.severity);
-      return { key, ...tierProfiles[key] };
-    }
-
-    function formatMinutes(minutes) {
-      if (minutes < 60) return `${minutes} min`;
-      const hours = Math.floor(minutes / 60);
-      const remainder = minutes % 60;
-      if (!remainder) return `${hours} hr`;
-      return `${hours} hr ${remainder} min`;
-    }
-
-    function getDeliverableSchedule(data = getData()) {
-      const profile = getTierProfile(data);
-      const now = new Date();
-      return deliverableDefinitions.map((definition) => {
-        const minutes = profile.minutes[definition.id] || 30;
-        const dueAt = state.intakeSubmittedAt ? new Date(state.intakeSubmittedAt.getTime() + minutes * 60 * 1000) : null;
-        const doneAt = state.deliverablesDone.get(definition.id) || null;
-        const status = doneAt ? "done" : !dueAt ? "waiting" : now > dueAt ? "late" : "open";
-        const statusLabel = doneAt ? `Done ${formatDateTime(doneAt)}` : dueAt ? status === "late" ? "Late" : "Open" : "Waiting";
-        const dueLabel = dueAt ? formatDateTime(dueAt) : `+${formatMinutes(minutes)} after intake`;
-        return {
-          ...definition,
-          minutes,
-          dueAt,
-          doneAt,
-          dueLabel,
-          status,
-          statusLabel
-        };
-      });
-    }
-
-    function makeScheduleText(data = getData()) {
-      const profile = getTierProfile(data);
-      const rows = getDeliverableSchedule(data).map((item) => {
-        const finished = item.doneAt ? `; completed ${formatDateTime(item.doneAt)}` : "";
-        return `- ${item.label} (${item.system}, ${item.owner}): due ${item.dueLabel}${finished}`;
-      });
-      return `Deliverable tracker (${profile.label}):\n${rows.join("\n")}`;
-    }
-
-    function truncateForUrl(value, limit = 520) {
-      const text = String(value || "").replace(/\s+/g, " ").trim();
-      return text.length > limit ? `${text.slice(0, limit - 1)}...` : text;
-    }
-
-    function makeOutlookComposeUrl() {
-      const data = getData();
-      const timing = getNextUpdateInfo(data);
-      const subject = `[${simulationLabel}] ${data.id || "Incident"} approval request`;
-      const body = [
-        `${simulationLabel} ONLY`,
+    function buildCommandPost(intake, submittedAt, nextUpdateAt) {
+      return [
+        `# [SIMULATION] ${intake.incidentId} Command Post`,
         "",
-        `Incident: ${data.id || "Unassigned"} - ${data.title || "Untitled"}`,
-        `Owner: ${data.owner || "Unassigned"}`,
-        `Severity: ${data.severity || "Unclassified"}`,
-        `Next update due: ${timing.dueLabel}`,
-        `Audience: ${data.audience || "Not specified"}`,
+        `Incident: ${intake.title}`,
+        `Owner: ${intake.owner}`,
+        `Tier: ${intake.tier}`,
+        `Audience: ${intake.audience}`,
+        `Source: ${intake.source}`,
+        `Submitted: ${formatDateTime(submittedAt)}`,
+        `Next update: ${formatDateTime(nextUpdateAt)}`,
         "",
         "Known facts:",
-        truncateForUrl(data.facts),
+        intake.facts,
         "",
         "Open questions:",
-        truncateForUrl(data.unknowns),
+        intake.questions,
         "",
-        "Requested decision: approve, revise, or hold. This is a training artifact and not a live incident."
+        "Working rule: keep this space simulation-labeled and draft-only until a human reviewer approves the next action."
       ].join("\n");
-      return `https://outlook.office.com/mail/deeplink/compose?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
 
-    function getPlatformConfig(platformKey) {
-      const platform = platformLinks[platformKey];
-      if (!platform) return null;
-      const synced = state.syncedPlatformLinks[platformKey];
-      if (synced?.url) {
-        return {
-          ...platform,
-          label: synced.label || syncedPlatformLabels[platformKey] || platform.label,
-          url: synced.url,
-          example: false,
-          local: false,
-          dynamic: ""
+    function buildAdaptiveCard(intake, nextUpdateAt) {
+      return {
+        contentType: "application/vnd.microsoft.card.adaptive",
+        content: {
+          "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+          type: "AdaptiveCard",
+          version: "1.3",
+          body: [
+            { type: "TextBlock", text: `[SIMULATION] ${intake.incidentId}`, weight: "Bolder", size: "Large", wrap: true },
+            { type: "TextBlock", text: intake.title, wrap: true },
+            {
+              type: "FactSet",
+              facts: [
+                { title: "Owner", value: intake.owner },
+                { title: "Tier", value: intake.tier },
+                { title: "Next update", value: formatDateTime(nextUpdateAt) },
+                { title: "Source", value: intake.source }
+              ]
+            },
+            { type: "TextBlock", text: "Known facts", weight: "Bolder", wrap: true },
+            { type: "TextBlock", text: intake.facts, wrap: true },
+            { type: "TextBlock", text: "Open questions", weight: "Bolder", wrap: true },
+            { type: "TextBlock", text: intake.questions, wrap: true }
+          ],
+          actions: [
+            { type: "Action.Submit", title: "Run triage", data: { action: "triage", incidentId: intake.incidentId } },
+            { type: "Action.Submit", title: "Draft update", data: { action: "draft_update", incidentId: intake.incidentId } },
+            { type: "Action.Submit", title: "Request approval", data: { action: "approval", incidentId: intake.incidentId } },
+            { type: "Action.Submit", title: "Close scenario", data: { action: "closeout", incidentId: intake.incidentId } }
+          ]
+        }
+      };
+    }
+
+    function buildThreadStarters(intake, nextUpdateAt) {
+      return phases.map((phase, index) => {
+        const prompts = {
+          Declare: ["Reported by", "Source system", "Initial owner", "First update time"],
+          Triage: ["Scope", "Severity", "Required reviewers", "Evidence needed"],
+          Draft: ["Holding language", "FAQ needs", "Audience", "Content owner"],
+          Approval: ["Legal review", "Privacy review", "Comms review", "Decision"],
+          Closeout: ["Recap", "Lessons learned", "Follow-up tasks", "Archive location"]
         };
-      }
-      if (platform.dynamic === "outlook-compose") {
-        return { ...platform, url: makeOutlookComposeUrl() };
-      }
-      return platform;
-    }
-
-    function refreshPlatformLaunchLinks() {
-      document.querySelectorAll("[data-platform-key]").forEach((link) => {
-        const platform = getPlatformConfig(link.dataset.platformKey);
-        if (!platform) return;
-        link.href = platform.url || "#";
-        link.textContent = platform.label;
+        return {
+          phase,
+          order: index + 1,
+          title: `[SIMULATION] ${intake.incidentId} - ${phase}`,
+          markdown: [
+            `# ${phase}`,
+            "",
+            `Incident: ${intake.title}`,
+            `Owner: ${intake.owner}`,
+            `Next update: ${formatDateTime(nextUpdateAt)}`,
+            "",
+            "Fields:",
+            ...prompts[phase].map((item) => `- ${item}:`),
+            "",
+            "Simulation note: do not add real incident or confidential data."
+          ].join("\n")
+        };
       });
     }
 
-    function safeIdPart(value) {
-      return String(value || "incident")
-        .trim()
-        .replace(/[^a-z0-9]+/gi, "-")
-        .replace(/^-+|-+$/g, "")
-        .slice(0, 48) || "incident";
-    }
-
-    function makeRecordId(data, submittedAt) {
-      const stamp = submittedAt.toISOString().replace(/\.\d{3}Z$/, "Z").replace(/[:.]/g, "");
-      return `${safeIdPart(data.id)}-${stamp}`;
-    }
-
-    function loadSavedRecords() {
-      try {
-        const records = JSON.parse(localStorage.getItem(intakeRecordStorageKey) || "[]");
-        return Array.isArray(records) ? records : [];
-      } catch (error) {
-        return [];
-      }
-    }
-
-    function persistSavedRecord(record) {
-      const records = loadSavedRecords().filter((item) => item.recordId !== record.recordId);
-      records.unshift(record);
-      localStorage.setItem(intakeRecordStorageKey, JSON.stringify(records.slice(0, maxSavedRecords)));
-    }
-
-    function makeIntakeRecord(outputs = state.outputs) {
-      const data = getData();
-      const timing = getNextUpdateInfo(data);
-      const profile = getTierProfile(data);
-      const submittedAt = timing.submittedAt || state.intakeSubmittedAt || new Date();
-      const savedAt = new Date();
-      const recordIdValue = state.currentRecordId || makeRecordId(data, submittedAt);
-      const deliverables = getDeliverableSchedule(data).map((item) => ({
-        id: item.id,
-        label: item.label,
-        system: item.system,
-        owner: item.owner,
-        dueInMinutes: item.minutes,
-        dueAt: item.dueAt ? item.dueAt.toISOString() : "",
-        doneAt: item.doneAt ? item.doneAt.toISOString() : "",
-        status: item.status
-      }));
+    function buildApiPlan() {
+      const packet = state.packet || buildPacket();
       return {
-        recordId: recordIdValue,
-        simulation: true,
-        source: "Practice Incident Command Center",
-        savedAt: savedAt.toISOString(),
-        incident: {
-          title: data.title,
-          id: data.id,
-          severity: data.severity,
-          owner: data.owner,
-          audience: data.audience,
-          updateCadence: data.deadline,
-          knownFacts: data.facts,
-          openQuestions: data.unknowns
-        },
-        timing: {
-          submittedAt: submittedAt.toISOString(),
-          submittedLabel: timing.submittedLabel,
-          nextUpdateAt: timing.iso,
-          nextUpdateLabel: timing.dueLabel,
-          nextUpdateSummary: timing.summary,
-          tier: profile.label,
-          tierKey: profile.key,
-          deliverables
-        },
-        artifacts: {
-          task: outputs.asana || "",
-          jira: outputs.jira || "",
-          notes: outputs.notes || "",
-          board: outputs.board || "",
-          email: outputs.email || "",
-          recap: outputs.recap || ""
-        },
-        workflow: {
-          endpointConfigured: Boolean(workflow.endpoint),
-          endpointStatus: workflow.lastStatus,
-          externalWrites: Boolean(workflow.endpoint)
+        hostDecision: "Organization-approved Webex bot, Webex MCP, or internal Webex API service",
+        browserRole: "Collect simulation intake and display returned state only",
+        webexActions: [
+          { order: 1, api: "POST /v1/rooms", purpose: "Create dedicated simulation incident space", title: packet.webex.roomTitle },
+          { order: 2, api: "POST /v1/memberships", purpose: "Invite responder groups after membership mapping is approved", groups: packet.webex.responderGroups },
+          { order: 3, api: "POST /v1/messages", purpose: "Post command card and command-post markdown" },
+          { order: 4, api: "POST /v1/messages", purpose: "Post phase thread starters" },
+          { order: 5, api: "POST /v1/webhooks", purpose: "Listen for attachmentActions created events from card buttons" },
+          { order: 6, api: "GET /v1/attachment/actions/{id}", purpose: "Retrieve encrypted card submission after webhook notification" }
+        ],
+        nonWebexHandoffs: [
+          "Jira validation issue only when engineering routing is required",
+          "Confluence or approved notes record for the playbook/recap",
+          "Task tracker mirror for PM accountability",
+          "Outlook draft only, no automatic send"
+        ]
+      };
+    }
+
+    function buildRecap() {
+      const packet = state.packet || buildPacket();
+      const incident = packet.incident;
+      return [
+        `[SIMULATION] AI closeout recap for ${incident.id}`,
+        "",
+        `Incident: ${incident.title}`,
+        `Owner: ${incident.owner}`,
+        `Tier: ${incident.tier}`,
+        `Submitted: ${formatDateTime(new Date(incident.submittedAt))}`,
+        `Next update target: ${formatDateTime(new Date(incident.nextUpdateAt))}`,
+        "",
+        "What happened:",
+        "The command workflow captured the intake, prepared a dedicated Webex space plan, staged the command card, generated phase threads, listed responder groups, and prepared downstream handoff objects.",
+        "",
+        "Confirmed facts:",
+        incident.knownFacts,
+        "",
+        "Open questions:",
+        incident.openQuestions,
+        "",
+        "Recommended follow-ups:",
+        "1. Confirm the organization-approved Webex bot or MCP owner.",
+        "2. Map responder groups to approved Webex memberships.",
+        "3. Decide which team owns Jira/Confluence handoffs.",
+        "4. Keep approval email draft-only until human approval.",
+        "5. Archive the simulation packet after the exercise."
+      ].join("\n");
+    }
+
+    function artifactText(tab = state.activeTab) {
+      const packet = state.packet || buildPacket();
+      if (tab === "card") return JSON.stringify(packet.webex.adaptiveCard, null, 2);
+      if (tab === "threads") return packet.webex.threadStarters.map((thread) => thread.markdown).join("\n\n---\n\n");
+      if (tab === "api") return JSON.stringify(buildApiPlan(), null, 2);
+      if (tab === "recap") return buildRecap();
+      return JSON.stringify(packet, null, 2);
+    }
+
+    function updateUi() {
+      const intake = getIntake();
+      const packet = state.packet || buildPacket();
+      const next = state.nextUpdateAt;
+      document.querySelector("#metric-id").textContent = intake.incidentId || "Draft";
+      document.querySelector("#metric-room").textContent = state.completed.has("space") ? "Space staged" : "Draft space";
+      document.querySelector("#metric-update").textContent = next ? formatTime(next) : "Submit intake";
+      document.querySelector("#metric-state").textContent = state.completed.size === 6 ? "6/6 complete" : `${state.completed.size}/6 actions`;
+      document.querySelector("#space-title").textContent = packet.webex.roomTitle;
+      document.querySelector("#post-heading").textContent = `[SIMULATION] ${intake.title}`;
+      document.querySelector("#post-subcopy").textContent = `${intake.incidentId} - ${intake.source}`;
+      document.querySelector("#post-owner").textContent = intake.owner || "Response owner";
+      document.querySelector("#post-tier").textContent = intake.tier;
+      document.querySelector("#post-update").textContent = next ? formatDateTime(next) : "Submit intake";
+      document.querySelector("#post-badge").textContent = state.completed.has("card") ? "Card staged" : "Draft card";
+      document.querySelector("#bot-message").innerHTML = `<strong>Incident concierge</strong><br>${escapeText(state.completed.has("space") ? "Dedicated Webex space plan is staged for the approved bot or MCP workflow." : "Submit and provision the space plan before routing responders.")}`;
+      document.querySelector("#human-message").innerHTML = `<strong>Command post</strong><br>${escapeText(next ? `Next simulation update is due ${formatDateTime(next)}.` : "All artifacts remain local until intake is submitted.")}`;
+      document.querySelector("#saved-state").textContent = state.submittedAt ? `Saved ${formatTime(state.submittedAt)}` : "Not submitted";
+      document.querySelector("#action-count").textContent = `${state.completed.size}/6 run`;
+      document.querySelector("#timeline-state").textContent = state.completed.size === 6 ? "Complete" : state.completed.size ? "In progress" : "Waiting";
+      document.querySelectorAll(".action-step").forEach((step) => {
+        step.classList.toggle("done", state.completed.has(step.dataset.step));
+      });
+      document.querySelectorAll("[data-action]").forEach((button) => {
+        const isDone = state.completed.has(button.dataset.action);
+        button.classList.toggle("done", isDone);
+        if (isDone && !button.innerHTML.includes("<svg")) {
+          button.innerHTML = `${iconCheck}${button.textContent}`;
         }
-      };
-    }
-
-    function makeIntakePacket(record = state.currentRecord) {
-      if (!record) return "";
-      const incident = record.incident;
-      const deliverables = record.timing.deliverables.map((item) => {
-        const due = item.dueAt ? formatDateTime(new Date(item.dueAt)) : `+${formatMinutes(item.dueInMinutes)} after intake`;
-        const done = item.doneAt ? `; done ${formatDateTime(new Date(item.doneAt))}` : "";
-        return `- ${item.label} (${item.system}, ${item.owner}): ${item.status}; due ${due}${done}`;
-      }).join("\n");
-      return `[${simulationLabel}] Intake packet
-
-Record ID: ${record.recordId}
-Saved locally: ${formatDateTime(new Date(record.savedAt))}
-Submitted at: ${formatDateTime(new Date(record.timing.submittedAt))}
-Next update due: ${record.timing.nextUpdateLabel}
-Tier timing: ${record.timing.tier}
-
-Incident:
-${incident.id} - ${incident.title}
-
-Owner:
-${incident.owner}
-
-Affected audience:
-${incident.audience}
-
-Known facts:
-${incident.knownFacts}
-
-Open questions:
-${incident.openQuestions}
-
-Deliverables:
-${deliverables}
-
-Workflow boundary:
-This is a saved simulation intake packet. External systems update only through an approved endpoint.`;
-    }
-
-    function saveCurrentIntakeRecord(outputs = state.outputs) {
-      const record = makeIntakeRecord(outputs);
-      state.currentRecord = record;
-      state.currentRecordId = record.recordId;
-      state.recordDirty = false;
-      persistSavedRecord(record);
-      renderIntakeRecord();
-      return record;
-    }
-
-    function renderIntakeRecord() {
-      const record = state.currentRecord;
-      const records = loadSavedRecords();
-      historyCount.textContent = `${records.length} saved`;
-
-      if (!record) {
-        recordStatus.textContent = "Not submitted";
-        recordId.textContent = "Not created yet";
-        recordSaved.textContent = "Not saved yet";
-        recordSubmitted.textContent = "Not submitted yet";
-        recordNextUpdate.textContent = "Calculated when intake is submitted";
-        copyPacketButton.disabled = true;
-        downloadPacketButton.disabled = true;
-        togglePacketButton.disabled = true;
-        packetPreview.hidden = true;
-        packetPreview.textContent = "";
-      } else {
-        recordStatus.textContent = state.recordDirty ? "Unsaved edits" : "Saved";
-        recordId.textContent = record.recordId;
-        recordSaved.textContent = formatDateTime(new Date(record.savedAt));
-        recordSubmitted.textContent = formatDateTime(new Date(record.timing.submittedAt));
-        recordNextUpdate.textContent = record.timing.nextUpdateLabel;
-        copyPacketButton.disabled = false;
-        downloadPacketButton.disabled = false;
-        togglePacketButton.disabled = false;
-        if (!packetPreview.hidden) packetPreview.textContent = makeIntakePacket(record);
-      }
-
-      renderSubmissionHistory(records);
-    }
-
-    function renderSubmissionHistory(records = loadSavedRecords()) {
-      if (!records.length) {
-        const empty = document.createElement("div");
-        empty.className = "history-item";
-        const copy = document.createElement("div");
-        copy.className = "history-copy";
-        const title = document.createElement("strong");
-        const meta = document.createElement("span");
-        title.textContent = "No saved simulation submissions yet";
-        meta.textContent = "Submit intake to create the first local packet.";
-        copy.append(title, meta);
-        empty.append(copy);
-        historyList.replaceChildren(empty);
-        return;
-      }
-
-      const rows = records.map((record) => {
-        const row = document.createElement("div");
-        const copy = document.createElement("div");
-        const title = document.createElement("strong");
-        const meta = document.createElement("span");
-        const actions = document.createElement("div");
-        const load = document.createElement("button");
-        const packet = document.createElement("button");
-
-        row.className = "history-item";
-        copy.className = "history-copy";
-        actions.className = "history-actions";
-        title.textContent = `${record.incident.id} - ${record.incident.title}`;
-        meta.textContent = `${formatDateTime(new Date(record.savedAt))} | ${record.timing.tier} | Next ${record.timing.nextUpdateLabel}`;
-        load.className = "history-action";
-        load.type = "button";
-        load.textContent = "Load";
-        load.dataset.historyAction = "load";
-        load.dataset.recordId = record.recordId;
-        packet.className = "history-action";
-        packet.type = "button";
-        packet.textContent = "Packet";
-        packet.dataset.historyAction = "packet";
-        packet.dataset.recordId = record.recordId;
-
-        copy.append(title, meta);
-        actions.append(load, packet);
-        row.append(copy, actions);
-        return row;
       });
-
-      historyList.replaceChildren(...rows);
+      document.querySelector("#rail-declare").textContent = state.completed.has("threads") ? "Ready" : "Wait";
+      document.querySelector("#rail-triage").textContent = state.completed.has("card") ? "Ready" : "Wait";
+      document.querySelector("#rail-review").textContent = state.completed.has("workstream") ? "Ready" : "Wait";
+      document.querySelector("#rail-closeout").textContent = state.completed.has("closeout") ? "Ready" : "Wait";
+      renderTimeline();
+      renderLog();
+      document.querySelector("#artifact-output").textContent = artifactText();
     }
 
-    function applyRecordToForm(record) {
-      const incident = record.incident;
-      document.querySelector("#incident-title").value = incident.title || "";
-      document.querySelector("#incident-id").value = incident.id || "";
-      document.querySelector("#severity").value = incident.severity || defaults.severity;
-      document.querySelector("#owner").value = incident.owner || "";
-      document.querySelector("#audience").value = incident.audience || "";
-      document.querySelector("#deadline").value = incident.updateCadence || defaults.deadline;
-      document.querySelector("#known-facts").value = incident.knownFacts || "";
-      document.querySelector("#unknowns").value = incident.openQuestions || "";
+    function renderTimeline() {
+      const packet = state.packet || buildPacket();
+      const submitted = state.submittedAt;
+      const rows = [
+        ["Intake", submitted, "Simulation packet captured", state.submittedAt],
+        ["Space", addMinutes(submitted, 2), "Dedicated Webex space plan", state.completed.has("space")],
+        ["Card", addMinutes(submitted, 4), "Command-post card and buttons", state.completed.has("card")],
+        ["Threads", addMinutes(submitted, 6), "Phase threads seeded", state.completed.has("threads")],
+        ["Roster", addMinutes(submitted, 8), `Responder groups: ${packet.webex.responderGroups.join(", ")}`, state.completed.has("members")],
+        ["Handoffs", addMinutes(submitted, 12), "Jira, notes, tracker, and Outlook draft objects", state.completed.has("workstream")],
+        ["Closeout", state.nextUpdateAt, "Recap and lessons learned packet", state.completed.has("closeout")]
+      ];
+      document.querySelector("#timeline").innerHTML = rows.map(([label, time, detail, done]) => `
+        <div class="timeline-row ${done ? "done" : ""}">
+          <time>${time ? formatTime(time) : "Pending"}</time>
+          <div><strong>${escapeText(label)}</strong><span>${escapeText(detail)}</span></div>
+          <span class="status-pill ${done ? "done" : ""}">${done ? "Done" : "Open"}</span>
+        </div>
+      `).join("");
     }
 
-    function loadSavedRecord(recordIdValue) {
-      const record = loadSavedRecords().find((item) => item.recordId === recordIdValue);
-      if (!record) return;
-      applyRecordToForm(record);
-      state.currentRecord = record;
-      state.currentRecordId = record.recordId;
-      state.recordDirty = false;
-      state.intakeSubmittedAt = new Date(record.timing.submittedAt);
-      state.deliverablesDone = new Map((record.timing.deliverables || [])
-        .filter((item) => item.doneAt)
-        .map((item) => [item.id, new Date(item.doneAt)]));
-      state.complete = new Set(["intake"]);
-      phaseOrder.forEach((phase) => {
-        document.querySelector(`[data-phase="${phase}"]`).classList.remove("active", "done");
-        document.querySelector(`#phase-${phase}`).textContent = phase === "intake" ? "Ready" : "Waiting";
-      });
-      document.querySelector('[data-phase="intake"]').classList.add("active");
-      state.outputs = {
-        ...makeOutputs(),
-        asana: record.artifacts.task || "",
-        jira: record.artifacts.jira || "",
-        notes: record.artifacts.notes || "",
-        board: record.artifacts.board || "",
-        email: record.artifacts.email || "",
-        recap: record.artifacts.recap || ""
-      };
-      setPhase("intake", "Captured");
-      setArtifact("asana", { refresh: false });
-      renderIntakeRecord();
-      updateMetrics();
-      addLog(`Loaded saved intake packet ${record.recordId}.`);
-      showToast("Saved intake loaded");
+    function renderLog() {
+      const log = state.log.slice(0, 10);
+      document.querySelector("#activity-log").innerHTML = log.map((item, index) => `
+        <div class="log-item">
+          <span class="log-index">${String(index + 1).padStart(2, "0")}</span>
+          <span>${escapeText(item)}</span>
+        </div>
+      `).join("");
     }
 
-    function showPacketForRecord(recordIdValue) {
-      const record = loadSavedRecords().find((item) => item.recordId === recordIdValue);
-      if (!record) return;
-      packetPreview.textContent = makeIntakePacket(record);
-      packetPreview.hidden = false;
-      togglePacketButton.textContent = state.currentRecord && state.currentRecord.recordId === record.recordId ? "Hide packet" : "Show packet";
-      packetPreview.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-
-    async function copyIntakePacket() {
-      if (!state.currentRecord) return;
-      try {
-        await navigator.clipboard.writeText(makeIntakePacket(state.currentRecord));
-        showToast("Intake packet copied");
-      } catch (error) {
-        showToast("Copy failed. Select the packet manually.");
-      }
-    }
-
-    function downloadIntakeJson() {
-      if (!state.currentRecord) return;
-      const blob = new Blob([JSON.stringify(state.currentRecord, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `${safeIdPart(state.currentRecord.recordId)}.json`;
-      document.body.append(anchor);
-      anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(url);
-      showToast("JSON download started");
-    }
-
-    function togglePacketPreview() {
-      if (!state.currentRecord) return;
-      packetPreview.hidden = !packetPreview.hidden;
-      togglePacketButton.textContent = packetPreview.hidden ? "Show packet" : "Hide packet";
-      if (!packetPreview.hidden) {
-        packetPreview.textContent = makeIntakePacket(state.currentRecord);
-        packetPreview.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-    }
-
-    function markDeliverableDone(action) {
-      const item = deliverableDefinitions.find((definition) => definition.action === action);
-      if (!item || state.deliverablesDone.has(item.id)) return;
-      state.deliverablesDone.set(item.id, new Date());
-    }
-
-    function renderDeliverableTracker() {
-      if (!deliverableList) return;
-      const data = getData();
-      const profile = getTierProfile(data);
-      const schedule = getDeliverableSchedule(data);
-      const completeCount = schedule.filter((item) => item.doneAt).length;
-      const allComplete = completeCount === schedule.length;
-      const nextOpen = schedule.find((item) => !item.doneAt);
-
-      trackerTier.textContent = profile.label;
-      deliverableTracker.classList.toggle("all-complete", allComplete);
-      if (!state.intakeSubmittedAt) {
-        trackerSummary.textContent = `Ready. Submit intake to calculate exact due times.`;
-      } else if (allComplete) {
-        trackerSummary.textContent = `All ${schedule.length} deliverables complete.`;
-      } else {
-        const nextDue = nextOpen.dueAt ? formatTimeOnly(nextOpen.dueAt) : nextOpen.dueLabel;
-        trackerSummary.textContent = `${completeCount}/${schedule.length} complete. Next: ${nextOpen.label} by ${nextDue}.`;
-      }
-
-      const rows = schedule.map((item) => {
-        const row = document.createElement("div");
-        const copy = document.createElement("div");
-        const title = document.createElement("strong");
-        const meta = document.createElement("span");
-        const time = document.createElement("div");
-        const side = document.createElement("div");
-        const stateLabel = document.createElement("span");
-        const button = document.createElement("button");
-
-        row.className = `deliverable-item ${item.status}`;
-        row.dataset.deliverable = item.id;
-        copy.className = "deliverable-copy";
-        title.textContent = item.label;
-        meta.textContent = `${item.system} - ${item.detail}`;
-        time.className = "deliverable-time";
-        const dueDisplay = item.dueAt ? formatTimeOnly(item.dueAt) : item.dueLabel;
-        const doneDisplay = item.doneAt ? formatTimeOnly(item.doneAt) : "";
-        time.textContent = item.doneAt ? `Due ${dueDisplay} - done ${doneDisplay}` : `Due ${dueDisplay}`;
-        side.className = "deliverable-actions";
-        stateLabel.className = "deliverable-state";
-        stateLabel.textContent = item.statusLabel === "Late" ? "Late" : item.doneAt ? "Done" : state.intakeSubmittedAt ? "Open" : "Wait";
-        button.className = "deliverable-run";
-        button.type = "button";
-        button.textContent = state.intakeSubmittedAt ? "Run" : "Start";
-        button.setAttribute("aria-label", `Run ${item.label}`);
-        if (!item.doneAt) {
-          button.addEventListener("click", () => runAction(item.action));
-        }
-
-        copy.append(title, meta, time);
-        side.append(stateLabel);
-        if (!item.doneAt) side.append(button);
-        row.append(copy, side);
-        return row;
-      });
-
-      deliverableList.replaceChildren(...rows);
-    }
-
-    function setChip(selector, text, tone = "") {
-      const chip = document.querySelector(selector);
-      chip.textContent = text;
-      chip.className = `chip${tone ? ` ${tone}` : ""}`;
-    }
-
-    function updateMetrics() {
-      const data = getData();
-      const tier = (data.severity || "Tier").split(" - ")[0];
-      const severityText = data.severity || "";
-      const approvalState = state.complete.has("closeout") ? "Closed" : state.complete.has("approval") ? "Pending" : "Draft";
-      const intakeChip = state.complete.has("closeout") ? "Closed" : state.complete.has("intake") ? "Captured" : "Ready";
-      const tierChip = severityText.includes("Tier 4") ? "External" : severityText.includes("Tier 3") ? "Leadership" : severityText.includes("Tier 2") ? "Review" : "Monitor";
-      const tierTone = severityText.includes("Tier 4") ? "pending" : severityText.includes("Tier 2") || severityText.includes("Tier 3") ? "warn" : "";
-      const approvalChip = state.complete.has("closeout") ? "Closed" : state.complete.has("approval") ? "Review" : "Hold";
-      const approvalTone = state.complete.has("closeout") ? "" : state.complete.has("approval") ? "warn" : "pending";
-      document.querySelector("#metric-id").textContent = data.id || "Unassigned";
-      document.querySelector("#metric-tier").textContent = tier;
-      document.querySelector("#metric-approval").textContent = approvalState;
-      setChip("#chip-intake", intakeChip);
-      setChip("#chip-tier", tierChip, tierTone);
-      setChip("#chip-approval", approvalChip, approvalTone);
-      const timing = getNextUpdateInfo(data);
-      nextUpdatePreview.textContent = timing.dueLabel;
-      submittedAtPreview.textContent = timing.submittedLabel;
-      renderDeliverableTracker();
-    }
-
-    function makeOutputs() {
-      const data = getData();
-      const timing = getNextUpdateInfo(data);
-      const profile = getTierProfile(data);
-      const scheduleText = makeScheduleText(data);
-      const brandStyle = "Brand style: header #07182d, primary action #0a60ff, timing lane #00a8d6, approval accent #ad5900, blockers #c73545.";
-      return {
-        asana: `${simulationLabel} Current task tracker draft
-
-Task: [${simulationLabel}] ${data.id} - Coordinate ${data.title}
-Project: Animal Farm / Incident Command
-Owner: ${data.owner}
-Live task: https://app.clickup.com/t/86b9qw4rn
-Sync status: This draft reflects the current intake. The linked ClickUp task is the current simulation proof artifact.
-Submitted at: ${timing.submittedLabel}
-Next update due: ${timing.dueLabel}
-Cadence: ${timing.cadence}
-Tier timing: ${profile.label}
-
-Checklist:
-- Confirm owner for engineering validation.
-- Generate Jira scope review draft.
-- Generate notes draft.
-- Prepare Outlook approval email.
-- Hold external language until approval is explicit.
-
-Simulation note:
-This is a training exercise. Do not treat this as a live incident record.
-
-${scheduleText}
-
-Context:
-${data.facts}
-
-Open questions:
-${data.unknowns}`,
-
-        thread: `[Simulation Declare] ${data.id} - ${data.title}
-
-Owner: ${data.owner}
-Severity: ${data.severity}
-Audience: ${data.audience}
-Submitted at: ${timing.submittedLabel}
-Next update due: ${timing.dueLabel}
-Cadence: ${timing.cadence}
-Tier timing: ${profile.label}
-
-Simulation note:
-This is a training exercise. Do not send externally as a live incident update.
-
-Known facts:
-${data.facts}
-
-Open questions:
-${data.unknowns}
-
-${scheduleText}
-
-Next action:
-Route engineering validation, capture notes, and keep external language draft-only until approval is explicit.`,
-
-        jira: `${simulationLabel} Current Jira validation draft
-
-Summary: [${simulationLabel}] ${data.id} - Validate scope for ${data.title}
-Issue type: Task
-Live issue: https://cooperinteractive.atlassian.net/browse/KAN-3
-Priority: ${data.severity.includes("Tier 4") ? "High" : "Medium"}
-Owner: Engineering validation lead
-Sync status: This draft reflects the current intake. The linked Jira issue is the current simulation proof artifact.
-
-Simulation note:
-Training artifact only. KAN-3 is an external simulation proof issue, not a production incident.
-
-Description:
-${data.facts}
-
-${scheduleText}
-
-Acceptance criteria:
-- Identify which documents were visible.
-- Confirm who had access and whether any access occurred.
-- Confirm whether visible content was draft-only or final.
-- Attach evidence or source links.
-- Add final engineering finding to the triage record.`,
-
-        notes: `${simulationLabel} Notes draft
-
-Title: [${simulationLabel}] ${data.id} Incident Record
-
-Purpose:
-Document the scenario, decisions, approvals, and lessons learned.
-
-Simulation note:
-Training artifact only. No real customer, employee, or production data should be added.
-
-${brandStyle}
-
-Known facts:
-${data.facts}
-
-Open questions:
-${data.unknowns}
-
-Decision log:
-- Owner: ${data.owner}
-- Intake submitted: ${timing.submittedLabel}
-- First update due: ${timing.dueLabel}
-- Update cadence: ${timing.cadence}
-- Tier timing: ${profile.label}
-- Approval rule: external language remains draft-only until reviewer approval.
-
-${scheduleText}
-
-Sections:
-- Timeline
-- Decisions
-- Engineering findings
-- Approved language
-- Follow-up tasks
-- Process improvements`,
-
-        board: `${simulationLabel} Miro board brief
-
-${brandStyle}
-
-Sync status:
-This brief reflects the current intake. The page cannot create a real Miro board until an approved endpoint or Miro app workflow is connected.
-
-Next update due:
-${timing.dueLabel}
-
-Update cadence:
-${timing.cadence}
-
-Tier timing:
-${profile.label}
-
-Create four lanes:
-1. Facts
-   - ${data.title}
-   - Known facts: ${data.facts}
-   - Open questions: ${data.unknowns}
-2. Roles
-   - Owner: ${data.owner}
-   - Reviewers
-   - Engineering validation lead
-3. Deliverables
-   - Internal update
-   - Holding statement
-   - Approval request
-4. Closeout
-   - Recap
-   - Lessons learned
-   - Follow-up tasks
-
-Add a timing lane:
-${scheduleText}
-
-Simulation note:
-Training board only. Keep real incident details out of this draft.`,
-
-        email: `${simulationLabel} approval email draft
-
-Subject: [${simulationLabel}] [Approval needed] ${data.id} - holding statement
-
-Hi team,
-
-This is a simulation training exercise.
-
-Please review the draft holding update for ${data.title}.
-
-Known facts:
-${data.facts}
-
-Open questions:
-${data.unknowns}
-
-Requested decision:
-Approve, revise, or hold. External language remains draft-only until approval is explicit.
-
-Owner: ${data.owner}
-Submitted at: ${timing.submittedLabel}
-Next update due: ${timing.dueLabel}
-Update cadence: ${timing.cadence}
-Tier timing: ${profile.label}
-
-${scheduleText}`,
-
-        recap: `${simulationLabel} AI incident recap
-
-Incident:
-${data.id} - ${data.title}
-
-Executive summary:
-A possible workspace exposure was reported. The response team captured known facts, separated open questions, routed engineering validation, prepared reviewer materials, and held external language until approval.
-
-Timeline:
-- Intake captured by ${data.owner}.
-- Intake submitted: ${timing.submittedLabel}.
-- Next update due: ${timing.dueLabel} (${timing.cadence} cadence).
-- Tier timing: ${profile.label}.
-- Engineering validation task drafted.
-- Notes page drafted for decisions and evidence.
-- Response board mapped with facts, roles, deliverables, and closeout lanes.
-- Approval email drafted for reviewer decision.
-
-${scheduleText}
-
-Known facts:
-${data.facts}
-
-Open questions:
-${data.unknowns}
-
-Recommended follow-ups:
-1. Confirm access scope and evidence.
-2. Record final reviewer decision.
-3. Store approved language in the source library.
-4. Update the incident playbook if the workflow missed any owner, approval, or timing detail.
-5. Close the incident only after all follow-up tasks are assigned.`
-      };
-    }
-
-    function setArtifact(name, options = {}) {
-      const shouldRefresh = options.refresh !== false;
-      state.activeArtifact = name;
-      if (shouldRefresh) {
-        state.outputs = { ...state.outputs, ...makeOutputs() };
-      }
-      document.querySelectorAll("[data-artifact]").forEach((tab) => {
-        const isActive = tab.dataset.artifact === name;
-        tab.classList.toggle("active", isActive);
-        tab.setAttribute("aria-selected", String(isActive));
-      });
-      preview.textContent = state.outputs[name] || "";
-      refreshWorkflowLinkForArtifact(name);
-      refreshPlatformLaunchLinks();
-    }
-
-    function showLocalArtifact(name) {
-      setArtifact(name);
-      preview.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      showToast("Draft shown in this page");
+    function addMinutes(date, minutes) {
+      if (!date) return null;
+      return new Date(date.getTime() + minutes * 60 * 1000);
     }
 
     function addLog(message) {
       state.log.unshift(message);
-      state.log = state.log.slice(0, 8);
-      log.replaceChildren(...state.log.map((entry, index) => {
-        const row = document.createElement("div");
-        const time = document.createElement("span");
-        const text = document.createElement("span");
-        row.className = "log-row";
-        time.className = "log-time";
-        text.className = "log-text";
-        time.textContent = String(index + 1).padStart(2, "0");
-        text.textContent = entry;
-        row.append(time, text);
-        return row;
-      }));
+      renderLog();
     }
 
-    function setPhase(phase, label) {
-      state.complete.add(phase);
-      phaseOrder.forEach((item) => {
-        const block = document.querySelector(`[data-phase="${item}"]`);
-        const text = document.querySelector(`#phase-${item}`);
-        const itemIndex = phaseOrder.indexOf(item);
-        const phaseIndex = phaseOrder.indexOf(phase);
-        block.classList.toggle("active", item === phase);
-        block.classList.toggle("done", itemIndex < phaseIndex || state.complete.has(item));
-        if (item === phase) text.textContent = label;
-      });
-      updateMetrics();
+    function showToast(message) {
+      const toast = document.querySelector("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2400);
     }
 
-    function makeWorkflowPayload(action, outputs) {
-      const data = getData();
-      const timing = getNextUpdateInfo(data);
-      const actionConfig = workflowActions[action] || workflowActions.intake;
-      const profile = getTierProfile(data);
-      const deliverables = getDeliverableSchedule(data).map((item) => ({
-        id: item.id,
-        label: item.label,
-        system: item.system,
-        owner: item.owner,
-        dueInMinutes: item.minutes,
-        dueAt: item.dueAt ? item.dueAt.toISOString() : "",
-        doneAt: item.doneAt ? item.doneAt.toISOString() : "",
-        status: item.status,
-        simulation: true
-      }));
-      return {
-        type: "incident.workflow.action",
-        version: "2026-04-30",
-        action,
-        actionLabel: actionConfig.label,
-        targetSystem: actionConfig.system,
-        requestedOutputs: actionConfig.requestedOutputs,
-        idempotencyKey: `${data.id || "unassigned"}:${action}`,
-        incident: {
-          id: data.id,
-          title: data.title,
-          severity: data.severity,
-          owner: data.owner,
-          audience: data.audience,
-          nextUpdate: timing.dueLabel,
-          nextUpdateSummary: timing.summary,
-          nextUpdateRaw: timing.raw,
-          nextUpdateAt: timing.iso,
-          submittedAt: timing.submittedAt ? timing.submittedAt.toISOString() : "",
-          simulation: true,
-          knownFacts: data.facts,
-          openQuestions: data.unknowns
-        },
-        timing: {
-          tier: profile.label,
-          tierKey: profile.key,
-          deliverables
-        },
-        artifacts: outputs,
-        page: {
-          origin: window.location.origin,
-          path: window.location.pathname
-        }
-      };
-    }
-
-    function setGitHubTrigger(action, payload) {
-      const platformKey = platformByAction[action] || "";
-      const platform = getPlatformConfig(platformKey);
-      githubTrigger.dataset.action = action;
-      githubTrigger.dataset.platformKey = platformKey;
-      if (!platform) {
-        githubTrigger.dataset.mode = "local";
-        githubTrigger.removeAttribute("target");
-        githubTrigger.removeAttribute("rel");
-        githubTrigger.href = "#";
-        githubTrigger.textContent = "";
-        githubTrigger.hidden = true;
-        return "";
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
       }
-      githubTrigger.dataset.mode = platform.local ? "local-artifact" : "platform";
-      githubTrigger.href = platform.url;
-      if (platform.local) {
-        githubTrigger.removeAttribute("target");
-        githubTrigger.removeAttribute("rel");
-      } else {
-        githubTrigger.target = "_blank";
-        githubTrigger.rel = "noopener noreferrer";
-      }
-      githubTrigger.textContent = platform.label;
-      githubTrigger.hidden = false;
-      return platform.url;
-    }
-
-    function refreshWorkflowLinkForArtifact(name) {
-      const action = artifactActions[name] || "intake";
-      const payload = makeWorkflowPayload(action, state.outputs);
-      setGitHubTrigger(action, payload);
-    }
-
-    function attachExternalArtifactNote(action) {
-      const actionConfig = workflowActions[action] || workflowActions.intake;
-      const platform = getPlatformConfig(platformByAction[action] || "");
-      if (!platform || !platform.example || !platform.url) return false;
-      const artifact = actionConfig.artifact || state.activeArtifact;
-      const line = `${platform.label}: ${platform.url}`;
-      const current = state.outputs[artifact] || "";
-      if (!current.includes(line)) {
-        state.outputs[artifact] = `${current}\n\nExternal example link (static until endpoint sync):\n${line}`;
-      }
-      if (state.activeArtifact === artifact) {
-        preview.textContent = state.outputs[artifact] || "";
-      }
-      return true;
-    }
-
-    function isHttpUrl(value) {
-      try {
-        const url = new URL(value);
-        return url.protocol === "https:" || url.protocol === "http:";
-      } catch (error) {
-        return false;
-      }
-    }
-
-    function workflowArtifactEntries(result = {}) {
-      return Object.entries({ ...(result.artifacts || {}), ...(result.urls || {}) })
-        .filter(([, value]) => typeof value === "string" && value.trim());
-    }
-
-    function recordSyncedPlatformLinks(action, result = {}) {
-      let updated = false;
-      workflowArtifactEntries(result).forEach(([key, value]) => {
-        if (!isHttpUrl(value)) return;
-        const platformKey = artifactPlatformKeys[key] || platformByAction[action];
-        if (!platformKey) return;
-        state.syncedPlatformLinks[platformKey] = {
-          url: value,
-          label: syncedPlatformLabels[platformKey] || "Open workflow result"
-        };
-        updated = true;
-      });
-      if (updated) {
-        refreshPlatformLaunchLinks();
-        refreshWorkflowLinkForArtifact(state.activeArtifact);
-      }
-    }
-
-    function applyWorkflowResult(action, result = {}) {
-      const actionConfig = workflowActions[action] || workflowActions.intake;
-      const artifact = actionConfig.artifact || state.activeArtifact;
-      if (result.outputs && typeof result.outputs === "object") {
-        state.outputs = { ...state.outputs, ...result.outputs };
-        if (Object.prototype.hasOwnProperty.call(result.outputs, artifact)) {
-          setArtifact(artifact, { refresh: false });
-        }
-      }
-
-      recordSyncedPlatformLinks(action, result);
-
-      const links = workflowArtifactEntries(result)
-        .map(([key, value]) => `${key}: ${value}`);
-
-      if (links.length) {
-        state.outputs[artifact] = `${state.outputs[artifact] || ""}\n\nWorkflow result:\n${links.join("\n")}`;
-        setArtifact(artifact, { refresh: false });
-      }
-
-      if (Array.isArray(result.messages)) {
-        result.messages.slice(0, 3).forEach((message) => addLog(String(message)));
-      }
-    }
-
-    async function sendWorkflowEvent(action, outputs) {
-      const actionConfig = workflowActions[action] || workflowActions.intake;
-      const payload = makeWorkflowPayload(action, outputs);
-
-      if (!workflow.endpoint) {
-        const triggerUrl = setGitHubTrigger(action, payload);
-        const exampleLinked = attachExternalArtifactNote(action);
-        workflow.lastStatus = exampleLinked ? "Current draft ready; external example static" : "Local draft only";
-        addLog(exampleLinked
-          ? `${actionConfig.label} rebuilt from current intake. External example is static until endpoint sync.`
-          : `${actionConfig.label} staged in this page. Approved workflow endpoint not connected.`);
-        return { mode: exampleLinked ? "example-link" : "local", payload, triggerUrl };
-      }
-
-      githubTrigger.hidden = true;
-      workflow.lastStatus = "Sending event";
-
-      try {
-        const response = await fetch(workflow.endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok || result.ok === false) {
-          throw new Error(result.error || `Workflow endpoint returned ${response.status}`);
-        }
-        workflow.lastStatus = "Endpoint accepted";
-        applyWorkflowResult(action, result);
-        addLog(`${actionConfig.label} workflow accepted by endpoint.`);
-        return result;
-      } catch (error) {
-        workflow.lastStatus = "Endpoint failed";
-        const triggerUrl = setGitHubTrigger(action, payload);
-        addLog(`${actionConfig.label} stayed local because endpoint failed: ${error.message}`);
-        addLog(`${actionConfig.label} fallback action ready.`);
-        showToast("Endpoint failed; draft kept local");
-        return { mode: "error", error: error.message, payload, triggerUrl };
-      }
-    }
-
-    async function runAction(action) {
-      const needsSubmission = action === "intake" || !state.intakeSubmittedAt;
-      if (needsSubmission || state.recordDirty) {
-        if (!validateIntake()) return;
-      }
-      if (needsSubmission) {
-        state.intakeSubmittedAt = new Date();
-        state.currentRecordId = "";
-        state.currentRecord = null;
-      }
-      if (state.intakeSubmittedAt) {
-        state.complete.add("intake");
-      }
-      markDeliverableDone(action);
-      const outputs = makeOutputs();
-      state.outputs = { ...state.outputs, ...outputs };
-      if (state.intakeSubmittedAt) {
-        saveCurrentIntakeRecord(state.outputs);
-      }
-      document.querySelectorAll("[data-action]").forEach((button) => {
-        button.classList.toggle("active", button.dataset.action === action);
-      });
-
-      if (action === "intake") {
-        setPhase("intake", "Captured");
-        setArtifact("asana");
-        addLog("Intake submitted and current task draft ready.");
-        addLog(`Intake packet saved locally as ${state.currentRecordId}.`);
-      }
-
-      if (action === "asana") {
-        setPhase("triage", "Task draft");
-        setArtifact("asana");
-        addLog("Task tracker draft rebuilt from intake.");
-      }
-
-      if (action === "jira") {
-        setPhase("draft", "Jira draft");
-        setArtifact("jira");
-        addLog("Jira validation draft rebuilt from intake.");
-      }
-
-      if (action === "confluence") {
-        setPhase("draft", "Notes ready");
-        setArtifact("notes");
-        addLog("Notes draft generated in this page.");
-      }
-
-      if (action === "miro") {
-        setPhase("draft", "Board mapped");
-        setArtifact("board");
-        addLog("Response board update generated.");
-      }
-
-      if (action === "approval") {
-        setPhase("approval", "Email ready");
-        setArtifact("email");
-        addLog("Approval email draft completed.");
-      }
-
-      if (action === "closeout") {
-        setPhase("closeout", "Recap ready");
-        setArtifact("recap");
-        addLog("AI incident recap generated.");
-      }
-
-      renderDeliverableTracker();
-      showToast("Workflow updated");
-      await sendWorkflowEvent(action, state.outputs);
-      if (state.currentRecord) {
-        saveCurrentIntakeRecord(state.outputs);
-      }
-    }
-
-    function resetWorkflow() {
-      state.activeArtifact = "asana";
-      state.complete = new Set();
-      state.intakeSubmittedAt = null;
-      state.deliverablesDone = new Map();
-      state.currentRecord = null;
-      state.currentRecordId = "";
-      state.recordDirty = false;
-      state.syncedPlatformLinks = {};
-      state.outputs = makeOutputs();
+      state.submittedAt = new Date();
+      state.nextUpdateAt = new Date(state.submittedAt.getTime() + parseCadence(fields.cadence.value));
+      state.completed = new Set();
+      state.packet = buildPacket();
       state.log = [];
-      phaseOrder.forEach((phase) => {
-        document.querySelector(`[data-phase="${phase}"]`).classList.remove("active", "done");
-        document.querySelector(`#phase-${phase}`).textContent = phase === "intake" ? "Ready" : "Waiting";
-      });
-      document.querySelector('[data-phase="intake"]').classList.add("active");
-      document.querySelectorAll("[data-action]").forEach((button) => button.classList.remove("active"));
-      githubTrigger.hidden = true;
-      githubTrigger.href = "#";
-      log.innerHTML = "";
-      setArtifact("asana");
-      updateMetrics();
-      renderIntakeRecord();
-      refreshPlatformLaunchLinks();
-      showToast("Workflow reset");
-    }
+      addLog("Intake saved locally. No external platform write was attempted.");
+      addLog("Webex agent handoff packet rebuilt from current fields.");
+      updateUi();
+      showToast("Simulation intake saved");
+    });
 
-    function resetIntake() {
-      document.querySelector("#incident-title").value = defaults.title;
-      document.querySelector("#incident-id").value = defaults.id;
-      document.querySelector("#severity").value = defaults.severity;
-      document.querySelector("#owner").value = defaults.owner;
-      document.querySelector("#audience").value = defaults.audience;
-      document.querySelector("#deadline").value = defaults.deadline;
-      document.querySelector("#known-facts").value = defaults.facts;
-      document.querySelector("#unknowns").value = defaults.unknowns;
-      resetWorkflow();
-    }
-
-    async function copyActiveDraft() {
-      try {
-        await navigator.clipboard.writeText(preview.textContent.trim());
-        showToast("Draft copied");
-      } catch (error) {
-        showToast("Copy failed. Select the text manually.");
-      }
-    }
-
-    document.querySelector("#start-incident").addEventListener("click", () => {
-      document.querySelector("#workflow").scrollIntoView({ behavior: "smooth", block: "start" });
-      runAction("intake");
+    document.querySelector("#reset-demo").addEventListener("click", () => {
+      state.submittedAt = null;
+      state.nextUpdateAt = null;
+      state.completed = new Set();
+      state.packet = null;
+      state.log = [];
+      form.reset();
+      updateUi();
+      showToast("Demo reset");
     });
 
     document.querySelectorAll("[data-action]").forEach((button) => {
-      button.addEventListener("click", () => runAction(button.dataset.action));
+      button.addEventListener("click", () => {
+        if (!state.submittedAt) {
+          form.requestSubmit();
+        }
+        const action = button.dataset.action;
+        state.completed.add(action);
+        state.packet = buildPacket();
+        addLog(`${actionLabels[action]}. Ready for approved Webex agent handoff.`);
+        if (action === "card") state.activeTab = "card";
+        if (action === "threads") state.activeTab = "threads";
+        if (action === "workstream") state.activeTab = "api";
+        if (action === "closeout") state.activeTab = "recap";
+        syncTabs();
+        updateUi();
+        showToast(actionLabels[action]);
+      });
     });
 
-    document.querySelectorAll("[data-artifact]").forEach((button) => {
-      button.addEventListener("click", () => setArtifact(button.dataset.artifact));
+    document.querySelectorAll("[data-tab]").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        state.activeTab = tab.dataset.tab;
+        syncTabs();
+        document.querySelector("#artifact-output").textContent = artifactText();
+      });
     });
 
-    document.querySelectorAll("[data-local-artifact]").forEach((button) => {
-      button.addEventListener("click", () => showLocalArtifact(button.dataset.localArtifact));
-    });
+    function syncTabs() {
+      document.querySelectorAll("[data-tab]").forEach((tab) => {
+        tab.setAttribute("aria-selected", String(tab.dataset.tab === state.activeTab));
+      });
+    }
 
-    document.querySelectorAll("[data-run-action]").forEach((button) => {
-      button.addEventListener("click", () => runAction(button.dataset.runAction));
-    });
-
-    githubTrigger.addEventListener("click", (event) => {
-      const platform = getPlatformConfig(githubTrigger.dataset.platformKey);
-      if (platform && platform.local && platform.artifact) {
-        event.preventDefault();
-        showLocalArtifact(platform.artifact);
+    async function copyText(text) {
+      try {
+        if (!navigator.clipboard) throw new Error("Clipboard API unavailable");
+        await navigator.clipboard.writeText(text);
+        showToast("Copied");
+      } catch (error) {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        const copied = document.execCommand("copy");
+        textarea.remove();
+        showToast(copied ? "Copied" : "Copy unavailable");
       }
+    }
+
+    document.querySelector("#copy-artifact").addEventListener("click", () => copyText(artifactText()));
+
+    document.querySelector("#download-packet").addEventListener("click", () => {
+      const packet = state.packet || buildPacket();
+      const blob = new Blob([JSON.stringify(packet, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${packet.incident.id}-webex-space-packet.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      showToast("Packet downloaded");
     });
 
-    document.querySelector("#copy-artifact").addEventListener("click", copyActiveDraft);
-    copyPacketButton.addEventListener("click", copyIntakePacket);
-    downloadPacketButton.addEventListener("click", downloadIntakeJson);
-    togglePacketButton.addEventListener("click", togglePacketPreview);
-    historyList.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-history-action]");
-      if (!button) return;
-      if (button.dataset.historyAction === "load") loadSavedRecord(button.dataset.recordId);
-      if (button.dataset.historyAction === "packet") showPacketForRecord(button.dataset.recordId);
-    });
-    document.querySelector("#reset-workflow").addEventListener("click", resetWorkflow);
-    document.querySelector("#reset-intake").addEventListener("click", resetIntake);
-    form.addEventListener("input", () => {
-      clearValidation();
-      if (state.currentRecord) {
-        state.recordDirty = true;
-      }
-      state.outputs = makeOutputs();
-      setArtifact(state.activeArtifact);
-      updateMetrics();
-      renderIntakeRecord();
-      refreshPlatformLaunchLinks();
+    Object.values(fields).forEach((field) => {
+      field.addEventListener("input", () => {
+        state.packet = state.submittedAt ? buildPacket() : null;
+        updateUi();
+      });
+      field.addEventListener("change", () => {
+        state.packet = state.submittedAt ? buildPacket() : null;
+        updateUi();
+      });
     });
 
-    state.outputs = makeOutputs();
-    setArtifact("asana");
-    refreshPlatformLaunchLinks();
-    updateMetrics();
-    renderIntakeRecord();
+    updateUi();
   </script>
 </body>
 </html>

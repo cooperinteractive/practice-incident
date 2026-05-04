@@ -1,40 +1,30 @@
 # practice-incident
 
-Static incident command center training page for a Webex website shortcut.
+Static Webex incident space builder for the Practice Incident simulation.
 
-The page runs in the browser and now includes a simulation artifact pack for:
+The page is designed to live as a Webex website/content tab while staying safe as a public static site. It does not contain platform credentials, API keys, webhook secrets, private emails, real incident facts, or automatic writes to external systems.
 
-- ClickUp task tracker
-- Jira validation issue
-- Notes draft
-- Miro board brief
-- Approval email
-- AI incident recap
+The current experience generates a Webex-native operating model from one editable intake:
 
-The deployed demo uses no external workflow endpoint by default. Workflow cards update the in-page draft preview and expose contextual links. ClickUp, Jira, and notes links point to simulation proof artifacts created through the connected tools. Miro board brief and AI recap stay in the page by default because embedded browser sessions may block some platform pages. Outlook opens a compose screen using the current intake values and does not send.
+- simulation-labeled incident packet
+- dedicated Webex space plan
+- command-post card preview
+- phase thread starters
+- responder membership plan
+- Jira, notes, tracker, and Outlook handoff plan
+- AI closeout recap draft
+- downloadable JSON packet
+- copyable Webex Adaptive Card JSON
 
-When an approved endpoint is configured, workflow buttons post the current simulation intake to that server-side bridge. If the bridge returns real artifact URLs, the launch buttons update from static examples to those returned links, such as `Open ClickUp Task` or `Open Jira Issue`. The page still stores no platform credentials.
+Button behavior is intentionally local until an organization-approved Webex bot, Webex MCP workflow, or internal Webex API service is selected. The buttons update the visual room preview, timeline, activity log, and active artifact so the client can understand exactly what the eventual automation will create.
 
-Submit Intake now creates a functional local simulation packet:
+Recommended live architecture:
 
-- required-field validation
-- saved local intake record
-- exact submitted and next-update timestamps
-- copyable intake packet
-- downloadable JSON
-- saved submission history with reload
-
-This keeps the Webex/GitHub Pages version useful without putting credentials in the browser or relying on long encoded trigger URLs.
-
-External systems are modified only if the page is opened with an explicitly approved workflow endpoint:
-
-```text
-https://cooperinteractive.github.io/practice-incident/?endpoint=https://your-workflow-url
-```
-
-When an endpoint is configured, each button posts an `incident.workflow.action` JSON event. The endpoint can create or update ClickUp, Jira, notes records, Outlook, Miro, or AI outputs and return links or revised draft text to the page.
-
-Use the local endpoint starter in `../WorkflowEndpoint` for safe bridge testing only. It keeps external writes disabled by default and requires server-only environment variables before any platform adapter can write. Do not set a hosted endpoint as the default unless the endpoint host has been explicitly approved.
+1. Keep this page as the visual command tab or translate it into a native Webex App Hub surface.
+2. Let an approved Webex bot/MCP/API service own writes to Webex rooms, memberships, messages, cards, and webhooks.
+3. Keep all credentials server-side in the approved environment.
+4. Return non-secret status and artifact links to the page after each approved action.
+5. Preserve the simulation label on every generated artifact until the exercise is formally promoted.
 
 Current live page:
 
