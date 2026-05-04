@@ -1616,7 +1616,8 @@
     ];
 
     const workflowStorageKey = "practiceIncidentWorkflowEndpoint";
-    const defaultWorkflowEndpoint = "https://practice-incident-workflow.vercel.app/incident";
+    const defaultWorkflowEndpoint = "";
+    const blockedWorkflowHosts = new Set(["practice-incident-workflow.vercel.app"]);
     const pageParams = new URLSearchParams(window.location.search);
     const endpointParam = pageParams.get("endpoint");
     if (endpointParam) {
@@ -1630,6 +1631,11 @@
           localStorage.removeItem(workflowStorageKey);
         }
       }
+    }
+
+    const storedWorkflowEndpoint = getValidWorkflowEndpoint(localStorage.getItem(workflowStorageKey) || "");
+    if (storedWorkflowEndpoint && blockedWorkflowHosts.has(new URL(storedWorkflowEndpoint).hostname)) {
+      localStorage.removeItem(workflowStorageKey);
     }
 
     const workflow = {
