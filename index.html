@@ -931,7 +931,7 @@
       <div class="status-cluster" aria-label="Workflow status">
         <span class="chip safe"><span class="dot"></span>Simulation only</span>
         <span class="chip"><span class="dot"></span>Webex-native plan</span>
-        <span class="chip warn"><span class="dot"></span>No external writes</span>
+        <span class="chip warn" id="bot-mode"><span class="dot"></span>No bot endpoint</span>
       </div>
     </header>
 
@@ -1162,7 +1162,9 @@
       completed: new Set(),
       activeTab: "packet",
       log: [],
-      packet: null
+      packet: null,
+      botEndpoint: getBotEndpoint(),
+      botArtifacts: {}
     };
 
     const form = document.querySelector("#intake-form");
@@ -1191,6 +1193,25 @@
 
     function getIntake() {
       return Object.fromEntries(Object.entries(fields).map(([key, field]) => [key, field.value.trim()]));
+    }
+
+    function getBotEndpoint() {
+      const raw = new URLSearchParams(window.location.search).get("botEndpoint") || "";
+      if (!raw) return "";
+      try {
+        const url = new URL(raw);
+        if (url.protocol === "https:" || url.protocol === "http:") return url.toString();
+      } catch (error) {
+        return "";
+      }
+      return "";
+    }
+
+    function botActionEndpoint() {
+      if (!state.botEndpoint) return "";
+      const url = new URL(state.botEndpoint);
+      if (url.pathname.endsWith("/incident")) url.pathname = `${url.pathname}/action`;
+      return url.toString();
     }
 
     function parseCadence(value) {
@@ -1421,6 +1442,9 @@
       const next = state.nextUpdateAt;
       document.querySelector("#metric-id").textContent = intake.incidentId || "Draft";
       document.querySelector("#metric-room").textContent = state.completed.has("space") ? "Space staged" : "Draft space";
+      if (state.botArtifacts.roomId && !String(state.botArtifacts.roomId).startsWith("pending://")) {
+        document.querySelector("#metric-room").textContent = `Room ${String(state.botArtifacts.roomId).slice(0, 8)}`;
+      }
       document.querySelector("#metric-update").textContent = next ? formatTime(next) : "Submit intake";
       document.querySelector("#metric-state").textContent = state.completed.size === 6 ? "6/6 complete" : `${state.completed.size}/6 actions`;
       document.querySelector("#space-title").textContent = packet.webex.roomTitle;
@@ -1435,6 +1459,7 @@
       document.querySelector("#saved-state").textContent = state.submittedAt ? `Saved ${formatTime(state.submittedAt)}` : "Not submitted";
       document.querySelector("#action-count").textContent = `${state.completed.size}/6 run`;
       document.querySelector("#timeline-state").textContent = state.completed.size === 6 ? "Complete" : state.completed.size ? "In progress" : "Waiting";
+      document.querySelector("#bot-mode").innerHTML = `<span class="dot"></span>${state.botEndpoint ? "Bot endpoint armed" : "No bot endpoint"}`;
       document.querySelectorAll(".action-step").forEach((step) => {
         step.classList.toggle("done", state.completed.has(step.dataset.step));
       });
@@ -1512,6 +1537,7 @@
       state.submittedAt = new Date();
       state.nextUpdateAt = new Date(state.submittedAt.getTime() + parseCadence(fields.cadence.value));
       state.completed = new Set();
+      state.botArtifacts = {};
       state.packet = buildPacket();
       state.log = [];
       addLog("Intake saved locally. No external platform write was attempted.");
@@ -1525,6 +1551,7 @@
       state.nextUpdateAt = null;
       state.completed = new Set();
       state.packet = null;
+      state.botArtifacts = {};
       state.log = [];
       form.reset();
       updateUi();
@@ -1532,14 +1559,16 @@
     });
 
     document.querySelectorAll("[data-action]").forEach((button) => {
-      button.addEventListener("click", () => {
+      button.addEventListener("click", async () => {
         if (!state.submittedAt) {
           form.requestSubmit();
+          if (!state.submittedAt) return;
         }
         const action = button.dataset.action;
         state.completed.add(action);
         state.packet = buildPacket();
         addLog(`${actionLabels[action]}. Ready for approved Webex agent handoff.`);
+        await triggerBotAction(action);
         if (action === "card") state.activeTab = "card";
         if (action === "threads") state.activeTab = "threads";
         if (action === "workstream") state.activeTab = "api";
@@ -1549,6 +1578,36 @@
         showToast(actionLabels[action]);
       });
     });
+
+    async function triggerBotAction(action) {
+      const endpoint = botActionEndpoint();
+      if (!endpoint || !state.packet) return;
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action,
+            packet: state.packet,
+            artifacts: state.botArtifacts,
+            page: {
+              origin: window.location.origin,
+              path: window.location.pathname
+            }
+          })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.ok) {
+          addLog(`Bot action ${action} did not complete: ${result.error || response.status}.`);
+          return;
+        }
+        state.botArtifacts = { ...state.botArtifacts, ...(result.artifacts || {}) };
+        const mode = result.mode === "external_write" ? "live write" : "dry run";
+        addLog(`Webex bot ${mode} accepted ${action}.`);
+      } catch (error) {
+        addLog(`Webex bot endpoint unreachable for ${action}.`);
+      }
+    }
 
     document.querySelectorAll("[data-tab]").forEach((tab) => {
       tab.addEventListener("click", () => {
