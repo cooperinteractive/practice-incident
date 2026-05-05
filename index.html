@@ -1307,6 +1307,16 @@
       return url.toString();
     }
 
+    function hostedPageCannotReachLocalBot() {
+      if (!state.botEndpoint || window.location.protocol !== "https:") return false;
+      try {
+        const endpoint = new URL(state.botEndpoint);
+        return endpoint.protocol === "http:" && ["127.0.0.1", "localhost", "::1"].includes(endpoint.hostname);
+      } catch (error) {
+        return false;
+      }
+    }
+
     function commandCenterActionUrl(action) {
       const url = new URL(window.location.href);
       if (action) url.searchParams.set("demoAction", action);
@@ -1778,6 +1788,10 @@
     async function loadPacketFromBot() {
       const endpoint = packetEndpoint();
       if (!endpoint) return false;
+      if (hostedPageCannotReachLocalBot()) {
+        addLog("Hosted page cannot reach the local bot over HTTP. Open the local bot-served command center URL for packet-loaded demos.");
+        return false;
+      }
       try {
         const response = await fetch(endpoint, { headers: { "Accept": "application/json" } });
         const result = await response.json();
@@ -1954,6 +1968,17 @@
         state.nativeStatus = null;
         renderNativeStatus();
         return null;
+      }
+
+      if (hostedPageCannotReachLocalBot()) {
+        state.nativeStatus = {
+          ok: false,
+          visible: false,
+          detail: "Hosted page cannot reach the local bot over HTTP. Use the local bot URL for live packet demos."
+        };
+        renderNativeStatus();
+        addLog(state.nativeStatus.detail);
+        return state.nativeStatus;
       }
 
       try {
