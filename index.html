@@ -1703,7 +1703,8 @@
 
       if (status.visible) {
         title.textContent = status.room?.title || status.targetRoomTitle || "Practice Incident";
-        detail.textContent = `Connected as ${status.botEmail || "Practice Incident bot"}.`;
+        const mode = status.writesEnabled ? "Live Webex write mode" : "Dry-run mode";
+        detail.textContent = `Connected as ${status.botEmail || "Practice Incident bot"}. ${mode}.`;
         return;
       }
 
