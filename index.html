@@ -369,6 +369,54 @@
       overflow-wrap: anywhere;
     }
 
+    .native-strip {
+      margin-top: 10px;
+      min-height: 72px;
+      padding: 13px 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(26, 35, 48, 0.08);
+    }
+
+    .native-strip span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 820;
+      margin-bottom: 4px;
+    }
+
+    .native-strip strong {
+      display: block;
+      font-size: 16px;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .native-strip small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .native-strip.ready {
+      border-color: #b9e6e3;
+      background: linear-gradient(180deg, #ffffff 0%, #f0fbfa 100%);
+    }
+
+    .native-strip.blocked {
+      border-color: #f0c892;
+      background: linear-gradient(180deg, #ffffff 0%, #fff8ec 100%);
+    }
+
     .stage {
       display: contents;
     }
@@ -861,6 +909,7 @@
       .topbar,
       .field-grid,
       .metrics,
+      .native-strip,
       .post-grid,
       .phase-grid,
       .space-content {
@@ -951,6 +1000,18 @@
       <div class="metric">
         <span>Provisioning</span>
         <strong id="metric-state">Local plan</strong>
+      </div>
+    </section>
+
+    <section class="native-strip" id="native-strip" aria-label="Native Webex target">
+      <div>
+        <span>Native Webex target</span>
+        <strong id="native-title">Practice Incident</strong>
+        <small id="native-detail">Checking channel visibility...</small>
+      </div>
+      <div class="button-row">
+        <button class="button secondary" type="button" id="check-native">Check channel</button>
+        <button class="button secondary" type="button" id="copy-bot-email">Copy bot email</button>
       </div>
     </section>
 
@@ -1122,6 +1183,7 @@
           <button class="tab" role="tab" aria-selected="false" data-tab="card">Webex card JSON</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="threads">Thread starters</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="api">Bot API plan</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="action">Action output</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="recap">AI recap</button>
         </div>
         <div class="panel-body">
@@ -1147,6 +1209,7 @@
 
   <script>
     const iconCheck = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const packetStorageKey = "practiceIncidentLastPacket";
     const phases = ["Declare", "Triage", "Draft", "Approval", "Closeout"];
     const actionLabels = {
       space: "Webex space plan created",
@@ -1164,7 +1227,10 @@
       log: [],
       packet: null,
       botEndpoint: getBotEndpoint(),
-      botArtifacts: {}
+      botArtifacts: {},
+      nativeStatus: null,
+      packetId: getPacketId(),
+      demoAction: getDemoAction()
     };
 
     const form = document.querySelector("#intake-form");
@@ -1207,10 +1273,47 @@
       return "";
     }
 
+    function getDemoAction() {
+      const raw = new URLSearchParams(window.location.search).get("demoAction") || "";
+      return ["triage", "draft_update", "approval", "closeout"].includes(raw) ? raw : "";
+    }
+
+    function getPacketId() {
+      const raw = new URLSearchParams(window.location.search).get("packetId") || "";
+      return raw.replace(/[^a-z0-9_.-]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 96);
+    }
+
     function botActionEndpoint() {
       if (!state.botEndpoint) return "";
       const url = new URL(state.botEndpoint);
       if (url.pathname.endsWith("/incident")) url.pathname = `${url.pathname}/action`;
+      return url.toString();
+    }
+
+    function nativeStatusEndpoint() {
+      if (!state.botEndpoint) return "";
+      const url = new URL(state.botEndpoint);
+      url.pathname = "/native/status";
+      url.search = "";
+      return url.toString();
+    }
+
+    function packetEndpoint() {
+      if (!state.botEndpoint || !state.packetId) return "";
+      const url = new URL(state.botEndpoint);
+      url.pathname = "/incident/packet";
+      url.search = "";
+      url.searchParams.set("packetId", state.packetId);
+      return url.toString();
+    }
+
+    function commandCenterActionUrl(action) {
+      const url = new URL(window.location.href);
+      if (action) url.searchParams.set("demoAction", action);
+      else url.searchParams.delete("demoAction");
+      if (state?.botEndpoint) url.searchParams.set("botEndpoint", state.botEndpoint);
+      const packetId = state?.packet?.recordId || state?.packetId || "";
+      if (packetId) url.searchParams.set("packetId", packetId);
       return url.toString();
     }
 
@@ -1249,7 +1352,7 @@
       const roomTitle = `[SIMULATION] ${intake.incidentId} - ${intake.title}`;
       return {
         simulation: true,
-        recordId: `${intake.incidentId}-${submittedAt.toISOString().replace(/[-:]/g, "").slice(0, 13)}Z`,
+        recordId: state.packetId || `${intake.incidentId}-${submittedAt.toISOString().replace(/[-:]/g, "").slice(0, 13)}Z`,
         incident: {
           id: intake.incidentId,
           title: intake.title,
@@ -1337,10 +1440,11 @@
             { type: "TextBlock", text: intake.questions, wrap: true }
           ],
           actions: [
-            { type: "Action.Submit", title: "Run triage", data: { action: "triage", incidentId: intake.incidentId } },
-            { type: "Action.Submit", title: "Draft update", data: { action: "draft_update", incidentId: intake.incidentId } },
-            { type: "Action.Submit", title: "Request approval", data: { action: "approval", incidentId: intake.incidentId } },
-            { type: "Action.Submit", title: "Close scenario", data: { action: "closeout", incidentId: intake.incidentId } }
+            { type: "Action.OpenUrl", title: "Open command center", url: commandCenterActionUrl("") },
+            { type: "Action.OpenUrl", title: "Run triage", url: commandCenterActionUrl("triage") },
+            { type: "Action.OpenUrl", title: "Draft update", url: commandCenterActionUrl("draft_update") },
+            { type: "Action.OpenUrl", title: "Request approval", url: commandCenterActionUrl("approval") },
+            { type: "Action.OpenUrl", title: "Close scenario", url: commandCenterActionUrl("closeout") }
           ]
         }
       };
@@ -1427,11 +1531,95 @@
       ].join("\n");
     }
 
+    function actionTitle(action = state.demoAction) {
+      return {
+        triage: "Run triage",
+        draft_update: "Draft update",
+        approval: "Request approval",
+        closeout: "Close scenario"
+      }[action] || "Card action";
+    }
+
+    function buildActionOutput(action = state.demoAction) {
+      const packet = state.packet || buildPacket();
+      const incident = packet.incident;
+      const nextUpdate = formatDateTime(new Date(incident.nextUpdateAt));
+      if (action === "triage") {
+        return [
+          `[SIMULATION] TRIAGE OUTPUT - ${incident.id}`,
+          "",
+          `Incident: ${incident.title}`,
+          `Owner: ${incident.owner}`,
+          `Tier: ${incident.tier}`,
+          `Affected audience: ${incident.audience}`,
+          `Next update due: ${nextUpdate}`,
+          "",
+          "Immediate triage tasks:",
+          "1. Confirm scope and affected audience.",
+          "2. Identify evidence needed before any external update.",
+          "3. Route review to the approved response, legal, privacy, and engineering owners.",
+          "4. Keep all facts simulation-labeled until a human reviewer approves the next step.",
+          "",
+          "Known facts:",
+          incident.knownFacts || "None recorded.",
+          "",
+          "Open questions:",
+          incident.openQuestions || "None recorded."
+        ].join("\n");
+      }
+      if (action === "draft_update") {
+        return [
+          `[SIMULATION] DRAFT STATUS UPDATE - ${incident.id}`,
+          "",
+          `Subject: [SIMULATION] ${incident.id} status update - ${incident.title}`,
+          "",
+          "Draft body:",
+          `We are coordinating a simulation response for ${incident.title}. The current owner is ${incident.owner}. The current tier is ${incident.tier}.`,
+          "",
+          `Next update target: ${nextUpdate}`,
+          "",
+          "Current known facts:",
+          incident.knownFacts || "None recorded.",
+          "",
+          "Items still being validated:",
+          incident.openQuestions || "None recorded.",
+          "",
+          "This is a training draft only. Do not send externally without explicit human approval."
+        ].join("\n");
+      }
+      if (action === "approval") {
+        return [
+          `[SIMULATION] APPROVAL PACKET - ${incident.id}`,
+          "",
+          `Incident: ${incident.title}`,
+          `Owner: ${incident.owner}`,
+          `Tier: ${incident.tier}`,
+          `Next update due: ${nextUpdate}`,
+          "",
+          "Approval checklist:",
+          "- Facts reviewed",
+          "- Open questions acknowledged",
+          "- Audience confirmed",
+          "- Draft language approved or held",
+          "- Follow-up owner assigned",
+          "",
+          "Recommended decision options:",
+          "1. Approve simulation update.",
+          "2. Hold pending more facts.",
+          "3. Request changes to the draft.",
+          "",
+          "Simulation note: this page does not send approvals or emails automatically."
+        ].join("\n");
+      }
+      return buildRecap();
+    }
+
     function artifactText(tab = state.activeTab) {
       const packet = state.packet || buildPacket();
       if (tab === "card") return JSON.stringify(packet.webex.adaptiveCard, null, 2);
       if (tab === "threads") return packet.webex.threadStarters.map((thread) => thread.markdown).join("\n\n---\n\n");
       if (tab === "api") return JSON.stringify(buildApiPlan(), null, 2);
+      if (tab === "action") return buildActionOutput();
       if (tab === "recap") return buildRecap();
       return JSON.stringify(packet, null, 2);
     }
@@ -1454,12 +1642,15 @@
       document.querySelector("#post-tier").textContent = intake.tier;
       document.querySelector("#post-update").textContent = next ? formatDateTime(next) : "Submit intake";
       document.querySelector("#post-badge").textContent = state.completed.has("card") ? "Card staged" : "Draft card";
-      document.querySelector("#bot-message").innerHTML = `<strong>Incident concierge</strong><br>${escapeText(state.completed.has("space") ? "Dedicated Webex space plan is staged for the approved bot or MCP workflow." : "Submit and provision the space plan before routing responders.")}`;
+      document.querySelector("#bot-message").innerHTML = state.demoAction
+        ? `<strong>${escapeText(actionTitle())}</strong><br>${escapeText("Opened from a Webex card button. The output is ready in the Action output tab.")}`
+        : `<strong>Incident concierge</strong><br>${escapeText(state.packetId ? "Loaded from a Webex bot intake packet." : state.completed.has("space") ? "Dedicated Webex space plan is staged for the approved bot or MCP workflow." : "Submit and provision the space plan before routing responders.")}`;
       document.querySelector("#human-message").innerHTML = `<strong>Command post</strong><br>${escapeText(next ? `Next simulation update is due ${formatDateTime(next)}.` : "All artifacts remain local until intake is submitted.")}`;
       document.querySelector("#saved-state").textContent = state.submittedAt ? `Saved ${formatTime(state.submittedAt)}` : "Not submitted";
       document.querySelector("#action-count").textContent = `${state.completed.size}/6 run`;
       document.querySelector("#timeline-state").textContent = state.completed.size === 6 ? "Complete" : state.completed.size ? "In progress" : "Waiting";
       document.querySelector("#bot-mode").innerHTML = `<span class="dot"></span>${state.botEndpoint ? "Bot endpoint armed" : "No bot endpoint"}`;
+      renderNativeStatus();
       document.querySelectorAll(".action-step").forEach((step) => {
         step.classList.toggle("done", state.completed.has(step.dataset.step));
       });
@@ -1477,6 +1668,36 @@
       renderTimeline();
       renderLog();
       document.querySelector("#artifact-output").textContent = artifactText();
+    }
+
+    function renderNativeStatus() {
+      const strip = document.querySelector("#native-strip");
+      const title = document.querySelector("#native-title");
+      const detail = document.querySelector("#native-detail");
+      const status = state.nativeStatus;
+      strip.classList.toggle("ready", Boolean(status?.visible));
+      strip.classList.toggle("blocked", Boolean(status && !status.visible));
+
+      if (!state.botEndpoint) {
+        title.textContent = "No bot endpoint";
+        detail.textContent = "Open the bot-served URL to check native Webex status.";
+        return;
+      }
+
+      if (!status) {
+        title.textContent = "Practice Incident";
+        detail.textContent = "Checking channel visibility...";
+        return;
+      }
+
+      if (status.visible) {
+        title.textContent = status.room?.title || status.targetRoomTitle || "Practice Incident";
+        detail.textContent = `Connected as ${status.botEmail || "Practice Incident bot"}.`;
+        return;
+      }
+
+      title.textContent = status.targetRoomTitle || "Practice Incident";
+      detail.textContent = status.detail || `Add ${status.botEmail || "the bot"} to this Webex space.`;
     }
 
     function renderTimeline() {
@@ -1528,6 +1749,97 @@
       showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2400);
     }
 
+    function savePacketForCardActions() {
+      if (!state.packet) return;
+      try {
+        window.localStorage.setItem(packetStorageKey, JSON.stringify(state.packet));
+      } catch (error) {
+        addLog("Could not save local packet for card actions.");
+      }
+    }
+
+    function restorePacketForCardActions() {
+      if (!state.demoAction || state.packetId) return;
+      try {
+        const raw = window.localStorage.getItem(packetStorageKey);
+        if (!raw) return;
+        const packet = JSON.parse(raw);
+        if (!packet?.simulation || !packet.incident) return;
+        populateFieldsFromPacket(packet);
+        state.submittedAt = packet.incident.submittedAt ? new Date(packet.incident.submittedAt) : new Date();
+        state.nextUpdateAt = packet.incident.nextUpdateAt ? new Date(packet.incident.nextUpdateAt) : new Date(state.submittedAt.getTime() + parseCadence(fields.cadence.value));
+        state.packet = buildPacket();
+        addLog(`Opened ${actionTitle()} from a Webex card button.`);
+      } catch (error) {
+        addLog("Could not restore the last local packet for this card action.");
+      }
+    }
+
+    async function loadPacketFromBot() {
+      const endpoint = packetEndpoint();
+      if (!endpoint) return false;
+      try {
+        const response = await fetch(endpoint, { headers: { "Accept": "application/json" } });
+        const result = await response.json();
+        if (!response.ok || !result.ok || !result.packet?.incident) {
+          addLog(`Could not load packet ${state.packetId}: ${result.error || response.status}.`);
+          return false;
+        }
+        applyPacket(result.packet);
+        savePacketForCardActions();
+        addLog(`Loaded simulation packet ${state.packetId} from the Webex bot.`);
+        return true;
+      } catch (error) {
+        addLog(`Could not reach the bot packet store for ${state.packetId}.`);
+        return false;
+      }
+    }
+
+    function applyPacket(packet) {
+      state.packetId = packet.recordId || state.packetId;
+      populateFieldsFromPacket(packet);
+      state.submittedAt = packet.incident.submittedAt ? new Date(packet.incident.submittedAt) : new Date();
+      state.nextUpdateAt = packet.incident.nextUpdateAt ? new Date(packet.incident.nextUpdateAt) : new Date(state.submittedAt.getTime() + parseCadence(fields.cadence.value));
+      state.packet = buildPacket();
+      state.packet.recordId = state.packetId || state.packet.recordId;
+    }
+
+    function populateFieldsFromPacket(packet) {
+      setFieldValue(fields.title, packet.incident.title);
+      setFieldValue(fields.incidentId, packet.incident.id);
+      setFieldValue(fields.tier, packet.incident.tier);
+      setFieldValue(fields.owner, packet.incident.owner);
+      setFieldValue(fields.audience, packet.incident.audience);
+      setFieldValue(fields.cadence, packet.incident.updateCadence);
+      setFieldValue(fields.source, packet.incident.source);
+      setFieldValue(fields.responders, (packet.webex?.responderGroups || []).join(", "));
+      setFieldValue(fields.facts, packet.incident.knownFacts);
+      setFieldValue(fields.questions, packet.incident.openQuestions);
+    }
+
+    function setFieldValue(field, value) {
+      if (!field || value === undefined || value === null || value === "") return;
+      const stringValue = String(value);
+      if (field.tagName === "SELECT" && !Array.from(field.options).some((option) => option.value === stringValue)) {
+        field.add(new Option(stringValue, stringValue));
+      }
+      field.value = stringValue;
+    }
+
+    function applyDemoAction() {
+      if (!state.demoAction) return;
+      if (!state.submittedAt) {
+        state.submittedAt = new Date();
+        state.nextUpdateAt = new Date(state.submittedAt.getTime() + parseCadence(fields.cadence.value));
+        state.packet = buildPacket();
+      }
+      state.activeTab = "action";
+      if (state.demoAction === "triage") state.completed.add("card");
+      if (state.demoAction === "draft_update" || state.demoAction === "approval") state.completed.add("workstream");
+      if (state.demoAction === "closeout") state.completed.add("closeout");
+      addLog(`${actionTitle()} output generated locally for demo.`);
+    }
+
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       if (!form.checkValidity()) {
@@ -1538,7 +1850,9 @@
       state.nextUpdateAt = new Date(state.submittedAt.getTime() + parseCadence(fields.cadence.value));
       state.completed = new Set();
       state.botArtifacts = {};
+      state.packetId = "";
       state.packet = buildPacket();
+      savePacketForCardActions();
       state.log = [];
       addLog("Intake saved locally. No external platform write was attempted.");
       addLog("Webex agent handoff packet rebuilt from current fields.");
@@ -1551,8 +1865,14 @@
       state.nextUpdateAt = null;
       state.completed = new Set();
       state.packet = null;
+      state.packetId = "";
       state.botArtifacts = {};
       state.log = [];
+      try {
+        window.localStorage.removeItem(packetStorageKey);
+      } catch (error) {
+        // Ignore localStorage reset failures.
+      }
       form.reset();
       updateUi();
       showToast("Demo reset");
@@ -1565,10 +1885,25 @@
           if (!state.submittedAt) return;
         }
         const action = button.dataset.action;
-        state.completed.add(action);
         state.packet = buildPacket();
+        addLog(`${actionLabels[action]} requested.`);
+        if (action === "space") {
+          const nativeStatus = await checkNativeStatus();
+          if (nativeStatus && nativeStatus.visible === false) {
+            addLog(nativeStatus.detail || "Native Webex target is not visible to the bot yet.");
+            updateUi();
+            showToast("Practice Incident not connected");
+            return;
+          }
+        }
+        const triggerResult = await triggerBotAction(action);
+        if (!triggerResult.ok) {
+          updateUi();
+          showToast(`${actionLabels[action]} failed`);
+          return;
+        }
+        state.completed.add(action);
         addLog(`${actionLabels[action]}. Ready for approved Webex agent handoff.`);
-        await triggerBotAction(action);
         if (action === "card") state.activeTab = "card";
         if (action === "threads") state.activeTab = "threads";
         if (action === "workstream") state.activeTab = "api";
@@ -1581,7 +1916,7 @@
 
     async function triggerBotAction(action) {
       const endpoint = botActionEndpoint();
-      if (!endpoint || !state.packet) return;
+      if (!endpoint || !state.packet) return { ok: true, skipped: true };
       try {
         const response = await fetch(endpoint, {
           method: "POST",
@@ -1598,14 +1933,42 @@
         });
         const result = await response.json();
         if (!response.ok || !result.ok) {
-          addLog(`Bot action ${action} did not complete: ${result.error || response.status}.`);
-          return;
+          addLog(`Bot action ${action} did not complete: ${result.detail || result.error || response.status}.`);
+          if (action === "space") await checkNativeStatus();
+          return { ok: false, result };
         }
         state.botArtifacts = { ...state.botArtifacts, ...(result.artifacts || {}) };
         const mode = result.mode === "external_write" ? "live write" : "dry run";
         addLog(`Webex bot ${mode} accepted ${action}.`);
+        if (action === "space") await checkNativeStatus();
+        return { ok: true, result };
       } catch (error) {
         addLog(`Webex bot endpoint unreachable for ${action}.`);
+        return { ok: false, error };
+      }
+    }
+
+    async function checkNativeStatus() {
+      const endpoint = nativeStatusEndpoint();
+      if (!endpoint) {
+        state.nativeStatus = null;
+        renderNativeStatus();
+        return null;
+      }
+
+      try {
+        const response = await fetch(endpoint, { headers: { "Accept": "application/json" } });
+        const result = await response.json();
+        state.nativeStatus = result;
+        renderNativeStatus();
+        if (result.visible) addLog(`Native Webex target visible: ${result.room?.title || result.targetRoomTitle}.`);
+        else addLog(`Native Webex target not visible: ${result.detail || result.error || "not connected"}.`);
+        return result;
+      } catch (error) {
+        state.nativeStatus = { ok: false, visible: false, detail: "Native status check failed." };
+        renderNativeStatus();
+        addLog("Native Webex status check failed.");
+        return state.nativeStatus;
       }
     }
 
@@ -1644,6 +2007,16 @@
 
     document.querySelector("#copy-artifact").addEventListener("click", () => copyText(artifactText()));
 
+    document.querySelector("#check-native").addEventListener("click", async () => {
+      await checkNativeStatus();
+      showToast(state.nativeStatus?.visible ? "Practice Incident connected" : "Practice Incident not visible");
+    });
+
+    document.querySelector("#copy-bot-email").addEventListener("click", () => {
+      const email = state.nativeStatus?.botEmail || "cooper-practice-incident@webex.bot";
+      copyText(email);
+    });
+
     document.querySelector("#download-packet").addEventListener("click", () => {
       const packet = state.packet || buildPacket();
       const blob = new Blob([JSON.stringify(packet, null, 2)], { type: "application/json" });
@@ -1667,7 +2040,16 @@
       });
     });
 
-    updateUi();
+    async function init() {
+      restorePacketForCardActions();
+      await loadPacketFromBot();
+      applyDemoAction();
+      syncTabs();
+      updateUi();
+      checkNativeStatus();
+    }
+
+    init();
   </script>
 </body>
 </html>
