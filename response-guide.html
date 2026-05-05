@@ -1,0 +1,1492 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Incident Response Field Guide</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a6b73'/%3E%3Cpath d='M20 34h24M26 24h12M26 44h18' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10151c;
+      --bg-2: #161d27;
+      --panel: #f7f9fb;
+      --panel-2: #ffffff;
+      --ink: #111720;
+      --muted: #5d6775;
+      --soft: #8490a0;
+      --line: #d8dee8;
+      --line-dark: rgba(255, 255, 255, 0.15);
+      --white: #ffffff;
+      --teal: #0a6b73;
+      --blue: #1667d9;
+      --amber: #c97518;
+      --coral: #ce5b43;
+      --green: #177450;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+      --radius: 8px;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background:
+        linear-gradient(180deg, var(--bg) 0, #121922 540px, #eef3f7 540px, #f7f9fb 100%);
+      color: var(--ink);
+      font-family: var(--sans);
+      letter-spacing: 0;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 88px);
+      opacity: 0.35;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(22, 103, 217, 0.38);
+      outline-offset: 2px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
+      width: min(1420px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 20px 0 36px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px;
+      color: var(--white);
+      background: rgba(22, 29, 39, 0.94);
+      border: 1px solid var(--line-dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .lockup {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--teal), var(--blue));
+      flex: 0 0 auto;
+    }
+
+    .mark svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    h1 {
+      font-size: clamp(24px, 3vw, 42px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subcopy {
+      margin-top: 6px;
+      max-width: 840px;
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .toolbar,
+    .button-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .toolbar {
+      justify-content: flex-end;
+    }
+
+    .button {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 10px 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      color: var(--white);
+      background: var(--blue);
+      font-size: 13px;
+      font-weight: 820;
+      line-height: 1;
+      text-decoration: none;
+      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease, border-color 150ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 13px 28px rgba(22, 103, 217, 0.26);
+    }
+
+    .button.secondary {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .button.secondary:hover {
+      background: rgba(255, 255, 255, 0.13);
+      box-shadow: 0 13px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .button.light {
+      color: var(--ink);
+      background: var(--panel-2);
+      border-color: var(--line);
+    }
+
+    .button.light:hover {
+      box-shadow: 0 12px 26px rgba(26, 35, 48, 0.14);
+    }
+
+    .button.safe {
+      background: var(--teal);
+    }
+
+    .button.warn {
+      background: var(--amber);
+    }
+
+    .button svg {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+    }
+
+    .notice {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin-top: 14px;
+      padding: 12px 14px;
+      color: #fff4e8;
+      background: rgba(201, 117, 24, 0.18);
+      border: 1px solid rgba(201, 117, 24, 0.42);
+      border-radius: var(--radius);
+    }
+
+    .notice strong {
+      display: block;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .notice span {
+      color: rgba(255, 244, 232, 0.84);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .notice .button.secondary {
+      color: var(--white);
+      background: rgba(17, 23, 32, 0.28);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      gap: 8px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--amber);
+    }
+
+    .start-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .phase-jump {
+      min-height: 66px;
+      border: 1px solid rgba(255, 255, 255, 0.17);
+      border-radius: var(--radius);
+      display: grid;
+      align-content: center;
+      gap: 5px;
+      padding: 12px;
+      cursor: pointer;
+      text-align: left;
+      color: rgba(255, 255, 255, 0.82);
+      background: #252d38;
+      transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+    }
+
+    .phase-jump:hover,
+    .phase-jump.active {
+      transform: translateY(-1px);
+      border-color: rgba(255, 255, 255, 0.34);
+      background: #303a46;
+    }
+
+    .phase-jump strong {
+      color: var(--white);
+      font-size: 14px;
+    }
+
+    .phase-jump span {
+      font-size: 12px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      min-height: 86px;
+      padding: 13px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(215, 221, 230, 0.9);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.55fr);
+      gap: 16px;
+      margin-top: 16px;
+      align-items: start;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.48fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel,
+    .phase-card,
+    .rail,
+    .role-card {
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(215, 221, 230, 0.94);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 15px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .panel-meta {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .phase-list {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .phase-card {
+      width: 100%;
+      min-width: 0;
+      display: grid;
+      gap: 9px;
+      padding: 13px;
+      cursor: pointer;
+      text-align: left;
+      color: var(--ink);
+      box-shadow: none;
+      transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+    }
+
+    .phase-card:hover,
+    .phase-card.active {
+      transform: translateY(-1px);
+      border-color: rgba(10, 107, 115, 0.45);
+      background: #f1fbfa;
+    }
+
+    .phase-card.done {
+      background: #eef8f2;
+      border-color: rgba(23, 116, 80, 0.34);
+    }
+
+    .phase-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .phase-head > span:first-child {
+      min-width: 0;
+    }
+
+    .phase-kicker {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .phase-card h2,
+    .detail h2 {
+      color: var(--ink);
+      font-size: 20px;
+      line-height: 1.15;
+    }
+
+    .phase-card p,
+    .detail p,
+    .role-card p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .status-label {
+      min-width: 92px;
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: #eef2f7;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .status-label.done {
+      color: #0f5f3f;
+      background: #dff4e9;
+    }
+
+    .detail {
+      overflow: hidden;
+    }
+
+    .detail-body {
+      display: grid;
+      gap: 14px;
+      padding: 16px;
+    }
+
+    .detail-hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .phase-number {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      color: var(--white);
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--teal), var(--blue));
+      font-weight: 900;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .micro-section {
+      min-height: 168px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .micro-section strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .micro-section ul,
+    .checklist ul,
+    .summary-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .micro-section li,
+    .checklist li,
+    .summary-list li {
+      position: relative;
+      padding-left: 18px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .micro-section li::before,
+    .checklist li::before,
+    .summary-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.63em;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .decision-grid {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .question {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    .question strong {
+      font-size: 14px;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .segmented button {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: #f7f9fb;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 820;
+    }
+
+    .segmented button.active {
+      color: var(--white);
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+
+    .recommendations {
+      margin: 0 14px 14px;
+      padding: 13px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(201, 117, 24, 0.32);
+      background: #fff7ed;
+    }
+
+    .recommendations h3 {
+      font-size: 14px;
+      margin-bottom: 9px;
+    }
+
+    .rail {
+      position: sticky;
+      top: 14px;
+      overflow: hidden;
+    }
+
+    .rail-body {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    select,
+    textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #cfd7e2;
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: #fff;
+      padding: 10px 11px;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    select:focus,
+    textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(22, 103, 217, 0.12);
+      outline: none;
+    }
+
+    .summary {
+      min-height: 220px;
+      padding: 12px;
+      border: 1px solid #cfd7e2;
+      border-radius: var(--radius);
+      background: #0f1720;
+      color: rgba(255, 255, 255, 0.88);
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .roles {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .role-card {
+      display: grid;
+      gap: 10px;
+      min-height: 176px;
+      padding: 13px;
+      box-shadow: 0 16px 36px rgba(26, 35, 48, 0.11);
+    }
+
+    .role-card h3 {
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .role-actions {
+      margin-top: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .tiny-button {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .tiny-button:hover {
+      border-color: rgba(10, 107, 115, 0.45);
+      background: #f1fbfa;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      max-width: min(420px, calc(100% - 36px));
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      color: var(--white);
+      background: #111720;
+      box-shadow: var(--shadow);
+      transform: translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .presenter .decision-panel,
+    .presenter .roles,
+    .presenter .support-copy {
+      display: none;
+    }
+
+    .presenter .workbench {
+      grid-template-columns: 1fr;
+    }
+
+    .presenter .main-grid {
+      grid-template-columns: 0.42fr 1fr;
+    }
+
+    .presenter .rail {
+      position: static;
+    }
+
+    @media (max-width: 1180px) {
+      .topbar,
+      .workbench,
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .rail {
+        position: static;
+      }
+
+      .roles {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 860px) {
+      .page-shell {
+        width: min(100% - 20px, 1420px);
+        padding-top: 10px;
+      }
+
+      .notice,
+      .status-grid,
+      .section-grid,
+      .roles {
+        grid-template-columns: 1fr;
+      }
+
+      .start-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .topbar {
+        padding: 13px;
+      }
+
+      .lockup {
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .start-strip,
+      .segmented,
+      .role-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .button,
+      .button.light,
+      .button.secondary,
+      .tiny-button {
+        width: 100%;
+      }
+
+      .toolbar,
+      .button-row {
+        align-items: stretch;
+      }
+
+      .detail-hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .toolbar,
+      .start-strip,
+      .phase-list,
+      .decision-panel,
+      .roles,
+      .notice button {
+        display: none !important;
+      }
+
+      .page-shell {
+        width: 100%;
+        padding: 0;
+      }
+
+      .topbar,
+      .rail,
+      .detail,
+      .stat {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="lockup">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M5 5.5h14v13H5z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 9h8M8 12h8M8 15h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>[SIMULATION] Incident Response Field Guide</h1>
+          <p class="subcopy">A cleaner, interactive training guide for the first response window. Keep the room calm, capture what matters, and move the scenario into the command center when the team is ready.</p>
+        </div>
+      </div>
+      <nav class="toolbar" aria-label="Guide controls">
+        <span class="pill"><span class="dot"></span>Training guide</span>
+        <button class="button secondary" type="button" id="presenter-toggle">Presenter mode</button>
+        <button class="button secondary" type="button" id="copy-checklist">Copy checklist</button>
+        <a class="button" id="open-command-center" href="index.html">Open command center</a>
+      </nav>
+    </header>
+
+    <section class="notice" aria-label="Training data notice">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3 21 20H3L12 3Z" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M12 9v5M12 17.2v.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <strong>Training scenario only</strong>
+        <span>Do not enter real incident, client, employee, credential, or confidential data. This page is static and credential-free.</span>
+      </div>
+      <button class="button secondary" type="button" id="reset-guide">Reset simulation</button>
+    </section>
+
+    <section class="start-strip" aria-label="Start here">
+      <button class="phase-jump" type="button" data-jump="stabilize"><strong>Stabilize</strong><span>Name the lead and start the clock.</span></button>
+      <button class="phase-jump" type="button" data-jump="contain"><strong>Contain</strong><span>Protect systems and preserve evidence.</span></button>
+      <button class="phase-jump" type="button" data-jump="coordinate"><strong>Coordinate</strong><span>Bring the right roles into the room.</span></button>
+      <button class="phase-jump" type="button" data-jump="communicate"><strong>Communicate</strong><span>Draft careful updates on cadence.</span></button>
+      <button class="phase-jump" type="button" data-jump="recover"><strong>Recover</strong><span>Validate restore and capture learning.</span></button>
+    </section>
+
+    <section class="status-grid" aria-label="Guide summary">
+      <div class="stat">
+        <span>Current phase</span>
+        <strong id="current-phase">Stabilize</strong>
+      </div>
+      <div class="stat">
+        <span>Progress</span>
+        <strong id="progress-stat">0/5 done</strong>
+      </div>
+      <div class="stat">
+        <span>Update rhythm</span>
+        <strong id="cadence-stat">30 min</strong>
+      </div>
+      <div class="stat">
+        <span>Next checkpoint</span>
+        <strong id="checkpoint-stat">Set cadence</strong>
+      </div>
+    </section>
+
+    <main class="workbench">
+      <section class="main-grid" aria-label="Interactive response guide">
+        <aside class="panel" aria-label="Response phases">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Response phases</div>
+              <div class="panel-meta">Five focused moves</div>
+            </div>
+          </div>
+          <div class="phase-list" id="phase-list"></div>
+        </aside>
+
+        <article class="panel detail" aria-live="polite">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="detail-title">Stabilize the room</div>
+              <div class="panel-meta" id="detail-meta">Phase 01</div>
+            </div>
+            <div class="button-row">
+              <button class="button light" type="button" id="copy-step">Copy step brief</button>
+              <button class="button safe" type="button" id="mark-phase">Mark done</button>
+            </div>
+          </div>
+          <div class="detail-body">
+            <div class="detail-hero">
+              <div>
+                <h2 id="active-heading">Stabilize the room</h2>
+                <p id="active-purpose">Name the lead, open the working space, and slow the first few decisions down.</p>
+              </div>
+              <div class="phase-number" id="active-number">01</div>
+            </div>
+            <div class="section-grid" id="section-grid"></div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="rail" aria-label="Guide actions and summary">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Live packet</div>
+            <div class="panel-meta">Browser-only simulation</div>
+          </div>
+        </div>
+        <div class="rail-body">
+          <div class="field">
+            <label for="severity">Scenario urgency</label>
+            <select id="severity">
+              <option value="Advisory">Advisory - 60 minutes</option>
+              <option value="Elevated">Elevated - 30 minutes</option>
+              <option value="Urgent">Urgent - 15 minutes</option>
+              <option value="Critical">Critical - 10 minutes</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="situation">Situation note</label>
+            <textarea id="situation">[SIMULATION] Practice scenario opened for incident response training. No real incident facts entered.</textarea>
+          </div>
+          <div class="button-row">
+            <a class="button light" id="open-intake" href="index.html">Open intake</a>
+            <button class="button light" type="button" id="draft-update">Draft update</button>
+            <button class="button light" type="button" id="timeline-note">Timeline note</button>
+            <button class="button warn" type="button" id="build-summary">Build summary</button>
+          </div>
+          <pre class="summary" id="summary-output" tabindex="0"></pre>
+          <div class="button-row">
+            <button class="button light" type="button" id="copy-summary">Copy summary</button>
+            <button class="button light" type="button" id="download-summary">Download .md</button>
+            <button class="button light" type="button" id="print-guide">Print / Save PDF</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="panel decision-panel" aria-label="Decision prompts">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Decision prompts</div>
+          <div class="panel-meta">Answers shape the next recommended move</div>
+        </div>
+      </div>
+      <div class="decision-grid" id="decision-grid"></div>
+      <div class="recommendations">
+        <h3>Recommended next moves</h3>
+        <ul class="summary-list" id="recommendation-list"></ul>
+      </div>
+    </section>
+
+    <section class="roles" aria-label="Response roles" id="roles"></section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const phases = [
+      {
+        id: "stabilize",
+        title: "Stabilize the room",
+        short: "Stabilize",
+        purpose: "Name the lead, open the working space, and slow the first few decisions down.",
+        owner: "Incident lead",
+        now: ["Assign a single lead for the next 30 minutes.", "Open the incident room and start a timeline.", "Write known facts and unknowns separately."],
+        capture: ["First report time", "Initial systems or audiences mentioned", "Who has authority for the next call"],
+        avoid: ["Guessing scope", "Deleting logs", "Crowding the room before roles are clear"],
+        checkpoint: "Lead named and first facts captured."
+      },
+      {
+        id: "contain",
+        title: "Contain the exposure",
+        short: "Contain",
+        purpose: "Reduce further damage while preserving the evidence needed for later decisions.",
+        owner: "Technical lead",
+        now: ["Identify affected systems and accounts.", "Isolate only what needs isolation.", "Protect clean backups and recovery paths."],
+        capture: ["Systems touched", "Accounts changed or disabled", "Evidence preserved before changes"],
+        avoid: ["Wiping machines too early", "Restoring from unverified sources", "Treating backup access as automatically safe"],
+        checkpoint: "Affected scope is bounded enough for the next update."
+      },
+      {
+        id: "coordinate",
+        title: "Coordinate the response",
+        short: "Coordinate",
+        purpose: "Bring in the right roles without turning the room into a crowd.",
+        owner: "Incident lead",
+        now: ["Add technical, communications, and risk owners.", "Set a working cadence and decision owner.", "Keep a simple approval trail."],
+        capture: ["Role assignments", "Decision owner", "Update cadence and reviewer path"],
+        avoid: ["Inviting people without a role", "Making side-channel decisions", "Letting old drafts circulate"],
+        checkpoint: "Roles are assigned and the next update time is visible."
+      },
+      {
+        id: "communicate",
+        title: "Communicate carefully",
+        short: "Communicate",
+        purpose: "Give useful updates without speculating, overpromising, or losing review control.",
+        owner: "Communications lead",
+        now: ["Draft a short internal update.", "Prepare external language only if needed.", "Route sensitive language through the approved reviewer."],
+        capture: ["Audience", "Approved facts", "Next promised update"],
+        avoid: ["Stating root cause too early", "Using blame language", "Sending updates without owner approval"],
+        checkpoint: "Draft update is ready for review, not auto-sent."
+      },
+      {
+        id: "recover",
+        title: "Recover and learn",
+        short: "Recover",
+        purpose: "Validate the restore, close the loop, and turn the scenario into better readiness.",
+        owner: "Technical lead",
+        now: ["Confirm clean restoration criteria.", "Document what changed and why.", "Turn follow-ups into owners and dates."],
+        capture: ["Restore validation", "Final timeline", "Follow-up backlog"],
+        avoid: ["Calling recovery complete without validation", "Losing temporary workaround notes", "Ending without an after-action review"],
+        checkpoint: "Closeout recap and follow-up list are ready."
+      }
+    ];
+
+    const decisionPrompts = [
+      { id: "disruption", label: "Is there active service disruption?", yes: "Prioritize containment and a workaround before deeper analysis." },
+      { id: "data", label: "Is sensitive data exposure suspected?", yes: "Bring legal/privacy into review before external language moves forward." },
+      { id: "external", label: "Will customers or partners need an update?", yes: "Draft a holding update and keep a visible next-update time." },
+      { id: "recovery", label: "Are recovery systems available?", yes: "Validate the recovery source before switching traffic or restoring service." }
+    ];
+
+    const roles = [
+      { id: "incident-lead", title: "Incident lead", brief: "Owns pace, decisions, room hygiene, and the next checkpoint." },
+      { id: "technical-lead", title: "Technical lead", brief: "Owns containment, evidence, recovery criteria, and technical facts." },
+      { id: "communications", title: "Communications", brief: "Owns plain-language updates and review-ready message drafts." },
+      { id: "legal-risk", title: "Legal / risk", brief: "Reviews sensitive language, regulatory triggers, and preservation needs." },
+      { id: "customer-support", title: "Customer support", brief: "Prepares customer impact notes and inbound response guidance." }
+    ];
+
+    const cadenceBySeverity = {
+      Advisory: 60,
+      Elevated: 30,
+      Urgent: 15,
+      Critical: 10
+    };
+
+    const storageKey = "practiceIncident.responseGuide.v1";
+    const defaultState = {
+      active: "stabilize",
+      done: [],
+      severity: "Elevated",
+      situation: "[SIMULATION] Practice scenario opened for incident response training. No real incident facts entered.",
+      decisions: { disruption: "unknown", data: "unknown", external: "unknown", recovery: "unknown" },
+      assigned: [],
+      presenter: false,
+      startedAt: new Date().toISOString()
+    };
+
+    const state = loadState();
+
+    const els = {
+      phaseList: document.getElementById("phase-list"),
+      sectionGrid: document.getElementById("section-grid"),
+      currentPhase: document.getElementById("current-phase"),
+      progressStat: document.getElementById("progress-stat"),
+      cadenceStat: document.getElementById("cadence-stat"),
+      checkpointStat: document.getElementById("checkpoint-stat"),
+      detailTitle: document.getElementById("detail-title"),
+      detailMeta: document.getElementById("detail-meta"),
+      activeHeading: document.getElementById("active-heading"),
+      activePurpose: document.getElementById("active-purpose"),
+      activeNumber: document.getElementById("active-number"),
+      severity: document.getElementById("severity"),
+      situation: document.getElementById("situation"),
+      summary: document.getElementById("summary-output"),
+      decisions: document.getElementById("decision-grid"),
+      recommendations: document.getElementById("recommendation-list"),
+      roles: document.getElementById("roles"),
+      toast: document.getElementById("toast"),
+      presenterToggle: document.getElementById("presenter-toggle"),
+      openCommandCenter: document.getElementById("open-command-center"),
+      openIntake: document.getElementById("open-intake")
+    };
+
+    function loadState() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(storageKey) || "null");
+        return { ...defaultState, ...(parsed || {}) };
+      } catch {
+        return { ...defaultState };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function currentPhase() {
+      return phases.find((phase) => phase.id === state.active) || phases[0];
+    }
+
+    function isDone(id) {
+      return state.done.includes(id);
+    }
+
+    function setActive(id) {
+      state.active = id;
+      saveState();
+      render();
+      document.querySelector(".detail")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function toggleDone(id) {
+      state.done = isDone(id) ? state.done.filter((item) => item !== id) : [...state.done, id];
+      saveState();
+      render();
+    }
+
+    function nextUpdateDate() {
+      const minutes = cadenceBySeverity[state.severity] || 30;
+      return new Date(Date.now() + minutes * 60000);
+    }
+
+    function formatTime(date) {
+      return new Intl.DateTimeFormat([], { hour: "numeric", minute: "2-digit", timeZoneName: "short" }).format(date);
+    }
+
+    function updateLocalLinks() {
+      const isLocalBot = location.hostname === "127.0.0.1" && location.port === "8790";
+      const url = isLocalBot
+        ? `/ui?botEndpoint=${encodeURIComponent(`${location.origin}/incident`)}`
+        : "index.html";
+      els.openCommandCenter.href = url;
+      els.openIntake.href = url;
+    }
+
+    function render() {
+      const phase = currentPhase();
+      const phaseIndex = phases.findIndex((item) => item.id === phase.id) + 1;
+      document.body.classList.toggle("presenter", Boolean(state.presenter));
+      els.presenterToggle.textContent = state.presenter ? "Exit presenter" : "Presenter mode";
+      els.severity.value = state.severity;
+      els.situation.value = state.situation;
+      els.currentPhase.textContent = phase.short;
+      els.progressStat.textContent = `${state.done.length}/5 done`;
+      els.cadenceStat.textContent = `${cadenceBySeverity[state.severity]} min`;
+      els.checkpointStat.textContent = formatTime(nextUpdateDate());
+      els.detailTitle.textContent = phase.title;
+      els.detailMeta.textContent = `Phase ${String(phaseIndex).padStart(2, "0")}`;
+      els.activeHeading.textContent = phase.title;
+      els.activePurpose.textContent = phase.purpose;
+      els.activeNumber.textContent = String(phaseIndex).padStart(2, "0");
+      document.querySelectorAll("[data-jump]").forEach((button) => button.classList.toggle("active", button.dataset.jump === phase.id));
+
+      els.phaseList.innerHTML = phases.map((item, index) => `
+        <button class="phase-card ${item.id === phase.id ? "active" : ""} ${isDone(item.id) ? "done" : ""}" type="button" data-phase="${item.id}">
+          <span class="phase-head">
+            <span>
+              <span class="phase-kicker">Phase ${String(index + 1).padStart(2, "0")}</span>
+              <h2>${escapeHtml(item.short)}</h2>
+            </span>
+            <span class="status-label ${isDone(item.id) ? "done" : ""}">${isDone(item.id) ? "Done" : item.id === phase.id ? "Active" : "Open"}</span>
+          </span>
+          <p>${escapeHtml(item.purpose)}</p>
+        </button>
+      `).join("");
+
+      els.sectionGrid.innerHTML = sectionMarkup("Do now", phase.now)
+        + sectionMarkup("Capture", phase.capture)
+        + sectionMarkup("Avoid", phase.avoid);
+
+      document.getElementById("mark-phase").textContent = isDone(phase.id) ? "Reopen phase" : "Mark done";
+      renderDecisions();
+      renderRoles();
+      els.summary.textContent = buildSummary();
+      saveState();
+    }
+
+    function sectionMarkup(title, items) {
+      return `
+        <section class="micro-section">
+          <strong>${escapeHtml(title)}</strong>
+          <ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        </section>
+      `;
+    }
+
+    function renderDecisions() {
+      els.decisions.innerHTML = decisionPrompts.map((prompt) => `
+        <section class="question">
+          <strong>${escapeHtml(prompt.label)}</strong>
+          <div class="segmented" role="group" aria-label="${escapeHtml(prompt.label)}">
+            ${["yes", "no", "unknown"].map((value) => `
+              <button type="button" class="${state.decisions[prompt.id] === value ? "active" : ""}" data-decision="${prompt.id}" data-value="${value}">${labelFor(value)}</button>
+            `).join("")}
+          </div>
+        </section>
+      `).join("");
+
+      const recommendations = buildRecommendations();
+      els.recommendations.innerHTML = recommendations.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+    }
+
+    function renderRoles() {
+      els.roles.innerHTML = roles.map((role) => {
+        const assigned = state.assigned.includes(role.id);
+        return `
+          <article class="role-card">
+            <div>
+              <h3>${escapeHtml(role.title)}</h3>
+              <p>${escapeHtml(role.brief)}</p>
+            </div>
+            <span class="status-label ${assigned ? "done" : ""}">${assigned ? "Assigned" : "Placeholder"}</span>
+            <div class="role-actions">
+              <button class="tiny-button" type="button" data-role-assign="${role.id}">${assigned ? "Unassign" : "Assign"}</button>
+              <button class="tiny-button" type="button" data-role-copy="${role.id}">Copy brief</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function buildRecommendations() {
+      const items = [];
+      decisionPrompts.forEach((prompt) => {
+        if (state.decisions[prompt.id] === "yes") items.push(prompt.yes);
+      });
+      if (!items.length) items.push("Keep the first move simple: name the lead, start the clock, and separate facts from unknowns.");
+      if (state.done.length < phases.length) items.push(`Next phase to complete: ${currentPhase().short}.`);
+      return items.slice(0, 5);
+    }
+
+    function buildSummary() {
+      const phase = currentPhase();
+      const doneTitles = phases.filter((item) => isDone(item.id)).map((item) => item.short).join(", ") || "None yet";
+      const assignedRoles = roles.filter((role) => state.assigned.includes(role.id)).map((role) => role.title).join(", ") || "Assigned in command center";
+      return [
+        `[SIMULATION] Incident Response Field Guide`,
+        "",
+        `Situation: ${state.situation}`,
+        `Current phase: ${phase.short}`,
+        `Next checkpoint: ${formatTime(nextUpdateDate())}`,
+        `Update rhythm: ${state.severity} (${cadenceBySeverity[state.severity]} minutes)`,
+        `Completed phases: ${doneTitles}`,
+        `Roles: ${assignedRoles}`,
+        "",
+        "What to do now:",
+        ...phase.now.map((item) => `- ${item}`),
+        "",
+        "Capture:",
+        ...phase.capture.map((item) => `- ${item}`),
+        "",
+        "Decision notes:",
+        ...buildRecommendations().map((item) => `- ${item}`),
+        "",
+        "Training note: simulation material only. Do not add real incident, client, employee, credential, or confidential data."
+      ].join("\n");
+    }
+
+    function buildStepBrief() {
+      const phase = currentPhase();
+      return [
+        `[SIMULATION] ${phase.title}`,
+        phase.purpose,
+        "",
+        `Owner: ${phase.owner}`,
+        `Next checkpoint: ${formatTime(nextUpdateDate())}`,
+        "",
+        "Do now:",
+        ...phase.now.map((item) => `- ${item}`),
+        "",
+        "Capture:",
+        ...phase.capture.map((item) => `- ${item}`),
+        "",
+        `Avoid: ${phase.avoid.join("; ")}`
+      ].join("\n");
+    }
+
+    function buildChecklist() {
+      return phases.map((phase, index) => [
+        `[SIMULATION] ${index + 1}. ${phase.title}`,
+        `Purpose: ${phase.purpose}`,
+        `Owner: ${phase.owner}`,
+        ...phase.now.map((item) => `- ${item}`)
+      ].join("\n")).join("\n\n");
+    }
+
+    function buildTimelineNote() {
+      const phase = currentPhase();
+      return `[SIMULATION] Timeline note - ${formatTime(new Date())}\nPhase: ${phase.short}\nCheckpoint due: ${formatTime(nextUpdateDate())}\nNote: ${phase.checkpoint}`;
+    }
+
+    function buildUpdateDraft() {
+      return [
+        "[SIMULATION] Update draft",
+        "",
+        `We are working through a practice response scenario. Current phase: ${currentPhase().short}.`,
+        `What we know: ${state.situation}`,
+        `Next checkpoint: ${formatTime(nextUpdateDate())}.`,
+        "No real incident facts or confidential information are included in this draft."
+      ].join("\n");
+    }
+
+    async function copyText(text, label) {
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          textarea.remove();
+        }
+        showToast(`${label} copied.`);
+      } catch {
+        showToast(`Could not copy ${label.toLowerCase()}. Select the text and copy manually.`);
+      }
+    }
+
+    function downloadMarkdown() {
+      const blob = new Blob([buildSummary()], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `SIM-response-guide-${new Date().toISOString().slice(0, 10)}.md`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast("Simulation summary downloaded.");
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => els.toast.classList.remove("show"), 2600);
+    }
+
+    function labelFor(value) {
+      if (value === "yes") return "Yes";
+      if (value === "no") return "No";
+      return "Unknown";
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    document.addEventListener("click", (event) => {
+      const phaseButton = event.target.closest("[data-phase]");
+      if (phaseButton) setActive(phaseButton.dataset.phase);
+
+      const jumpButton = event.target.closest("[data-jump]");
+      if (jumpButton) setActive(jumpButton.dataset.jump);
+
+      const decisionButton = event.target.closest("[data-decision]");
+      if (decisionButton) {
+        state.decisions[decisionButton.dataset.decision] = decisionButton.dataset.value;
+        saveState();
+        render();
+      }
+
+      const assignButton = event.target.closest("[data-role-assign]");
+      if (assignButton) {
+        const roleId = assignButton.dataset.roleAssign;
+        state.assigned = state.assigned.includes(roleId)
+          ? state.assigned.filter((item) => item !== roleId)
+          : [...state.assigned, roleId];
+        saveState();
+        render();
+      }
+
+      const copyRoleButton = event.target.closest("[data-role-copy]");
+      if (copyRoleButton) {
+        const role = roles.find((item) => item.id === copyRoleButton.dataset.roleCopy);
+        if (role) copyText(`[SIMULATION] ${role.title}\n${role.brief}`, `${role.title} brief`);
+      }
+    });
+
+    document.getElementById("mark-phase").addEventListener("click", () => toggleDone(state.active));
+    document.getElementById("copy-step").addEventListener("click", () => copyText(buildStepBrief(), "Step brief"));
+    document.getElementById("copy-checklist").addEventListener("click", () => copyText(buildChecklist(), "Checklist"));
+    document.getElementById("copy-summary").addEventListener("click", () => copyText(buildSummary(), "Summary"));
+    document.getElementById("download-summary").addEventListener("click", downloadMarkdown);
+    document.getElementById("print-guide").addEventListener("click", () => window.print());
+    document.getElementById("build-summary").addEventListener("click", () => {
+      els.summary.textContent = buildSummary();
+      els.summary.focus();
+      showToast("Simulation summary rebuilt.");
+    });
+    document.getElementById("draft-update").addEventListener("click", () => copyText(buildUpdateDraft(), "Update draft"));
+    document.getElementById("timeline-note").addEventListener("click", () => copyText(buildTimelineNote(), "Timeline note"));
+    document.getElementById("reset-guide").addEventListener("click", () => {
+      localStorage.removeItem(storageKey);
+      Object.assign(state, { ...defaultState, startedAt: new Date().toISOString() });
+      render();
+      showToast("Simulation reset.");
+    });
+    els.presenterToggle.addEventListener("click", () => {
+      state.presenter = !state.presenter;
+      saveState();
+      render();
+    });
+    els.severity.addEventListener("change", () => {
+      state.severity = els.severity.value;
+      saveState();
+      render();
+    });
+    els.situation.addEventListener("input", () => {
+      state.situation = els.situation.value;
+      saveState();
+      els.summary.textContent = buildSummary();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && state.presenter) {
+        state.presenter = false;
+        saveState();
+        render();
+      }
+    });
+
+    updateLocalLinks();
+    render();
+  </script>
+</body>
+</html>
