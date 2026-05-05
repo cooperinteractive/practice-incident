@@ -1230,6 +1230,7 @@
       botArtifacts: {},
       nativeStatus: null,
       packetId: getPacketId(),
+      packetLoaded: false,
       demoAction: getDemoAction()
     };
 
@@ -1362,7 +1363,7 @@
       const roomTitle = `[SIMULATION] ${intake.incidentId} - ${intake.title}`;
       return {
         simulation: true,
-        recordId: state.packetId || `${intake.incidentId}-${submittedAt.toISOString().replace(/[-:]/g, "").slice(0, 13)}Z`,
+        recordId: state.packetLoaded && state.packetId ? state.packetId : `${intake.incidentId}-${submittedAt.toISOString().replace(/[-:]/g, "").slice(0, 13)}Z`,
         incident: {
           id: intake.incidentId,
           title: intake.title,
@@ -1654,7 +1655,7 @@
       document.querySelector("#post-badge").textContent = state.completed.has("card") ? "Card staged" : "Draft card";
       document.querySelector("#bot-message").innerHTML = state.demoAction
         ? `<strong>${escapeText(actionTitle())}</strong><br>${escapeText("Opened from a Webex card button. The output is ready in the Action output tab.")}`
-        : `<strong>Incident concierge</strong><br>${escapeText(state.packetId ? "Loaded from a Webex bot intake packet." : state.completed.has("space") ? "Dedicated Webex space plan is staged for the approved bot or MCP workflow." : "Submit and provision the space plan before routing responders.")}`;
+        : `<strong>Incident concierge</strong><br>${escapeText(state.packetLoaded ? "Loaded from a Webex bot intake packet." : state.packetId ? "Packet ID present; waiting for bot packet access." : state.completed.has("space") ? "Dedicated Webex space plan is staged for the approved bot or MCP workflow." : "Submit and provision the space plan before routing responders.")}`;
       document.querySelector("#human-message").innerHTML = `<strong>Command post</strong><br>${escapeText(next ? `Next simulation update is due ${formatDateTime(next)}.` : "All artifacts remain local until intake is submitted.")}`;
       document.querySelector("#saved-state").textContent = state.submittedAt ? `Saved ${formatTime(state.submittedAt)}` : "Not submitted";
       document.querySelector("#action-count").textContent = `${state.completed.size}/6 run`;
@@ -1779,6 +1780,7 @@
         state.submittedAt = packet.incident.submittedAt ? new Date(packet.incident.submittedAt) : new Date();
         state.nextUpdateAt = packet.incident.nextUpdateAt ? new Date(packet.incident.nextUpdateAt) : new Date(state.submittedAt.getTime() + parseCadence(fields.cadence.value));
         state.packet = buildPacket();
+        state.packetLoaded = true;
         addLog(`Opened ${actionTitle()} from a Webex card button.`);
       } catch (error) {
         addLog("Could not restore the last local packet for this card action.");
@@ -1816,6 +1818,7 @@
       state.nextUpdateAt = packet.incident.nextUpdateAt ? new Date(packet.incident.nextUpdateAt) : new Date(state.submittedAt.getTime() + parseCadence(fields.cadence.value));
       state.packet = buildPacket();
       state.packet.recordId = state.packetId || state.packet.recordId;
+      state.packetLoaded = true;
     }
 
     function populateFieldsFromPacket(packet) {
@@ -1865,6 +1868,7 @@
       state.completed = new Set();
       state.botArtifacts = {};
       state.packetId = "";
+      state.packetLoaded = false;
       state.packet = buildPacket();
       savePacketForCardActions();
       state.log = [];
@@ -1880,6 +1884,7 @@
       state.completed = new Set();
       state.packet = null;
       state.packetId = "";
+      state.packetLoaded = false;
       state.botArtifacts = {};
       state.log = [];
       try {
