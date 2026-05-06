@@ -1,0 +1,1328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>[SIMULATION] Crisis Communications Playbook</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231667d9'/%3E%3Cpath d='M18 19h28v21H27l-9 7V19Z' fill='none' stroke='white' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10151c;
+      --bg-2: #161d27;
+      --panel: #f7f9fb;
+      --panel-2: #ffffff;
+      --ink: #111720;
+      --muted: #5d6775;
+      --soft: #8490a0;
+      --line: #d8dee8;
+      --line-dark: rgba(255, 255, 255, 0.15);
+      --white: #ffffff;
+      --teal: #0a6b73;
+      --blue: #1667d9;
+      --amber: #c97518;
+      --coral: #ce5b43;
+      --green: #177450;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+      --radius: 8px;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background:
+        linear-gradient(180deg, var(--bg) 0, #121922 520px, #eef3f7 520px, #f7f9fb 100%);
+      color: var(--ink);
+      font-family: var(--sans);
+      letter-spacing: 0;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 88px);
+      opacity: 0.35;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(22, 103, 217, 0.38);
+      outline-offset: 2px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
+      width: min(1420px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 20px 0 36px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px;
+      color: var(--white);
+      background: rgba(22, 29, 39, 0.94);
+      border: 1px solid var(--line-dark);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .lockup {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      flex: 0 0 auto;
+    }
+
+    .mark svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    h1 {
+      font-size: clamp(24px, 3vw, 42px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subcopy {
+      margin-top: 6px;
+      max-width: 920px;
+      color: rgba(255, 255, 255, 0.74);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .toolbar,
+    .button-row,
+    .chip-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .toolbar {
+      justify-content: flex-end;
+    }
+
+    .button {
+      min-height: 44px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 10px 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      color: var(--white);
+      background: var(--blue);
+      font-size: 13px;
+      font-weight: 820;
+      line-height: 1;
+      text-decoration: none;
+      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease, border-color 150ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 13px 28px rgba(22, 103, 217, 0.26);
+    }
+
+    .button.secondary {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .button.secondary:hover {
+      background: rgba(255, 255, 255, 0.13);
+      box-shadow: 0 13px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .button.light {
+      color: var(--ink);
+      background: var(--white);
+      border-color: var(--line);
+    }
+
+    .button.ghost {
+      color: var(--blue);
+      background: rgba(22, 103, 217, 0.08);
+      border-color: rgba(22, 103, 217, 0.18);
+    }
+
+    .pill,
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .pill {
+      min-height: 34px;
+      padding: 7px 11px;
+      color: rgba(255, 255, 255, 0.82);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .mini-pill {
+      padding: 5px 8px;
+      color: var(--muted);
+      background: #edf2f7;
+      border: 1px solid var(--line);
+      font-size: 11px;
+      font-weight: 820;
+      text-transform: uppercase;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(23, 116, 80, 0.18);
+    }
+
+    .notice {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      color: var(--white);
+      background: linear-gradient(135deg, rgba(10, 107, 115, 0.95), rgba(22, 103, 217, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .notice svg {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 14px;
+    }
+
+    .notice span {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .hero {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .hero-panel,
+    .brief-panel,
+    .section,
+    .builder,
+    .output-panel {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 12px 34px rgba(17, 23, 32, 0.08);
+    }
+
+    .hero-panel {
+      padding: clamp(22px, 4vw, 42px);
+      min-height: 360px;
+      display: grid;
+      align-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      bottom: -160px;
+      width: 360px;
+      height: 360px;
+      border: 44px solid rgba(22, 103, 217, 0.09);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .hero h2 {
+      margin-top: 10px;
+      max-width: 820px;
+      font-size: clamp(34px, 5vw, 68px);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      margin-top: 16px;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .principles {
+      margin-top: 24px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .principle {
+      min-height: 104px;
+      padding: 13px;
+      border-radius: var(--radius);
+      background: #f1f5f9;
+      border: 1px solid var(--line);
+    }
+
+    .principle strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .principle span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .brief-panel {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 2px;
+    }
+
+    .panel-title h2,
+    .section h2,
+    .builder h2,
+    .output-panel h2 {
+      font-size: 19px;
+      line-height: 1.15;
+    }
+
+    .panel-title p,
+    .section > p,
+    .builder > p,
+    .output-panel > p {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .status-board {
+      display: grid;
+      gap: 10px;
+    }
+
+    .status-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #f8fafc;
+    }
+
+    .step-number {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: var(--white);
+      background: var(--ink);
+      border-radius: var(--radius);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .status-item strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .status-item span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .status-item button {
+      min-width: 82px;
+    }
+
+    .status-item.active {
+      border-color: rgba(22, 103, 217, 0.44);
+      box-shadow: inset 4px 0 0 var(--blue);
+      background: #f3f7ff;
+    }
+
+    .content-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(380px, 1.05fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .section,
+    .builder,
+    .output-panel {
+      padding: 16px;
+    }
+
+    .stage-tabs {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .stage-tab {
+      min-height: 76px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #f8fafc;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .stage-tab:hover {
+      transform: translateY(-1px);
+      border-color: rgba(22, 103, 217, 0.34);
+    }
+
+    .stage-tab[aria-selected="true"] {
+      background: #f3f7ff;
+      border-color: rgba(22, 103, 217, 0.48);
+      box-shadow: inset 0 -4px 0 var(--blue);
+    }
+
+    .stage-tab strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .stage-tab span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .stage-detail {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .detail-box {
+      min-height: 152px;
+      padding: 13px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #fbfdff;
+    }
+
+    .detail-box h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .detail-box ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .detail-box li + li {
+      margin-top: 7px;
+    }
+
+    .roles-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .role-card {
+      padding: 13px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #fbfdff;
+    }
+
+    .role-card strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .role-card p {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .form-grid {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 820;
+      text-transform: uppercase;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 11px 12px;
+      color: var(--ink);
+      background: #fbfdff;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .output {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .draft {
+      padding: 14px;
+      min-height: 132px;
+      white-space: pre-wrap;
+      color: var(--ink);
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .decision-list {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .decision {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdff;
+    }
+
+    .decision input {
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      accent-color: var(--blue);
+    }
+
+    .decision strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .decision span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .decision.complete {
+      opacity: 0.68;
+      text-decoration: line-through;
+    }
+
+    .timeline {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfdff;
+    }
+
+    .timeline-row time {
+      color: var(--blue);
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .timeline-row strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .timeline-row p {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      max-width: min(360px, calc(100% - 36px));
+      padding: 12px 14px;
+      color: var(--white);
+      background: rgba(17, 23, 32, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1100px) {
+      .topbar,
+      .hero,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+      }
+
+      .principles,
+      .stage-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page-shell {
+        width: min(100% - 20px, 1420px);
+        padding-top: 10px;
+      }
+
+      .topbar,
+      .notice,
+      .status-item,
+      .stage-detail,
+      .roles-grid,
+      .form-grid,
+      .timeline-row {
+        grid-template-columns: 1fr;
+      }
+
+      .lockup {
+        align-items: flex-start;
+      }
+
+      .hero-panel {
+        min-height: 0;
+      }
+
+      .principles,
+      .stage-tabs {
+        grid-template-columns: 1fr;
+      }
+
+      .button,
+      .toolbar > * {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="lockup">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M5 7h14v9H9l-4 4V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M9 10h6M9 13h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>[SIMULATION] Crisis Communications Playbook</h1>
+          <p class="subcopy">A Webex-ready communications workspace for response exercises: decide what is known, choose the next audience, draft the update, and move the team toward clean closeout.</p>
+        </div>
+      </div>
+      <nav class="toolbar" aria-label="Playbook controls">
+        <span class="pill"><span class="dot"></span>Training playbook</span>
+        <a class="button secondary" href="response-guide.html">Field guide</a>
+        <a class="button" href="index.html">Command center</a>
+      </nav>
+    </header>
+
+    <section class="notice" aria-label="Training data notice">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 3 21 20H3L12 3Z" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M12 9v5M12 17.2v.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <strong>Training scenario only</strong>
+        <span>Do not enter real incident, client, employee, credential, or confidential data. This page is static and credential-free.</span>
+      </div>
+      <button class="button secondary" type="button" id="reset-playbook">Reset playbook</button>
+    </section>
+
+    <main>
+      <section class="hero" aria-label="Playbook overview">
+        <div class="hero-panel">
+          <div>
+            <p class="eyebrow">First response communication model</p>
+            <h2>Say less, say it clearly, and say what happens next.</h2>
+            <p class="hero-copy">The goal is not to fill the room with updates. The goal is to make every update useful: what we know, what we are checking, who is affected, what the team is doing now, and when the next message is due.</p>
+          </div>
+          <div class="principles" aria-label="Communication principles">
+            <div class="principle">
+              <strong>Confirm before amplifying</strong>
+              <span>Separate observed facts from assumptions, rumors, and pending analysis.</span>
+            </div>
+            <div class="principle">
+              <strong>Name the audience</strong>
+              <span>Internal responders, leaders, customers, partners, and regulators need different levels of detail.</span>
+            </div>
+            <div class="principle">
+              <strong>Use a clock</strong>
+              <span>Every update should include a concrete next-update time or a reason one cannot be set.</span>
+            </div>
+            <div class="principle">
+              <strong>Close the loop</strong>
+              <span>Capture decisions, owners, and follow-ups so the after-action recap is not guesswork.</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="brief-panel" aria-label="Quick start">
+          <div class="panel-title">
+            <div>
+              <h2>Run the room</h2>
+              <p>Use these steps as the Webex space rhythm once the intake is submitted.</p>
+            </div>
+            <span class="mini-pill">Simulation</span>
+          </div>
+          <div class="status-board" id="status-board">
+            <article class="status-item active" data-stage="intake">
+              <span class="step-number">01</span>
+              <div>
+                <strong>Intake and stabilize</strong>
+                <span>Capture the report, severity, owner, known facts, open questions, and update cadence.</span>
+              </div>
+              <button class="button ghost" type="button" data-jump="intake">Open</button>
+            </article>
+            <article class="status-item" data-stage="triage">
+              <span class="step-number">02</span>
+              <div>
+                <strong>Triage and assign</strong>
+                <span>Identify workstreams, decision makers, and the first responder update.</span>
+              </div>
+              <button class="button ghost" type="button" data-jump="triage">Open</button>
+            </article>
+            <article class="status-item" data-stage="message">
+              <span class="step-number">03</span>
+              <div>
+                <strong>Draft and approve</strong>
+                <span>Draft a concise update with facts, action, audience, and next time marker.</span>
+              </div>
+              <button class="button ghost" type="button" data-jump="message">Open</button>
+            </article>
+            <article class="status-item" data-stage="closeout">
+              <span class="step-number">04</span>
+              <div>
+                <strong>Close and learn</strong>
+                <span>Produce the recap, open-action list, and clean handoff for follow-up work.</span>
+              </div>
+              <button class="button ghost" type="button" data-jump="closeout">Open</button>
+            </article>
+          </div>
+        </aside>
+      </section>
+
+      <div class="content-grid">
+        <section class="section" aria-labelledby="stages-title">
+          <div class="panel-title">
+            <div>
+              <h2 id="stages-title">Response stages</h2>
+              <p>Pick the active stage to see what the communications lead should ask for and produce.</p>
+            </div>
+            <span class="mini-pill" id="active-stage-label">Intake</span>
+          </div>
+          <div class="stage-tabs" role="tablist" aria-label="Response stage">
+            <button class="stage-tab" type="button" role="tab" aria-selected="true" data-stage="intake">
+              <strong>Intake</strong>
+              <span>Make the report usable.</span>
+            </button>
+            <button class="stage-tab" type="button" role="tab" aria-selected="false" data-stage="triage">
+              <strong>Triage</strong>
+              <span>Sort impact and owners.</span>
+            </button>
+            <button class="stage-tab" type="button" role="tab" aria-selected="false" data-stage="contain">
+              <strong>Contain</strong>
+              <span>Coordinate the response.</span>
+            </button>
+            <button class="stage-tab" type="button" role="tab" aria-selected="false" data-stage="message">
+              <strong>Message</strong>
+              <span>Draft and approve.</span>
+            </button>
+            <button class="stage-tab" type="button" role="tab" aria-selected="false" data-stage="closeout">
+              <strong>Closeout</strong>
+              <span>Recap and follow through.</span>
+            </button>
+          </div>
+
+          <div class="stage-detail" aria-live="polite">
+            <article class="detail-box">
+              <h3>Ask for</h3>
+              <ul id="ask-list"></ul>
+            </article>
+            <article class="detail-box">
+              <h3>Produce</h3>
+              <ul id="produce-list"></ul>
+            </article>
+          </div>
+
+          <div class="roles-grid" aria-label="Core response roles">
+            <article class="role-card">
+              <strong>Incident Lead</strong>
+              <p>Owns room rhythm, priority calls, and the final decision on what moves next.</p>
+            </article>
+            <article class="role-card">
+              <strong>Security Lead</strong>
+              <p>Maintains the fact pattern, scope assessment, containment status, and technical risk.</p>
+            </article>
+            <article class="role-card">
+              <strong>Comms Lead</strong>
+              <p>Turns facts into audience-specific updates and keeps wording consistent.</p>
+            </article>
+            <article class="role-card">
+              <strong>Business Owner</strong>
+              <p>Clarifies customer, service, partner, staffing, and operational impact.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="builder" aria-labelledby="message-builder-title">
+          <div class="panel-title">
+            <div>
+              <h2 id="message-builder-title">Update builder</h2>
+              <p>Draft a simulation-safe update for the room, leadership, or a stakeholder group.</p>
+            </div>
+            <span class="mini-pill" id="next-update-pill">Next update: 30 min</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label for="incident-id">Incident ID</label>
+              <input id="incident-id" value="SIM-IR-2026-001">
+            </div>
+            <div class="field">
+              <label for="audience">Audience</label>
+              <select id="audience">
+                <option>Incident response room</option>
+                <option>Executive stakeholders</option>
+                <option>Customer-facing teams</option>
+                <option>Legal and compliance review</option>
+                <option>Support and operations</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="severity">Severity</label>
+              <select id="severity">
+                <option>Tier 2 - Coordinated response</option>
+                <option>Tier 1 - Urgent response</option>
+                <option>Tier 3 - Monitored response</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cadence">Update cadence</label>
+              <select id="cadence">
+                <option value="30">30 minutes</option>
+                <option value="45">45 minutes</option>
+                <option value="60">60 minutes</option>
+                <option value="120">2 hours</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="facts">Known facts</label>
+              <textarea id="facts">Simulation report received. The response team is validating scope, affected audience, and any service impact before issuing a broader update.</textarea>
+            </div>
+            <div class="field full">
+              <label for="action">Current action</label>
+              <textarea id="action">Incident lead is assigning workstreams. Security lead is confirming the fact pattern. Comms lead is preparing the first room update for approval.</textarea>
+            </div>
+          </div>
+
+          <div class="button-row" style="margin-top: 12px;">
+            <button class="button" type="button" id="build-update">Build update</button>
+            <button class="button light" type="button" id="copy-update">Copy update</button>
+            <button class="button ghost" type="button" id="copy-recap">Copy recap shell</button>
+          </div>
+
+          <div class="output">
+            <div class="draft" id="update-draft" aria-live="polite"></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="content-grid">
+        <section class="output-panel" aria-labelledby="decisions-title">
+          <div class="panel-title">
+            <div>
+              <h2 id="decisions-title">Decision checkpoints</h2>
+              <p>Cross these out as the room resolves them. The list is intentionally short for live exercises.</p>
+            </div>
+            <span class="mini-pill" id="decision-count">0 of 6</span>
+          </div>
+          <div class="decision-list" id="decision-list">
+            <label class="decision">
+              <input type="checkbox">
+              <span><strong>Scope is stated clearly</strong><span>The team knows which systems, audiences, or workflows are in scope for this exercise.</span></span>
+            </label>
+            <label class="decision">
+              <input type="checkbox">
+              <span><strong>Response owner is named</strong><span>One person owns room rhythm, next update time, and final escalation calls.</span></span>
+            </label>
+            <label class="decision">
+              <input type="checkbox">
+              <span><strong>Audience path is chosen</strong><span>The team knows whether the next message is internal only or stakeholder-facing.</span></span>
+            </label>
+            <label class="decision">
+              <input type="checkbox">
+              <span><strong>Approval path is understood</strong><span>Draft, review, approval, and release ownership are not ambiguous.</span></span>
+            </label>
+            <label class="decision">
+              <input type="checkbox">
+              <span><strong>Next update time is real</strong><span>The next update is expressed as a clock time, not only a duration.</span></span>
+            </label>
+            <label class="decision">
+              <input type="checkbox">
+              <span><strong>Closeout owner is assigned</strong><span>Someone owns recap, open actions, and training follow-up.</span></span>
+            </label>
+          </div>
+        </section>
+
+        <section class="output-panel" aria-labelledby="timeline-title">
+          <div class="panel-title">
+            <div>
+              <h2 id="timeline-title">Suggested room timeline</h2>
+              <p>A practical rhythm for the first response window once the intake has been submitted.</p>
+            </div>
+            <span class="mini-pill">Working clock</span>
+          </div>
+          <div class="timeline" id="timeline">
+            <article class="timeline-row">
+              <time>0 min</time>
+              <div>
+                <strong>Open the room</strong>
+                <p>Confirm simulation label, owner, intake summary, and the next-update cadence.</p>
+              </div>
+            </article>
+            <article class="timeline-row">
+              <time>10 min</time>
+              <div>
+                <strong>Sort the facts</strong>
+                <p>Separate known facts, suspected impact, unknowns, and decisions needed from leadership.</p>
+              </div>
+            </article>
+            <article class="timeline-row">
+              <time>20 min</time>
+              <div>
+                <strong>Draft the first update</strong>
+                <p>Use the update builder and route the message through the approval path.</p>
+              </div>
+            </article>
+            <article class="timeline-row">
+              <time id="timeline-next">30 min</time>
+              <div>
+                <strong>Send or hold with reason</strong>
+                <p>Post the approved update, or explain why it is being held and reset the clock.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const stages = {
+      intake: {
+        label: "Intake",
+        ask: [
+          "What happened, who reported it, and when was it first observed?",
+          "Which systems, audiences, or services might be affected?",
+          "Who is the response owner and who must approve external wording?"
+        ],
+        produce: [
+          "Simulation-labeled intake summary.",
+          "Known facts and open questions.",
+          "Next-update clock time based on the selected cadence."
+        ]
+      },
+      triage: {
+        label: "Triage",
+        ask: [
+          "What changed since intake?",
+          "What is confirmed versus still being investigated?",
+          "Which workstreams need owners now?"
+        ],
+        produce: [
+          "Severity recommendation.",
+          "Workstream owner list.",
+          "First internal update draft."
+        ]
+      },
+      contain: {
+        label: "Contain",
+        ask: [
+          "What action is underway to limit impact?",
+          "What should responders avoid saying until confirmed?",
+          "What customer, partner, or employee impact is possible?"
+        ],
+        produce: [
+          "Containment status in plain language.",
+          "Decision log update.",
+          "Audience-specific holding statement."
+        ]
+      },
+      message: {
+        label: "Message",
+        ask: [
+          "Who is the audience for this update?",
+          "What is the minimum useful detail they need?",
+          "Who has approved the exact language?"
+        ],
+        produce: [
+          "Approved update with simulation label.",
+          "Release owner and channel.",
+          "Next-update time."
+        ]
+      },
+      closeout: {
+        label: "Closeout",
+        ask: [
+          "What decisions were made and why?",
+          "Which tasks remain open?",
+          "What should the training recap teach the next team?"
+        ],
+        produce: [
+          "Incident recap shell.",
+          "Open actions and owners.",
+          "Lessons learned and follow-up tracker."
+        ]
+      }
+    };
+
+    const els = {
+      askList: document.getElementById("ask-list"),
+      produceList: document.getElementById("produce-list"),
+      activeStageLabel: document.getElementById("active-stage-label"),
+      stageTabs: [...document.querySelectorAll(".stage-tab")],
+      statusItems: [...document.querySelectorAll(".status-item")],
+      incidentId: document.getElementById("incident-id"),
+      audience: document.getElementById("audience"),
+      severity: document.getElementById("severity"),
+      cadence: document.getElementById("cadence"),
+      facts: document.getElementById("facts"),
+      action: document.getElementById("action"),
+      updateDraft: document.getElementById("update-draft"),
+      nextUpdatePill: document.getElementById("next-update-pill"),
+      timelineNext: document.getElementById("timeline-next"),
+      decisionCount: document.getElementById("decision-count"),
+      toast: document.getElementById("toast")
+    };
+
+    function setStage(stageKey) {
+      const stage = stages[stageKey] || stages.intake;
+      els.activeStageLabel.textContent = stage.label;
+      els.askList.innerHTML = stage.ask.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+      els.produceList.innerHTML = stage.produce.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+      els.stageTabs.forEach((tab) => tab.setAttribute("aria-selected", String(tab.dataset.stage === stageKey)));
+      els.statusItems.forEach((item) => item.classList.toggle("active", item.dataset.stage === stageKey));
+    }
+
+    function nextUpdateTime() {
+      const minutes = Number(els.cadence.value || 30);
+      const next = new Date(Date.now() + minutes * 60 * 1000);
+      return next.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    }
+
+    function buildUpdate() {
+      const minutes = Number(els.cadence.value || 30);
+      const nextTime = nextUpdateTime();
+      els.nextUpdatePill.textContent = `Next update: ${nextTime}`;
+      els.timelineNext.textContent = `${minutes} min`;
+      const text = [
+        `[SIMULATION] ${els.incidentId.value || "SIM-IR"} update`,
+        ``,
+        `Audience: ${els.audience.value}`,
+        `Severity: ${els.severity.value}`,
+        `Next update due: ${nextTime} (${minutes} minute cadence)`,
+        ``,
+        `Known facts: ${cleanLine(els.facts.value)}`,
+        ``,
+        `Current action: ${cleanLine(els.action.value)}`,
+        ``,
+        `Open posture: We will not speculate beyond confirmed facts. Any stakeholder-facing language should be reviewed before release.`
+      ].join("\n");
+      els.updateDraft.textContent = text;
+      return text;
+    }
+
+    function buildRecapShell() {
+      return [
+        `[SIMULATION] Incident recap shell`,
+        ``,
+        `Incident ID: ${els.incidentId.value || "SIM-IR"}`,
+        `Audience reviewed: ${els.audience.value}`,
+        `Severity used for exercise: ${els.severity.value}`,
+        ``,
+        `What happened:`,
+        `- `,
+        ``,
+        `What we confirmed:`,
+        `- `,
+        ``,
+        `Decisions made:`,
+        `- `,
+        ``,
+        `Open actions:`,
+        `- Owner / due time / status`,
+        ``,
+        `Lessons learned:`,
+        `- `
+      ].join("\n");
+    }
+
+    async function copyText(text, label) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(`${label} copied.`);
+      } catch {
+        showToast("Copy was blocked by the browser. Select the text and copy manually.");
+      }
+    }
+
+    function updateDecisionCount() {
+      const decisions = [...document.querySelectorAll(".decision")];
+      const complete = decisions.filter((item) => item.querySelector("input").checked);
+      decisions.forEach((item) => item.classList.toggle("complete", item.querySelector("input").checked));
+      els.decisionCount.textContent = `${complete.length} of ${decisions.length}`;
+    }
+
+    function resetPlaybook() {
+      els.incidentId.value = "SIM-IR-2026-001";
+      els.audience.value = "Incident response room";
+      els.severity.value = "Tier 2 - Coordinated response";
+      els.cadence.value = "30";
+      els.facts.value = "Simulation report received. The response team is validating scope, affected audience, and any service impact before issuing a broader update.";
+      els.action.value = "Incident lead is assigning workstreams. Security lead is confirming the fact pattern. Comms lead is preparing the first room update for approval.";
+      document.querySelectorAll(".decision input").forEach((input) => { input.checked = false; });
+      setStage("intake");
+      updateDecisionCount();
+      buildUpdate();
+      showToast("Playbook reset to simulation defaults.");
+    }
+
+    function cleanLine(value) {
+      return String(value || "").replace(/\s+/g, " ").trim() || "Pending confirmation.";
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    let toastTimer;
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2600);
+    }
+
+    els.stageTabs.forEach((tab) => tab.addEventListener("click", () => setStage(tab.dataset.stage)));
+    document.querySelectorAll("[data-jump]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setStage(button.dataset.jump);
+        document.getElementById("stages-title").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+    document.getElementById("build-update").addEventListener("click", () => {
+      buildUpdate();
+      showToast("Simulation update rebuilt.");
+    });
+    document.getElementById("copy-update").addEventListener("click", () => copyText(buildUpdate(), "Simulation update"));
+    document.getElementById("copy-recap").addEventListener("click", () => copyText(buildRecapShell(), "Recap shell"));
+    document.getElementById("reset-playbook").addEventListener("click", resetPlaybook);
+    document.querySelectorAll(".decision input").forEach((input) => input.addEventListener("change", updateDecisionCount));
+    [els.incidentId, els.audience, els.severity, els.cadence, els.facts, els.action].forEach((field) => {
+      field.addEventListener("input", buildUpdate);
+      field.addEventListener("change", buildUpdate);
+    });
+
+    setStage("intake");
+    updateDecisionCount();
+    buildUpdate();
+  </script>
+</body>
+</html>

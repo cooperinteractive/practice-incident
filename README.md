@@ -1,6 +1,6 @@
 # practice-incident
 
-Static Webex incident space builder and response field guide for the Practice Incident simulation.
+Static Webex incident space builder, response field guide, and crisis communications playbook for the Practice Incident simulation.
 
 The page is designed to live as a Webex website/content tab while staying safe as a public static site. It does not contain platform credentials, API keys, webhook secrets, private emails, real incident facts, or automatic writes to external systems.
 
@@ -18,6 +18,8 @@ The current experience generates a Webex-native operating model from one editabl
 
 The companion field guide at `response-guide.html` is an original interactive rewrite of a supplied incident-response cheat-sheet concept. It keeps the value but drops the poster clutter: five phases, decision prompts, role cards, presenter mode, copyable outputs, markdown download, and print/save PDF. It does not include source-sheet branding, contact details, phone numbers, addresses, slogans, or copied layout.
 
+The companion playbook at `playbook.html` turns the longer crisis communications material into a Webex-friendly working surface: response stages, role clarity, decision checkpoints, an update builder, a live next-update clock, and a recap shell. It is written as simulation/training material and does not include source branding, copied layout, private contacts, or credentials.
+
 Button behavior is intentionally local until an organization-approved Webex bot, Webex MCP workflow, or internal Webex API service is selected. The buttons update the visual room preview, timeline, activity log, and active artifact so the client can understand exactly what the eventual automation will create.
 
 Recommended live architecture:
@@ -33,4 +35,5 @@ Current live page:
 ```text
 https://cooperinteractive.github.io/practice-incident/
 https://cooperinteractive.github.io/practice-incident/response-guide.html
+https://cooperinteractive.github.io/practice-incident/playbook.html
 ```
